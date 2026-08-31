@@ -4,18 +4,20 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c37ksquuxeqyi"
-path="res://.godot/imported/spawn_1.fbx-a6820c6303e4ba901c479d0e4279bc6d.scn"
+path="res://.godot/imported/spawn_1.fbx-8a6ae13ca0254bc49dda3b0bd537ca20.scn"
 
 [deps]
 
-source_file="res://assets/modelos3D/mapas_mas_coliciones/spawn_1.fbx"
-dest_files=["res://.godot/imported/spawn_1.fbx-a6820c6303e4ba901c479d0e4279bc6d.scn"]
+source_file="res://assets/models/mapas_mas_coliciones/spawn_1.fbx"
+dest_files=["res://.godot/imported/spawn_1.fbx-8a6ae13ca0254bc49dda3b0bd537ca20.scn"]
 
 [params]
 
 nodes/root_type=""
 nodes/root_name=""
 nodes/root_script=null
+mesh_library/use_node_names_as_mesh_names=false
+array_mesh/deduplicate_surfaces=true
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
 nodes/import_as_skeleton_bones=false

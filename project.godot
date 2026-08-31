@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="AndrooDev Friendslop Co-Op Tutorial Part 3"
+config/name="pollojuego2"
 config/description="FINAL part 3 project, with a few enhancements"
 run/main_scene="uid://drhjatayvlkyv"
 config/features=PackedStringArray("4.7", "GL Compatibility")
