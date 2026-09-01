@@ -4,3 +4,7 @@
 /dist/
 .DS_Store
 **/.DS_Store
+assets/models/crystal/scene.gltf.import
+.import/
+*.import
+/assets/models/castle_town
