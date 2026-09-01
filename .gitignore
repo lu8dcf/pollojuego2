@@ -5,3 +5,5 @@
 .DS_Store
 **/.DS_Store
 webrtc/lib/~libwebrtc_native.windows.template_debug.x86_64.dll~RF9cb407.TMP
+.import/
+*.import
