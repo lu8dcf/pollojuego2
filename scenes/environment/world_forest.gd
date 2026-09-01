@@ -20,3 +20,4 @@ func spawn_target():
 			var rand_z = randf_range(-25.0, 25.0)
 			new_target.position = Vector3(rand_x, 1.0, rand_z)
 			spawn_container.add_child(new_target, true)
+			
