@@ -1,6 +1,6 @@
 extends Node
 
-const PLAYER = preload("uid://dbcqeo103wau6")
+const PLAYER = preload("uid://bc1ek0bvbgna2")
 const TUBE_CONTEXT = preload("uid://chqw3jdoon6c1")
 
 var enet_peer := ENetMultiplayerPeer.new()
