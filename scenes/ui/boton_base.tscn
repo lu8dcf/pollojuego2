@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://go1lsk1664t3"]
+
+[ext_resource type="FontFile" uid="uid://b6kads1hhoxfx" path="res://assets/fuentes/Anton.ttf" id="1_3tbrf"]
+[ext_resource type="Script" uid="uid://gefbjbgvikf5" path="res://scenes/ui/boton_animador.gd" id="2_ihrwn"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3tbrf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m1kxf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_x2yvf"]
+
+[node name="Button" type="Button" unique_id=320612053]
+offset_left = 13.0
+offset_top = 54.0
+offset_right = 293.0
+offset_bottom = 109.0
+theme_override_fonts/font = ExtResource("1_3tbrf")
+theme_override_font_sizes/font_size = 31
+theme_override_styles/normal = SubResource("StyleBoxEmpty_3tbrf")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_m1kxf")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_x2yvf")
+text = "UN JUGADOR"
+script = ExtResource("2_ihrwn")

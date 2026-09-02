@@ -15,6 +15,9 @@ extends CanvasLayer
 const WORLD_FOREST = preload("uid://yubh30707eb7")
 const PLAYER = preload("uid://dbcqeo103wau6")
 
+@onready var world_forest: Node3D = %WorldForest
+@onready var menu_camera: MenuCameraController = %WorldForest.get_node("Camera3D")
+
 @onready var temp_world_forest: Node3D = %WorldForest
 
 
@@ -35,14 +38,30 @@ func _ready() -> void:
 	button_create_tube.pressed.connect(on_create_tube)
 	
 	Network.tube_client.error_raised.connect(on_error_raised)
-
+	_activate_menu_camera()
+	
 	if OS.has_feature('server'):
 		temp_world_forest.queue_free()
 		Network.start_server()
 		await get_tree().create_timer(0.1).timeout
 		add_world()
 
+func _activate_menu_camera() -> void:
+	"""Configurar la cámara para el modo menú"""
+	if world_forest and world_forest.has_method("enable_menu_mode"):
+		world_forest.enable_menu_mode()
+	
+	# Ajustes adicionales de la cámara para el menú
+	if menu_camera:
+		menu_camera.activate_menu_camera()
+
+func _deactivate_menu_camera() -> void:
+	"""Restaurar la cámara cuando se sale del menú"""
+	if world_forest and world_forest.has_method("disable_menu_mode"):
+		world_forest.disable_menu_mode()
+
 func on_join():
+	_deactivate_menu_camera()
 	temp_world_forest.queue_free()
 	Network.join_server()
 	add_world()
@@ -54,11 +73,13 @@ func add_world():
 	hide()
 
 func on_join_tube():
+	_deactivate_menu_camera()
 	temp_world_forest.queue_free()
 	Network.tube_join(line_edit_session.text)
 	multiplayer.connected_to_server.connect(add_world)
 
 func on_create_tube():
+	_deactivate_menu_camera()
 	temp_world_forest.queue_free()
 	Network.tube_create()
 	add_world()
@@ -77,3 +98,9 @@ func on_error_raised(_code, _message):
 	button_join_tube.add_theme_color_override('font_disabled_color', Color.DARK_RED)
 	button_join_tube.disabled = true
 	Network.clean_up_signals()
+	
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion and menu_camera:
+		# Efecto parallax: la cámara reacciona sutilmente al mouse
+		var mouse_offset = (event.position - get_viewport().size * 0.5) * 0.001
+		menu_camera.sway_offset += mouse_offset.x * 0.01

@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://b6hkal1627qjh"]
+
+[ext_resource type="Script" uid="uid://dpyo1ynmfu4xm" path="res://scenes/ui/texture_button.gd" id="1_nqnrk"]
+[ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="2_tsug6"]
+
+[node name="TextureButton" type="TextureButton" unique_id=1088779155]
+offset_right = 212.0
+offset_bottom = 40.0
+script = ExtResource("1_nqnrk")
+
+[node name="Label" type="Label" parent="." unique_id=1242559617]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 1.0
+offset_bottom = 21.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "UN JUGADOR"
+label_settings = ExtResource("2_tsug6")
+horizontal_alignment = 1
+vertical_alignment = 1

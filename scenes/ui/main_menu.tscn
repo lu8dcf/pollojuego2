@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://cyavwb4iw6rub" path="res://scenes/ui/main_menu.gd" id="1_sl1te"]
 [ext_resource type="Texture2D" uid="uid://b4o7vx0n8db1s" path="res://addons/tube/icons/tube_client.svg" id="2_fe2o3"]
 [ext_resource type="PackedScene" uid="uid://yubh30707eb7" path="res://scenes/environment/world_forest.tscn" id="3_1g8jr"]
+[ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_m1kxf"]
+[ext_resource type="Script" uid="uid://bmit8wdp3lyfr" path="res://scenes/ui/menu_principal.gd" id="3_x2yvf"]
 
 [node name="MainMenu" type="CanvasLayer" unique_id=1482325763]
 script = ExtResource("1_sl1te")
@@ -22,10 +24,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+offset_left = 116.5
+offset_top = -198.0
+offset_right = 377.5
+offset_bottom = 198.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -113,5 +115,73 @@ theme_override_constants/icon_max_width = 24
 text = "Create Session"
 icon = ExtResource("2_fe2o3")
 
+[node name="fondo" type="ColorRect" parent="Control" unique_id=1136097898]
+layout_mode = 0
+offset_left = -158.12402
+offset_top = 61.194344
+offset_right = 192.05176
+offset_bottom = 992.042
+rotation = -0.5693984
+color = Color(0.03529412, 0.03529412, 0.03529412, 0.8352941)
+
+[node name="menu_principal" type="Control" parent="Control" unique_id=1694592496]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -520.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_x2yvf")
+
+[node name="un_jugador" parent="Control/menu_principal" unique_id=1088779155 instance=ExtResource("3_m1kxf")]
+layout_mode = 0
+offset_left = -32.0
+offset_top = 72.43049
+offset_right = 258.46136
+offset_bottom = 164.4305
+rotation = -0.0014820776
+tamanio = 40
+color = "#ffff32"
+texto = "UN JUGADOR"
+
+[node name="multijugador" parent="Control/menu_principal" unique_id=1422080423 instance=ExtResource("3_m1kxf")]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 182.43048
+offset_right = 313.46136
+offset_bottom = 274.43048
+rotation = -0.0014820776
+texto = "MULTIJUGADOR"
+
+[node name="opciones" parent="Control/menu_principal" unique_id=38685769 instance=ExtResource("3_m1kxf")]
+layout_mode = 0
+offset_left = 93.0
+offset_top = 294.43048
+offset_right = 383.46136
+offset_bottom = 386.43048
+rotation = -0.0014820776
+texto = "OPCIONES"
+
+[node name="creditos" parent="Control/menu_principal" unique_id=274386862 instance=ExtResource("3_m1kxf")]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 400.43048
+offset_right = 450.46136
+offset_bottom = 492.43048
+rotation = -0.0014820776
+texto = "CRÉDITOS"
+
+[node name="salir" parent="Control/menu_principal" unique_id=533371450 instance=ExtResource("3_m1kxf")]
+layout_mode = 0
+offset_left = 240.0
+offset_top = 512.4305
+offset_right = 530.46136
+offset_bottom = 604.4305
+rotation = -0.0014820776
+texto = "SALIR"
+
 [node name="WorldForest" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
 unique_name_in_owner = true
+
+[connection signal="pressed" from="Control/menu_principal/salir" to="Control/menu_principal" method="_on_salir_pressed"]
