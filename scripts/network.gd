@@ -1,6 +1,6 @@
 extends Node
 
-const PLAYER = preload("uid://dbcqeo103wau6")
+const PLAYER = preload("uid://bc1ek0bvbgna2")
 const TUBE_CONTEXT = preload("uid://chqw3jdoon6c1")
 
 var enet_peer := ENetMultiplayerPeer.new()
@@ -50,8 +50,8 @@ func add_player(peer_id: int):
 	var new_player = PLAYER.instantiate()
 	new_player.name = str(peer_id)
 
-	var rand_x = randf_range(-5.0, 5.0)
-	var rand_z = randf_range(-5.0, 5.0)
+	var rand_x = randf_range(15.0, 20.0)
+	var rand_z = randf_range(15.0, 20.0)
 
 	new_player.position = Vector3(rand_x, 1.0, rand_z)
 	get_tree().current_scene.add_child(new_player, true)

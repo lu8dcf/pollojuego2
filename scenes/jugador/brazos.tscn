@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://cji8bli4euruv"]
+
+[node name="brazos" type="Node3D" unique_id=50839711]
+
+[node name="izquierdo" type="Node3D" parent="." unique_id=1700125377]
+
+[node name="mark_izq" type="Marker3D" parent="izquierdo" unique_id=1157031558]
+
+[node name="derecho" type="Node3D" parent="." unique_id=1881658879]
+
+[node name="mark_der" type="Marker3D" parent="derecho" unique_id=478729798]

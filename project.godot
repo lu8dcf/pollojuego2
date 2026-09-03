@@ -13,7 +13,7 @@ config_version=5
 config/name="pollojuego2"
 config/description="FINAL part 3 project, with a few enhancements"
 run/main_scene="uid://drhjatayvlkyv"
-config/features=PackedStringArray("4.6", "GL Compatibility")
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="uid://cateu5bxe5nab"
 
 [autoload]
@@ -21,6 +21,9 @@ config/icon="uid://cateu5bxe5nab"
 Network="*uid://bhyh5d2so8tve"
 TileRunInstancesGlobal="*uid://b6fg6pu2bfi14"
 Global="*uid://d1r3eqtrbojy0"
+Sonidos="*uid://vh6qthglqxy4"
+GlobalJuego="*uid://gyfy8r8vlaty"
+GlobalSignal="*uid://by2t47y7bj0tv"
 
 [display]
 
@@ -34,6 +37,7 @@ enabled=PackedStringArray("res://addons/tile-run-instances/plugin.cfg", "res://a
 
 folder_colors={
 "res://assets/": "green",
+"res://autoload/": "purple",
 "res://scenes/": "red",
 "res://scripts/": "yellow"
 }
