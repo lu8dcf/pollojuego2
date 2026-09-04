@@ -12,7 +12,7 @@ extends CanvasLayer
 @onready var enet_menu: VBoxContainer = %EnetMenu
 @onready var tube_menu: VBoxContainer = %TubeMenu
 
-const WORLD_FOREST = preload("uid://yubh30707eb7")
+const WORLD_FOREST = preload("uid://yubh30707eb7") 
 const PLAYER = preload("uid://dbcqeo103wau6")
 
 @onready var world_forest: Node3D = %WorldForest
@@ -62,7 +62,7 @@ func _deactivate_menu_camera() -> void:
 
 func on_join():
 	_deactivate_menu_camera()
-	temp_world_forest.queue_free()
+	temp_world_forest.queue_free()  # colocar animacion  de fondo
 	Network.join_server()
 	add_world()
 
@@ -70,14 +70,12 @@ func add_world():
 	#temp_world_forest.queue_free()
 	var new_world = WORLD_FOREST.instantiate()
 	get_tree().current_scene.add_child(new_world)
-	print ("mundo")
 	hide()
 
 func on_join_tube():
 	_deactivate_menu_camera()
 	temp_world_forest.queue_free()
 	Network.tube_join(line_edit_session.text)
-	
 	multiplayer.connected_to_server.connect(add_world)
 
 func on_create_tube():

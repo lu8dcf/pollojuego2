@@ -10,7 +10,7 @@ var is_dying := false
 
 func _ready():
 	#animation_player.playback_default_blend_time = 0.2
-	add_to_group('Targets')
+	add_to_group('enemy')
 	look_at(goal_position)
 
 	if multiplayer.is_server():
