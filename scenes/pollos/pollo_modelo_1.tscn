@@ -3,3 +3,26 @@
 [ext_resource type="PackedScene" uid="uid://bskyk4ur6lr8m" path="res://assets/modelos/pollos/pollo_1.fbx" id="1_mnqw3"]
 
 [node name="pollo_1" unique_id=1188442573 instance=ExtResource("1_mnqw3")]
+
+[node name="Skeleton3D" parent="esqueleto de pollo1" parent_id_path=PackedInt32Array(623059143) index="0" unique_id=1365462139]
+bones/0/rotation = Quaternion(0.4999999, 0.5000001, 0.49999994, 0.50000006)
+bones/1/rotation = Quaternion(0.9569554, 0.29023513, 9.694393e-09, -1.4208783e-07)
+bones/3/position = Vector3(0.0020072577, 0.0031390216, -0.0037156206)
+bones/3/rotation = Quaternion(-0.08278424, -0.09989376, 0.5338972, 0.83553684)
+bones/3/scale = Vector3(1, 1.0000001, 1)
+bones/5/position = Vector3(-0.0034813357, 0.0012601728, -1.1758163e-05)
+bones/5/rotation = Quaternion(-1.01273145e-07, 2.5296455e-07, 0.24253827, 0.9701418)
+bones/5/scale = Vector3(0.99999994, 0.9999999, 1)
+bones/7/position = Vector3(1.6148638e-10, -1.8224516e-09, 0.0015378322)
+bones/7/rotation = Quaternion(-4.95349e-08, 2.4340867e-09, 0.9144801, 0.40463084)
+bones/7/scale = Vector3(1, 1, 1)
+bones/9/position = Vector3(0.0020072572, 0.0031390206, 0.0037156206)
+bones/9/rotation = Quaternion(-0.53389716, 0.8355369, 0.08278429, -0.099893704)
+bones/9/scale = Vector3(1.0000001, 1.0000002, 1.0000002)
+bones/11/position = Vector3(0.0037861709, 0.003292321, -0.0016696774)
+bones/11/rotation = Quaternion(4.5474747e-15, 0, 1.0587912e-22, 1)
+bones/13/position = Vector3(0.0019595884, 0.0071406574, 3.182661e-10)
+bones/13/rotation = Quaternion(-0.012807288, -0.01280715, 0.70699084, 0.7069907)
+bones/13/scale = Vector3(1, 1, 1)
+bones/15/position = Vector3(0.0037861709, 0.0032923205, 0.0016696778)
+bones/15/rotation = Quaternion(5.421012e-22, 1, 4.5474743e-15, 7.549791e-08)
