@@ -70,12 +70,14 @@ func add_world():
 	#temp_world_forest.queue_free()
 	var new_world = WORLD_FOREST.instantiate()
 	get_tree().current_scene.add_child(new_world)
+	print ("mundo")
 	hide()
 
 func on_join_tube():
 	_deactivate_menu_camera()
 	temp_world_forest.queue_free()
 	Network.tube_join(line_edit_session.text)
+	
 	multiplayer.connected_to_server.connect(add_world)
 
 func on_create_tube():
