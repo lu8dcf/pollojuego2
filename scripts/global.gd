@@ -1,7 +1,7 @@
 extends Node
 
 var username := ''
-
+var un_jugador :=true
 var forest: Node3D
 var spawn_container: Node3D
 

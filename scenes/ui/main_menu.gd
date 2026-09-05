@@ -84,6 +84,7 @@ func on_unirse_tube():
 
 func on_crear_partida_tube():
 	_deactivate_menu_camera()
+	Global.un_jugador = false
 	temp_mundo.queue_free()
 	Network.tube_create()
 	add_world()
@@ -143,5 +144,26 @@ func _on_creditos_pressed() -> void:
 
 func _on_empezar_solo_pressed() -> void:
 	_deactivate_menu_camera()
-	temp_mundo.queue_free()
-	add_world()
+	if temp_mundo:
+		temp_mundo.queue_free()
+		await  get_tree().process_frame
+	var nuevo_mundo = MUNDO.instantiate()
+	get_tree().current_scene.add_child(nuevo_mundo)
+	await  get_tree().process_frame
+	
+	if nuevo_mundo.has_method("partida_unsolojugador"):
+		nuevo_mundo.partida_unsolojugador() # preparar mundo y partida para un solo jugador
+	_crear_jugador_local(nuevo_mundo)
+	hide() # ocultar menu
+
+func _crear_jugador_local(mundo_instancia:Node3D):
+
+	# crear jugador
+	var jugador = PLAYER.instantiate()
+	jugador.name="1" # el host debe tener numero 1 para jugar pero es solo un id, el user name se agrega con el edit
+	var spawn_container = mundo_instancia.get_node_or_null("SpawnContainer")
+	jugador.global_position = Vector3(22, 2, 22)
+	Global.un_jugador = true
+	# agregar el jguador  al mundo
+	mundo_instancia.add_child(jugador)
+	

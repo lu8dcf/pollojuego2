@@ -52,4 +52,4 @@ unique_name_in_owner = true
 wait_time = 5.0
 
 [node name="Sketchfab_Scene" parent="." unique_id=1802840441 instance=ExtResource("4_1o1l2")]
-transform = Transform3D(1, 0, 0, 0, 0.8622221, 0.50653046, 0, -0.50653046, 0.8622221, 19.1661, -0.7236707, 22.402742)
+transform = Transform3D(1, 0, 0, 0, 0.8622221, 0.50653046, 0, -0.50653046, 0.8622221, 19.1661, -0.7236707, 20.906834)

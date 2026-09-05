@@ -46,6 +46,7 @@ func disable_menu_mode() -> void:
 
 func spawn_target():
 	# No spawnear targets si estamos en modo menú
+	print("modo menu:", is_menu_mode)
 	if is_menu_mode:
 		return
 		
@@ -56,3 +57,13 @@ func spawn_target():
 			var rand_z = randf_range(-25.0, 25.0)
 			new_target.position = Vector3(rand_x, 1.0, rand_z)
 			spawn_container.add_child(new_target, true)
+
+func partida_unsolojugador():
+	is_menu_mode = false
+	
+	# Desactivar cámara del menú
+	if menu_camera:
+		menu_camera.deactivate_menu_camera()
+	
+	set_process(true)
+	
