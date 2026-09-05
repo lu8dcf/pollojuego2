@@ -18,7 +18,7 @@ extends CanvasLayer
 @onready var tube_menu: VBoxContainer = %TubeMenu
 
 const MUNDO = preload("uid://yubh30707eb7")
-const PLAYER = preload("uid://dbcqeo103wau6")
+const PLAYER = preload("uid://bc1ek0bvbgna2")
 
 @onready var mundo: Node3D = %Mundo
 @onready var menu_camera: MenuCameraController = %Mundo.get_node("Camera3D")

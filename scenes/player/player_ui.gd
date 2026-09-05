@@ -26,7 +26,7 @@ var COLORS: Array[Color] = [
 func _ready() -> void:
 	menu.hide()
 	hit_marker.hide()
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	button_leave.pressed.connect(func(): Network.leave_server())
 	button_copy_session.pressed.connect(func(): DisplayServer.clipboard_set(Network.tube_client.session_id))
 	DisplayServer.clipboard_set(Network.tube_client.session_id)
