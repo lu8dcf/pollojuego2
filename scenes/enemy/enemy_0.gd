@@ -16,6 +16,9 @@ func _ready():
 	if multiplayer.is_server():
 		crystal_timer.wait_time = 2.5
 		crystal_timer.timeout.connect(func(): Global.damage_crystal(10))
+	
+	
+	
 
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
@@ -49,7 +52,7 @@ func death(source):
 	queue_free()
 
 
-var SPEED := 2.0
+var SPEED := 0.5
 var direction := Vector3.ZERO
 var goal_position := Vector3.ZERO
 
@@ -61,9 +64,14 @@ func _physics_process(delta: float) -> void:
 		return
 
 	# Add the gravity.
+	
 	if not is_on_floor():
-		velocity += get_gravity() * delta
-
+		velocity += get_gravity() * delta 
+		print (position)
+		if position.y < 0.5:
+			print ("cayo")
+			queue_free()
+	
 	if position.distance_to(goal_position) > 3.0: 
 		direction = position.direction_to(goal_position)
 		#animation_player.play("Walk_Formal")
@@ -81,3 +89,6 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0, SPEED)
 
 	move_and_slide()
+
+
+	

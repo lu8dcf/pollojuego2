@@ -5,9 +5,10 @@ extends Node3D
 @onready var timer_target: Timer = %TimerTarget
 @onready var menu_camera: MenuCameraController = $Camera3D
 
-const TARGET = preload("uid://w08mo482g7si")
+const TARGET = preload("uid://b8go34qeye00a") # Escena enemy0
 
 var is_menu_mode: bool = false
+var ya_hizo=false
 
 func _ready() -> void:
 	Global.forest = self
@@ -45,14 +46,18 @@ func disable_menu_mode() -> void:
 		pass  # El timer ya está corriendo
 
 func spawn_target():
+	if ya_hizo:
+		pass
 	# No spawnear targets si estamos en modo menú
 	if is_menu_mode:
 		return
-		
+	
 	if is_multiplayer_authority() and get_tree().get_node_count_in_group('Targets') < 20:
-		for player in get_tree().get_node_count_in_group("Players"):
+		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = TARGET.instantiate()
-			var rand_x = randf_range(-25.0, 25.0)
-			var rand_z = randf_range(-25.0, 25.0)
-			new_target.position = Vector3(rand_x, 1.0, rand_z)
+			var rand_x = randf_range(-20, 20)
+			var rand_z = randf_range(-20, 20)
+			print (rand_x," ",rand_z)
+			new_target.position = Vector3(rand_x, 2.0, rand_z)
 			spawn_container.add_child(new_target, true)
+	ya_hizo=true
