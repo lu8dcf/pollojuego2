@@ -24,6 +24,23 @@ var nodoJugador = $jugador
 #obtengo mouse para seguirlo
 var mousePosicion : Vector2
 
+#maquina de estados
+enum estados {
+	OLEADA, #estado generico, dutante la oleada
+	CAIDO, #incapacitado, solo peude disparar pero no moverse
+	MUERTE, #paso el tiempo de caido y muere
+	TIENDA #no puede moverse ni atacar.
+}
+@export var estadoActual : estados
+
+#salud jugador
+var salud = 100
+#habilidad especial
+#@onready var habilidad: Habilidad = $habilidad
+
+
+
+
 #@onready var animation_library_godot_standard: Node3D = %AnimationLibrary_Godot_Standard
 #@export var animation_player: AnimationPlayer 
 #@export var player_mesh: MeshInstance3D
@@ -48,7 +65,7 @@ func _ready():
 	#replicate_color_changed(player_ui.COLORS[0])
 	player_ui.hide()
 
-	if not is_multiplayer_authority(): #?
+	if not is_multiplayer_authority(): #
 		set_process(false)
 		set_physics_process(false)
 		return
@@ -79,19 +96,27 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed('menu'):
+		estadoActual = estados.TIENDA
 		open_menu(player_ui.menu.visible)
+		
+	if Input.is_action_just_pressed("test_caido"):
+		estadoActual = estados.CAIDO
+		pedir_ser_salvado()
+		await get_tree().create_timer(4).timeout
+		pedir_salvar(2)
 		
 	if immobile:
 		return
 
-	if Input.is_action_just_pressed('shoot'):
+	if puede_disparar():
 		shoot()	
 
 	if Input.is_action_just_pressed("attack1"): # Mouse Izq
 		attack(1) 
 		
-	if Input.is_action_just_pressed("attack2"):# Mouse Der
-		attack(2)
+	#if Input.is_key_pressed(KEY_SHIFT):# ESTO DEBE SER ACCION PARA EL JOYSTICK VIRTUAL
+		#if habilidad:
+			#habilidad.usar()
 	
 
 func open_menu(current_visibility: bool):
@@ -104,8 +129,37 @@ func open_menu(current_visibility: bool):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	#else:
 		#Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		
+func puede_moverse() -> bool:
+	return estadoActual == estados.OLEADA
+
+func puede_atacar() -> bool:
+	return estadoActual == estados.OLEADA
+
+func puede_disparar() -> bool:
+	return estadoActual in [estados.OLEADA, estados.CAIDO]
+	
+func cambiar_estado(nuevo_estado: estados) -> void:
+	if estadoActual == nuevo_estado:
+		return
+	estadoActual = nuevo_estado
+	
 
 func _physics_process(delta: float) -> void:
+	if estadoActual == estados.MUERTE:
+		return
+
+	if estadoActual == estados.CAIDO:
+		# No movimiento
+		velocity = Vector3.ZERO
+		return
+
+	if estadoActual == estados.TIENDA:
+		# Tampoco movimiento
+		velocity = Vector3.ZERO
+		return
+
+	# Si llegamos acá estamos en OLEADA
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
@@ -252,3 +306,20 @@ func attack(version: int):
 	#await weapon_animation_player.animation_finished
 	#weapon_animation_player.play("arm_model_animations/idle")
 	
+#cuando un jugador esta cerca, si se aprieta la E, manda la peticion de salvarlo
+func _on_deteccion_ayuda_area_entered(area: Area3D) -> void: 
+	if area.is_in_group("Jugadores") and Input.is_key_pressed(KEY_E):
+		var jugador_objetivo = area.get_parent()
+		var objetivo_id = int(jugador_objetivo.name)
+		pedir_salvar(objetivo_id)
+
+	
+	#-----------------------------------------SERVIDOR
+	
+@rpc("any_peer")
+func pedir_ser_salvado():
+	print("Ayuda!")
+
+
+func pedir_salvar(objetivo_id: int) -> void:
+	Network.pedir_salvar_rpc.rpc_id(1, objetivo_id)

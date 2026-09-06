@@ -5,9 +5,10 @@
 [ext_resource type="PackedScene" uid="uid://cji8bli4euruv" path="res://scenes/jugador/brazos.tscn" id="2_1d7gi"]
 [ext_resource type="PackedScene" uid="uid://cp8eo8oyp07v8" path="res://scenes/camara3d/camara_rig.tscn" id="2_6htac"]
 [ext_resource type="PackedScene" uid="uid://6dr1scr4fnwt" path="res://scenes/pollos/pollo_modelo_1.tscn" id="2_f0vko"]
+[ext_resource type="PackedScene" uid="uid://bnvu2kn5ch0fj" path="res://scenes/habilidad/habilidad.tscn" id="6_6htac"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8w0r3"]
-height = 1.5
+height = 1.0024414
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_6bcbl"]
 properties/0/path = NodePath(".:position")
@@ -22,6 +23,12 @@ properties/2/replication_mode = 1
 properties/3/path = NodePath("Head/AnimationLibrary_Godot_Standard/AnimationPlayer:current_animation")
 properties/3/spawn = true
 properties/3/replication_mode = 1
+properties/4/path = NodePath(".:estadoActual")
+properties/4/spawn = true
+properties/4/replication_mode = 1
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_8w0r3"]
+height = 0.31140137
 
 [node name="character" type="CharacterBody3D" unique_id=997961619]
 script = ExtResource("1_ueyq7")
@@ -30,7 +37,7 @@ script = ExtResource("1_ueyq7")
 jugador = NodePath("..")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1479857195]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5012207, 0)
 shape = SubResource("CapsuleShape3D_8w0r3")
 
 [node name="jugador" type="Node3D" parent="." unique_id=977801473]
@@ -64,6 +71,16 @@ outline_size = 6
 
 [node name="Player_UI" parent="." unique_id=1188246629 instance=ExtResource("1_02n2h")]
 unique_name_in_owner = true
+
+[node name="habilidad" parent="." unique_id=1910525306 instance=ExtResource("6_6htac")]
+
+[node name="DeteccionAyuda" type="Area3D" parent="." unique_id=224189718]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DeteccionAyuda" unique_id=493757298]
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0.47852877, 0)
+shape = SubResource("CylinderShape3D_8w0r3")
+
+[connection signal="area_entered" from="DeteccionAyuda" to="." method="_on_deteccion_ayuda_area_entered"]
 
 [editable path="camaraRig"]
 [editable path="jugador/brazos"]

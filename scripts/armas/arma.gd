@@ -10,7 +10,6 @@ enum TipoArma {
 @export var nombre: String
 
 @export var danio: float
-@export var alcance: float
 @export var cadencia: float
 
 @export var sprite: Texture #el tipo que sea esto
