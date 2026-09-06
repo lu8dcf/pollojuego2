@@ -1,11 +1,16 @@
 [gd_scene format=3 uid="uid://cji8bli4euruv"]
 
+[ext_resource type="Script" uid="uid://2k86sivkv8eo" path="res://scripts/jugador/brazos.gd" id="1_lksug"]
+[ext_resource type="Script" uid="uid://cra4s5q5be7gy" path="res://scripts/armas/fabrica_armas.gd" id="2_aw5rb"]
+
 [node name="brazos" type="Node3D" unique_id=50839711]
+script = ExtResource("1_lksug")
 
 [node name="izquierdo" type="Node3D" parent="." unique_id=1700125377]
 
 [node name="mark_izq" type="Marker3D" parent="izquierdo" unique_id=1157031558]
 
 [node name="derecho" type="Node3D" parent="." unique_id=1881658879]
+script = ExtResource("2_aw5rb")
 
 [node name="mark_der" type="Marker3D" parent="derecho" unique_id=478729798]

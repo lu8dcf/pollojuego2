@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bnkdryg7730rq"]
+
+[ext_resource type="Script" uid="uid://dfs48ppugm2qf" path="res://scripts/armas/armas_escenas/arma_explosiva.gd" id="1_xpnvo"]
+
+[node name="armaExplosiva" type="Node3D" unique_id=643862236]
+script = ExtResource("1_xpnvo")
+
+[node name="Marker3D" type="Marker3D" parent="." unique_id=430691991]
