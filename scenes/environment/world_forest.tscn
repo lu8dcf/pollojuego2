@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c06gks0biq762" path="res://scenes/environment/world_forest.gd" id="1_3pli8"]
 [ext_resource type="PackedScene" uid="uid://c1uh3pf0og1vi" path="res://scenes/environment/mapa_1.tscn" id="2_1o1l2"]
+[ext_resource type="Script" uid="uid://c7p2vuotjcwys" path="res://scenes/environment/camera_3d.gd" id="3_1o1l2"]
 [ext_resource type="PackedScene" uid="uid://cypdi1lb7klts" path="res://assets/models/crystal/scene.gltf" id="4_1o1l2"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_b5dff"]
@@ -24,7 +25,12 @@ script = ExtResource("1_3pli8")
 [node name="mapa_1" parent="." unique_id=1924362278 instance=ExtResource("2_1o1l2")]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1711943740]
-transform = Transform3D(0.57484823, -0.09363707, 0.8128848, -1.4901161e-08, 0.99343085, 0.11443438, -0.8182601, -0.06578241, 0.5710719, 25.970402, 3.181158, 24.253902)
+transform = Transform3D(0.57484823, -0.09363707, 0.8128848, -1.4901161e-08, 0.99343085, 0.11443438, -0.8182601, -0.06578241, 0.5710719, 25.365261, 3.181158, 25.67688)
+script = ExtResource("3_1o1l2")
+sway_amplitude = 0.01
+sway_frequency = 0.1
+focus_height = 1.0
+smooth_follow_speed = 2.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=85961920]
 environment = SubResource("Environment_1o1l2")
@@ -41,9 +47,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.420815, 1.1245222, 20.8073
 _spawnable_scenes = PackedStringArray("uid://c1yny3sauy8yu", "uid://w08mo482g7si")
 spawn_path = NodePath("../SpawnContainer")
 
-[node name="TimerTarget" type="Timer" parent="." unique_id=32496409]
+[node name="TimerEnemy" type="Timer" parent="." unique_id=32496409]
 unique_name_in_owner = true
-wait_time = 5.0
+wait_time = 1.3769999999999998
+autostart = true
 
 [node name="Sketchfab_Scene" parent="." unique_id=1802840441 instance=ExtResource("4_1o1l2")]
-transform = Transform3D(1, 0, 0, 0, 0.8622221, 0.50653046, 0, -0.50653046, 0.8622221, 19.1661, -0.7236707, 22.402742)
+transform = Transform3D(1, 0, 0, 0, 0.8622221, 0.50653046, 0, -0.50653046, 0.8622221, 19.1661, -0.7236707, 20.906834)

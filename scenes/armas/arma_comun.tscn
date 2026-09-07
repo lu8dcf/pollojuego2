@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://ccpfxpxwl0rn2"]
+
+[ext_resource type="Script" uid="uid://dwe0m2ks5vd52" path="res://scripts/armas/armas_escenas/arma_comun.gd" id="1_m28bd"]
+
+[node name="armaComun" type="Node3D" unique_id=692652577]
+script = ExtResource("1_m28bd")
+
+[node name="Marker3D" type="Marker3D" parent="." unique_id=746436328]

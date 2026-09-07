@@ -1,6 +1,6 @@
 extends Node
 
-const PLAYER = preload("uid://dbcqeo103wau6")
+const PLAYER = preload("uid://bc1ek0bvbgna2")
 const TUBE_CONTEXT = preload("uid://chqw3jdoon6c1")
 
 var enet_peer := ENetMultiplayerPeer.new()
@@ -83,3 +83,24 @@ func clean_up_signals():
 func _exit_tree() -> void:
 	if tube_enabled:
 		tube_client.leave_session()
+
+
+#----------------------------------------------------- Interacciones Jugador
+
+@rpc("any_peer")
+func pedir_salvar_rpc(objetivo_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	var salvador_id = multiplayer.get_remote_sender_id()
+
+	var salvador = Global.get_player(salvador_id)
+	var objetivo = Global.get_player(objetivo_id)
+
+	if salvador == null or objetivo == null:
+		return
+	if objetivo.estadoActual != objetivo.estados.CAIDO:
+		return
+
+	objetivo.estadoActual = objetivo.estados.OLEADA
+	print("salvado!")
