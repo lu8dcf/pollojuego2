@@ -80,7 +80,7 @@ func on_unirse_tube():
 func on_crear_partida_tube():
 	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = false
-	temp_mundo.queue_free()
+	temp_mundo.queue_free() 
 	Network.tube_create()
 	add_world()
 

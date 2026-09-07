@@ -88,17 +88,17 @@ layout_mode = 2
 theme_override_constants/icon_max_width = 24
 icon = ExtResource("1_32d7b")
 
-[node name="ButtonLeave" type="Button" parent="Menu/PanelContainer/MarginContainer/VBoxContainer" unique_id=1656643302]
+[node name="BotonSalir" type="Button" parent="Menu/PanelContainer/MarginContainer/VBoxContainer" unique_id=1656643302]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Leave Game"
+text = "Salir Servidor"
 
-[node name="ButtonStartRound" type="Button" parent="Menu/PanelContainer/MarginContainer/VBoxContainer" unique_id=60188762]
+[node name="BotonEmpezarRonda" type="Button" parent="Menu/PanelContainer/MarginContainer/VBoxContainer" unique_id=60188762]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Start Round"
+text = "Empezar ronda"
 
-[node name="ItemList" type="ItemList" parent="Menu/PanelContainer/MarginContainer/VBoxContainer" unique_id=500981316]
+[node name="ListaUsuarios" type="ItemList" parent="Menu/PanelContainer/MarginContainer/VBoxContainer" unique_id=500981316]
 unique_name_in_owner = true
 layout_mode = 2
 
@@ -156,8 +156,9 @@ value = 60.84
 show_percentage = false
 
 [node name="TopLeft" type="MarginContainer" parent="." unique_id=1609076045]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_top = 144.0
+offset_right = 215.0
+offset_bottom = 316.0
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20

@@ -22,9 +22,10 @@ const DAÑO_MINIMO: int = 1
 const DAÑO_MAXIMO: int = 100
 
 # ===== TIPO DE JUEGO =====
-var mundo:Node3D
-var spawn_container: Node3D
+var mundo:Node3D# mapa actual, esto es forest
+var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
+var cant_jugadres:int = 0
 
 #Tamaño del Mapa
 var mapa_x_min = -20

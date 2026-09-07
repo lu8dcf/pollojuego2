@@ -4,21 +4,23 @@ class_name PlayerUI
 
 @onready var menu: Control = %Menu
 @onready var button_leave: Button = %ButtonLeave
-@onready var label_session: Label = %LabelSession
 @onready var button_copy_session: Button = %ButtonCopySession
+@onready var boton_salir: Button = %BotonSalir # para salir del servidor
 
-@onready var item_list: ItemList = %ItemList
+# lista de los conectados en el servidor, y barra de vida de ellos
+@onready var lista_usuarios: ItemList = %ListaUsuarios
 
 # vida
 @onready var control_vida: VBoxContainer = %ControlVida
 @onready var etiqueta_nombre: Label = %EtiquetaNombre
 @onready var etiqueta_salud: Label = %EtiquetaSalud
 @onready var barra_salud: ProgressBar = %BarraSalud
+@onready var boton_empezar_ronda: Button = %BotonEmpezarRonda
+@onready var label_session: Label = %LabelSession
 
-@onready var button_start_round: Button = %ButtonStartRound
 @onready var controls_root: VBoxContainer = %ControlsRoot
 
-var COLORS: Array[Color] = [
+var COLORS: Array[Color] =[ # colores de la barra de vida
 	Color.MAGENTA,
 	Color.CRIMSON,
 	Color.GREEN,
@@ -26,12 +28,13 @@ var COLORS: Array[Color] = [
 ]
 
 func _ready() -> void:
-	menu.hide()
+	#menu.hide()
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	button_leave.pressed.connect(func(): Network.leave_server())
+	boton_salir.pressed.connect(func(): Network.leave_server())
 	button_copy_session.pressed.connect(func(): DisplayServer.clipboard_set(Network.tube_client.session_id))
 	DisplayServer.clipboard_set(Network.tube_client.session_id)
-	label_session.text = Network.tube_client.session_id
+	if !GlobalJuego.un_jugador:
+		label_session.text = "ID Sesion: "+Network.tube_client.session_id
 
 	for single_color in COLORS:
 		var new_texture = GradientTexture2D.new()
@@ -41,10 +44,10 @@ func _ready() -> void:
 		new_texture.gradient = gradient	
 
 	# username, score
-	item_list.max_columns = 2
-	item_list.same_column_width = true
-	item_list.auto_height = true
-	item_list.auto_width = true
+	lista_usuarios.max_columns = 2
+	lista_usuarios.same_column_width = true
+	lista_usuarios.auto_height = true
+	lista_usuarios.auto_width = true
 	
 	#salud perosanje
 	barra_salud.max_value = GlobalJuego.salud_maxima
@@ -57,20 +60,20 @@ func _ready() -> void:
 	if GlobalJuego.nombre_jugador:
 		etiqueta_nombre.text = GlobalJuego.nombre_jugador
 		
-	GlobalSignal.sesion_actualizada.connect(render_item_list)
+	GlobalSignal.sesion_actualizada.connect(render_lista_usuarios)
 	_actualizar_barra_salud(GlobalJuego.salud_jugador)
 #
 #
-	#button_start_round.pressed.connect(Global.crystal_game_start)
+	#boton_empezar_ronda.pressed.connect(Global.crystal_game_start)
 
 
-func render_item_list(new_info: Dictionary):
-	item_list.clear()
+func render_lista_usuarios(new_info: Dictionary):
+	lista_usuarios.clear()
 	for peer_id in new_info.keys():
 		var player_info = new_info[peer_id]
 		
-		item_list.add_item(player_info.username)
-		item_list.add_item(str(player_info.score))
+		lista_usuarios.add_item(player_info.username)
+		lista_usuarios.add_item(str(player_info.score))
 
 func _actualizar_barra_salud(nueva_salud: int):
 	barra_salud.value = nueva_salud
@@ -93,5 +96,5 @@ func _actualizar_info_sesion(info: Dictionary):
 
 func _mostrar_daño(peer_id: int, cantidad: int):
 	if peer_id == multiplayer.get_unique_id():
-		# Mostrar efecto de daño en pantalla
+		# seria genial mostrar efecto de daño en pantalla
 		print("Recibiste ", cantidad, " de daño")
