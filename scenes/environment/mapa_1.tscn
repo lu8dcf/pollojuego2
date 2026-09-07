@@ -11,19 +11,22 @@ data = PackedVector3Array(0.04, -0.35999998, 0.039899997, 0.03, -0.35999998, 0.0
 [node name="mapa_1" unique_id=1924362278 instance=ExtResource("1_yi4aq")]
 
 [node name="spawn" type="StaticBody3D" parent="." index="0" unique_id=1057305324]
+collision_mask = 6
 
 [node name="spawn" type="CollisionShape3D" parent="spawn" index="0" unique_id=1380577009]
 transform = Transform3D(100, 0, 0, 0, -1.1920929e-05, 99.99999, 0, -99.99999, -1.1920929e-05, 0, 0, 0)
 shape = SubResource("ConcavePolygonShape3D_2djxk")
 
 [node name="muros" type="StaticBody3D" parent="." index="1" unique_id=991800981]
+collision_layer = 8
+collision_mask = 6
 
 [node name="muros" type="CollisionShape3D" parent="muros" index="0" unique_id=1817193962]
 transform = Transform3D(100, 0, 0, 0, -2.3841858e-05, 99.99999, 0, -99.99999, -2.3841858e-05, 0, 0, 0)
 shape = SubResource("ConcavePolygonShape3D_rbey2")
 
-[node name="muros_1" parent="." index="2" unique_id=1875248862]
+[node name="muros_1" parent="." index="2" unique_id=792044679]
 visible = false
 
-[node name="spawn_1" parent="." index="3" unique_id=811712612]
+[node name="spawn_1" parent="." index="3" unique_id=631138271]
 visible = false

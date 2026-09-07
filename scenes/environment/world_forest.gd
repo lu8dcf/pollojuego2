@@ -2,18 +2,19 @@
 extends Node3D
 
 @onready var spawn_container: Node3D = %SpawnContainer
-@onready var timer_target: Timer = %TimerTarget
+@onready var timer_enemy: Timer = %TimerEnemy
 @onready var menu_camera: MenuCameraController = $Camera3D
 
-const TARGET = preload("uid://w08mo482g7si")
+const TARGET = preload("uid://b8go34qeye00a") # Escena enemy0
 
 var is_menu_mode: bool = false
+var ya_hizo=false
 
 func _ready() -> void:
 	Global.forest = self
 	Global.spawn_container = spawn_container
 	
-	timer_target.timeout.connect(spawn_target)
+	timer_enemy.timeout.connect(spawn_enemy)
 	
 	# Configurar la cámara
 	if menu_camera:
@@ -30,8 +31,8 @@ func enable_menu_mode() -> void:
 		menu_camera.set_process(true)
 	
 	# Detener el timer de spawn
-	if timer_target:
-		timer_target.stop()
+	if timer_enemy:
+		timer_enemy.stop()
 
 func disable_menu_mode() -> void:
 	"""Desactivar modo menú"""
@@ -41,21 +42,25 @@ func disable_menu_mode() -> void:
 		menu_camera.set_process(false)
 	
 	# Reactivar el timer si es necesario
-	if timer_target and not timer_target.is_stopped():
+	if timer_enemy and not timer_enemy.is_stopped():
 		pass  # El timer ya está corriendo
 
-func spawn_target():
+func spawn_enemy():
+	var cantidad_enemigos = get_tree().get_nodes_in_group("enemy").size()
+	if cantidad_enemigos > GlobalJuego.cant_enemigos:
+		return
 	# No spawnear targets si estamos en modo menú
 	print("modo menu:", is_menu_mode)
 	if is_menu_mode:
 		return
-		
+	
 	if is_multiplayer_authority() and get_tree().get_node_count_in_group('Targets') < 20:
-		for player in get_tree().get_node_count_in_group("Players"):
+		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = TARGET.instantiate()
-			var rand_x = randf_range(-25.0, 25.0)
-			var rand_z = randf_range(-25.0, 25.0)
-			new_target.position = Vector3(rand_x, 1.0, rand_z)
+			var rand_x = randf_range(GlobalJuego.mapa_x_min, GlobalJuego.mapa_x_max)
+			var rand_z = randf_range(GlobalJuego.mapa_z_min, GlobalJuego.mapa_z_max)
+			#print (rand_x," ",rand_z)
+			new_target.position = Vector3(rand_x, 2.0, rand_z)
 			spawn_container.add_child(new_target, true)
 
 func partida_unsolojugador():
