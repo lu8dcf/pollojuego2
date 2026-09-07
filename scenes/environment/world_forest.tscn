@@ -47,9 +47,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.420815, 1.1245222, 20.8073
 _spawnable_scenes = PackedStringArray("uid://c1yny3sauy8yu", "uid://w08mo482g7si")
 spawn_path = NodePath("../SpawnContainer")
 
-[node name="TimerTarget" type="Timer" parent="." unique_id=32496409]
+[node name="TimerEnemy" type="Timer" parent="." unique_id=32496409]
 unique_name_in_owner = true
-wait_time = 5.016
+wait_time = 1.3769999999999998
 autostart = true
 
 [node name="Sketchfab_Scene" parent="." unique_id=1802840441 instance=ExtResource("4_1o1l2")]

@@ -100,6 +100,8 @@ attack2={
 3d_physics/layer_1="suelo"
 3d_physics/layer_2="enemigo"
 3d_physics/layer_3="player"
+3d_physics/layer_4="paredes"
+3d_physics/layer_5="balas"
 
 [physics]
 

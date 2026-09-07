@@ -2,8 +2,19 @@ extends CharacterBody3D
 
 @export var health := 100
 # @export var animation_player: AnimationPlayer
-@export var mesh: MeshInstance3D
+
 @onready var crystal_timer: Timer = $Timer
+
+# IA
+var puede_moverse = false
+
+# Cruz
+var ver_cruz = true
+@onready var cruz: MeshInstance3D = $cruz
+
+# Modelo
+var ver_modelo = false
+@onready var modelo= $modelo
 
 var is_hurt := false
 var is_dying := false
@@ -67,14 +78,21 @@ func _physics_process(delta: float) -> void:
 	
 	if not is_on_floor():
 		velocity += get_gravity() * delta 
-		print (position)
-		if position.y < 0.5:
-			print ("cayo")
+		#print (position)
+		if position.y < -1:
+			#print ("cayo")
 			queue_free()
+		move_and_slide()	
+		return
+	elif is_on_floor() and ver_cruz: #Mostrar cruz
+		mostrar_cruz()
+		
+	if not puede_moverse:
+		return
 	
 	if position.distance_to(goal_position) > 3.0: 
 		direction = position.direction_to(goal_position)
-		#animation_player.play("Walk_Formal")
+		#animation_player.play("andar")
 	else:
 		direction = Vector3.ZERO
 		#animation_player.play("Spell_Simple_Shoot")
@@ -91,4 +109,27 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
+func mostrar_cruz(): # titila la cruz 
+	var tween = create_tween()
+	ver_cruz = false # solo parpadela la primera vez
+		#  ciclo de parpadeo 3 veces
+	for i in range(3):
+		tween.tween_property($cruz, "visible", true, 0.0)
+		tween.tween_interval(0.3)
+		tween.tween_property($cruz, "visible", false, 0.0)
+		tween.tween_interval(0.3)
 	
+	#  inicial del nodo Modelo antes de aparecer
+	tween.tween_callback(func():
+		$modelo.visible = true
+		$modelo.scale = Vector3.ZERO # Inicia invisible/pequeño
+	)
+	
+	#  Aparición suave (Fade-in por escala en 0.5 segundos)
+	tween.tween_property($modelo, "scale", Vector3.ONE, 0.5)\
+		.set_trans(Tween.TRANS_QUAD)\
+		.set_ease(Tween.EASE_OUT)
+	# finalizar la aparicion de puede mover
+	tween.tween_callback(func():
+			puede_moverse = true # permino que se empiece a movere
+			set_collision_mask_value(4, true))  # Agrego las pareces de colision
