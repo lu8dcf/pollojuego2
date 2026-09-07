@@ -10,8 +10,8 @@ const TARGET = preload("uid://w08mo482g7si")
 var is_menu_mode: bool = false
 
 func _ready() -> void:
-	Global.forest = self
-	Global.spawn_container = spawn_container
+	GlobalJuego.mundo = self
+	GlobalJuego.spawn_container = spawn_container
 	
 	timer_target.timeout.connect(spawn_target)
 	

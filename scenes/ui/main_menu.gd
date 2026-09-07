@@ -1,10 +1,10 @@
 extends CanvasLayer
 
-@onready var button_join: Button = %ButtonJoin
-@onready var button_quit: Button = %ButtonQuit
 
 @onready var edit_sesion: LineEdit = %EditSesion
 @onready var edit_nombre_usuario: LineEdit = %EditNombreUsuario
+# para un solo jugador
+@onready var nombre_usuario: LineEdit = %nombre_usuario
 
 @onready var boton_unirse_tube: Button = %BotonUnirseTube
 @onready var boton_crear_partida_tube: Button = %BotonCrearPartidaTube
@@ -14,7 +14,6 @@ extends CanvasLayer
 @onready var panel_multijugador: PanelContainer = %PanelMultijugador
 @onready var panel_opciones: PanelContainer = %PanelOpciones
 
-@onready var enet_menu: VBoxContainer = %EnetMenu
 @onready var tube_menu: VBoxContainer = %TubeMenu
 
 const MUNDO = preload("uid://yubh30707eb7")
@@ -27,25 +26,21 @@ const PLAYER = preload("uid://bc1ek0bvbgna2")
 
 
 func _ready() -> void:
-	ocultar_todo()
-	if Network.tube_enabled:
-		enet_menu.hide()
-	else:
-		tube_menu.hide()
+	ocultar_todo() # ocultar toso los menus 
 
-	button_join.pressed.connect(on_join)
-	button_quit.pressed.connect(func(): get_tree().quit())
 
 	edit_sesion.text_changed.connect(update_session)
 	edit_nombre_usuario.text_changed.connect(update_username)
+	nombre_usuario.text_changed.connect(update_username)
 	boton_unirse_tube.disabled = true
 	boton_unirse_tube.pressed.connect(on_unirse_tube)
 	boton_salir.pressed.connect(func(): get_tree().quit())
 	boton_crear_partida_tube.pressed.connect(on_crear_partida_tube)
 	
 	Network.tube_client.error_raised.connect(on_error_raised)
-	_activate_menu_camera()
 	
+	_activate_menu_camera() # activa la camara tipo cine del menu
+	# si es servidor dedicado, iniciar servidor automáticamente
 	if OS.has_feature('server'):
 		temp_mundo.queue_free()
 		Network.start_server()
@@ -84,7 +79,7 @@ func on_unirse_tube():
 
 func on_crear_partida_tube():
 	_deactivate_menu_camera()
-	Global.un_jugador = false
+	GlobalJuego.un_jugador = false
 	temp_mundo.queue_free()
 	Network.tube_create()
 	add_world()
@@ -96,7 +91,7 @@ func update_session(new_text: String):
 	edit_sesion.caret_column = caret_pos
 
 func update_username(new_text: String):
-	Global.username = new_text
+	GlobalJuego.nombre_jugador = new_text
 
 func on_error_raised(_code, _message):
 	edit_sesion.text = ''
@@ -163,7 +158,7 @@ func _crear_jugador_local(mundo_instancia:Node3D):
 	jugador.name="1" # el host debe tener numero 1 para jugar pero es solo un id, el user name se agrega con el edit
 	var spawn_container = mundo_instancia.get_node_or_null("SpawnContainer")
 	jugador.global_position = Vector3(22, 2, 22)
-	Global.un_jugador = true
+	GlobalJuego.un_jugador = true
 	# agregar el jguador  al mundo
 	mundo_instancia.add_child(jugador)
 	
