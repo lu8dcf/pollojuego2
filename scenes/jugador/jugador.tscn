@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://cji8bli4euruv" path="res://scenes/jugador/brazos.tscn" id="2_1d7gi"]
 [ext_resource type="PackedScene" uid="uid://cp8eo8oyp07v8" path="res://scenes/camara3d/camara_rig.tscn" id="2_6htac"]
 [ext_resource type="PackedScene" uid="uid://6dr1scr4fnwt" path="res://scenes/pollos/pollo_modelo_1.tscn" id="2_f0vko"]
-[ext_resource type="PackedScene" uid="uid://bnvu2kn5ch0fj" path="res://scenes/habilidad/habilidad.tscn" id="6_6htac"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8w0r3"]
 height = 1.0024414
@@ -31,6 +30,7 @@ properties/4/replication_mode = 1
 height = 0.31140137
 
 [node name="character" type="CharacterBody3D" unique_id=997961619]
+collision_mask = 11
 script = ExtResource("1_ueyq7")
 
 [node name="camaraRig" parent="." unique_id=654216859 node_paths=PackedStringArray("jugador") instance=ExtResource("2_6htac")]
@@ -45,11 +45,15 @@ shape = SubResource("CapsuleShape3D_8w0r3")
 [node name="pollo_1" parent="jugador" unique_id=1188442573 instance=ExtResource("2_f0vko")]
 
 [node name="brazos" parent="jugador" unique_id=50839711 instance=ExtResource("2_1d7gi")]
+script = null
 
 [node name="mark_izq" parent="jugador/brazos/izquierdo" parent_id_path=PackedInt32Array(50839711, 1700125377) index="0" unique_id=1157031558]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.5, 0)
 
-[node name="mark_der" parent="jugador/brazos/derecho" parent_id_path=PackedInt32Array(50839711, 1881658879) index="0" unique_id=478729798]
+[node name="derecho" parent="jugador/brazos" index="1" unique_id=1881658879]
+script = null
+
+[node name="mark_der" parent="jugador/brazos/derecho" index="0" unique_id=478729798]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, 0)
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1038503219]
@@ -72,7 +76,7 @@ outline_size = 6
 [node name="Player_UI" parent="." unique_id=1188246629 instance=ExtResource("1_02n2h")]
 unique_name_in_owner = true
 
-[node name="habilidad" parent="." unique_id=1910525306 instance=ExtResource("6_6htac")]
+[node name="habilidad" parent="." unique_id=1910525306]
 
 [node name="DeteccionAyuda" type="Area3D" parent="." unique_id=224189718]
 
