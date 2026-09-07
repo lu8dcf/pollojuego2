@@ -22,7 +22,6 @@ collision_layer = 2
 script = ExtResource("1_qypkf")
 
 [node name="modelo" parent="." unique_id=1655325594 instance=ExtResource("2_20j7o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.19314834, 0)
 visible = false
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]
@@ -31,7 +30,6 @@ visible = false
 mesh = SubResource("TextMesh_20j7o")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=746515846]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.86579424, -0.009876132, 0.23651016, 0)
 shape = SubResource("CylinderShape3D_2rcni")
 debug_color = Color(0.52156866, 0.07058824, 0.07058824, 1)
 
