@@ -1,7 +1,7 @@
 extends Node
 
 var username := ''
-
+var un_jugador :=true
 var forest: Node3D
 var spawn_container: Node3D
 
@@ -15,7 +15,7 @@ func _ready():
 	Network.tube_client.session_created.connect(set_up_scoreboard)
 	
 func set_up_scoreboard():
-	var temp_username = "1"
+	var temp_username = "Anónimo"
 	if username != "":
 		temp_username = username
 	session_info[1] = { "score": 0, "username": temp_username }

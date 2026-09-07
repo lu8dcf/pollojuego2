@@ -4,7 +4,10 @@
 [ext_resource type="Texture2D" uid="uid://b4o7vx0n8db1s" path="res://addons/tube/icons/tube_client.svg" id="2_fe2o3"]
 [ext_resource type="PackedScene" uid="uid://yubh30707eb7" path="res://scenes/environment/world_forest.tscn" id="3_1g8jr"]
 [ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_m1kxf"]
+[ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="3_wb0q5"]
 [ext_resource type="Script" uid="uid://bmit8wdp3lyfr" path="res://scenes/ui/menu_principal.gd" id="3_x2yvf"]
+[ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="4_q85j6"]
+[ext_resource type="FontFile" uid="uid://b6kads1hhoxfx" path="res://assets/fuentes/Anton.ttf" id="5_8g5eo"]
 
 [node name="MainMenu" type="CanvasLayer" unique_id=1482325763]
 script = ExtResource("1_sl1te")
@@ -17,7 +20,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Center" type="PanelContainer" parent="Control" unique_id=882952804]
+[node name="PanelMultijugador" type="PanelContainer" parent="Control" unique_id=882952804]
+unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -31,89 +36,194 @@ offset_bottom = 198.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="Control/Center" unique_id=57966873]
+[node name="MarginContainer" type="MarginContainer" parent="Control/PanelMultijugador" unique_id=57966873]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Control/Center/MarginContainer" unique_id=752125355]
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/PanelMultijugador/MarginContainer" unique_id=752125355]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="EnetMenu" type="VBoxContainer" parent="Control/Center/MarginContainer/HBoxContainer" unique_id=85887884]
+[node name="EnetMenu" type="VBoxContainer" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer" unique_id=85887884]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Control/Center/MarginContainer/HBoxContainer/EnetMenu" unique_id=225050093]
+[node name="Label" type="Label" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/EnetMenu" unique_id=225050093]
 layout_mode = 2
 text = "Androo Game"
 
-[node name="ButtonJoin" type="Button" parent="Control/Center/MarginContainer/HBoxContainer/EnetMenu" unique_id=197219473]
+[node name="ButtonJoin" type="Button" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/EnetMenu" unique_id=197219473]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Join"
 
-[node name="ButtonQuit" type="Button" parent="Control/Center/MarginContainer/HBoxContainer/EnetMenu" unique_id=1133431028]
+[node name="ButtonQuit" type="Button" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/EnetMenu" unique_id=1133431028]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Quit"
 
-[node name="TubeMenu" type="VBoxContainer" parent="Control/Center/MarginContainer/HBoxContainer" unique_id=1250280223]
+[node name="TubeMenu" type="VBoxContainer" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer" unique_id=1250280223]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="LabelTitle" type="Label" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=455454260]
+[node name="Titulo" type="Label" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=455454260]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Androo Friendslop 
-Tutorial Part 3"
+text = "CREAR USUARIO"
+label_settings = ExtResource("4_q85j6")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LabelUsername" type="Label" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=1449943180]
+[node name="LabelNombreUsuario" type="Label" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1449943180]
 layout_mode = 2
-text = "Username:"
+text = "Nombre usuario:"
+label_settings = ExtResource("3_wb0q5")
 
-[node name="LineEditUsername" type="LineEdit" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=998737583]
+[node name="EditNombreUsuario" type="LineEdit" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=998737583]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_fonts/font = ExtResource("5_8g5eo")
 max_length = 12
 
-[node name="LabelSessionid" type="Label" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=390504241]
+[node name="HSeparator" type="HSeparator" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=814587652]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="LabelSesion" type="Label" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=390504241]
 layout_mode = 2
 text = "Session ID:"
+label_settings = ExtResource("3_wb0q5")
 
-[node name="LineEditSession" type="LineEdit" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=382891492]
+[node name="EditSesion" type="LineEdit" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=382891492]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_fonts/font = ExtResource("5_8g5eo")
 
-[node name="HSeparator" type="HSeparator" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=814587652]
+[node name="BotonUnirseTube" type="Button" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=95161552]
+unique_name_in_owner = true
+layout_mode = 2
+text = "UNIRSE"
+
+[node name="HSeparator2" type="HSeparator" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1704946178]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="ButtonJoinTube" type="Button" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=95161552]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Join"
-
-[node name="ButtonQuitTube" type="Button" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=614329493]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Quit"
-
-[node name="HSeparator2" type="HSeparator" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=1704946178]
-layout_mode = 2
-theme_override_constants/separation = 24
-
-[node name="ButtonCreateTube" type="Button" parent="Control/Center/MarginContainer/HBoxContainer/TubeMenu" unique_id=1800931519]
+[node name="BotonCrearPartidaTube" type="Button" parent="Control/PanelMultijugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1800931519]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/icon_max_width = 24
-text = "Create Session"
+text = "CREAR PARTIDA"
 icon = ExtResource("2_fe2o3")
+
+[node name="PanelUnJugador" type="PanelContainer" parent="Control" unique_id=605970837]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 116.5
+offset_top = -198.0
+offset_right = 377.5
+offset_bottom = 198.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/PanelUnJugador" unique_id=1290685399]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/PanelUnJugador/MarginContainer" unique_id=1320200546]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="PuntajeMenu" type="VBoxContainer" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer" unique_id=1497192841]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/PuntajeMenu" unique_id=1525440713]
+layout_mode = 2
+text = "Puntaje Personal"
+label_settings = ExtResource("3_wb0q5")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TubeMenu" type="VBoxContainer" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer" unique_id=1040404985]
+layout_mode = 2
+
+[node name="titulo" type="Label" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=171721742]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Un Solo Jugador"
+label_settings = ExtResource("4_q85j6")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="label_usuario" type="Label" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1541034621]
+layout_mode = 2
+text = "Usuario:"
+label_settings = ExtResource("3_wb0q5")
+
+[node name="nombre_usuario" type="LineEdit" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1314644862]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("5_8g5eo")
+max_length = 12
+
+[node name="HSeparator2" type="HSeparator" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=885743908]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="empezar_solo" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1088779155 instance=ExtResource("3_m1kxf")]
+custom_minimum_size = Vector2(40, 50)
+clip_contents = true
+layout_mode = 2
+texto = "JUGAR"
+metadata/_edit_use_anchors_ = true
+
+[node name="PanelOpciones" type="PanelContainer" parent="Control" unique_id=500977056]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 116.5
+offset_top = -198.0
+offset_right = 377.5
+offset_bottom = 198.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/PanelOpciones" unique_id=913924786]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/PanelOpciones/MarginContainer" unique_id=2100883162]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="OpcionesMenu" type="VBoxContainer" parent="Control/PanelOpciones/MarginContainer/HBoxContainer" unique_id=1653513947]
+layout_mode = 2
+
+[node name="titulo" type="Label" parent="Control/PanelOpciones/MarginContainer/HBoxContainer/OpcionesMenu" unique_id=1114625596]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Hace las opciones bro"
+label_settings = ExtResource("4_q85j6")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="fondo" type="ColorRect" parent="Control" unique_id=1136097898]
 layout_mode = 0
@@ -134,7 +244,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_x2yvf")
 
-[node name="un_jugador" parent="Control/menu_principal" unique_id=1088779155 instance=ExtResource("3_m1kxf")]
+[node name="un_jugador" parent="Control/menu_principal" unique_id=493601890 instance=ExtResource("3_m1kxf")]
 layout_mode = 0
 offset_left = -32.0
 offset_top = 72.43049
@@ -172,7 +282,8 @@ offset_bottom = 492.43048
 rotation = -0.0014820776
 texto = "CRÉDITOS"
 
-[node name="salir" parent="Control/menu_principal" unique_id=533371450 instance=ExtResource("3_m1kxf")]
+[node name="BotonSalir" parent="Control/menu_principal" unique_id=533371450 instance=ExtResource("3_m1kxf")]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 240.0
 offset_top = 512.4305
@@ -181,7 +292,11 @@ offset_bottom = 604.4305
 rotation = -0.0014820776
 texto = "SALIR"
 
-[node name="WorldForest" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
+[node name="Mundo" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
 unique_name_in_owner = true
 
-[connection signal="pressed" from="Control/menu_principal/salir" to="Control/menu_principal" method="_on_salir_pressed"]
+[connection signal="pressed" from="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu/empezar_solo" to="." method="_on_empezar_solo_pressed"]
+[connection signal="pressed" from="Control/menu_principal/un_jugador" to="." method="_on_un_jugador_pressed"]
+[connection signal="pressed" from="Control/menu_principal/multijugador" to="." method="_on_multijugador_pressed"]
+[connection signal="pressed" from="Control/menu_principal/opciones" to="." method="_on_opciones_pressed"]
+[connection signal="pressed" from="Control/menu_principal/creditos" to="." method="_on_creditos_pressed"]

@@ -50,6 +50,7 @@ func spawn_enemy():
 	if cantidad_enemigos > GlobalJuego.cant_enemigos:
 		return
 	# No spawnear targets si estamos en modo menú
+	print("modo menu:", is_menu_mode)
 	if is_menu_mode:
 		return
 	
@@ -61,4 +62,13 @@ func spawn_enemy():
 			#print (rand_x," ",rand_z)
 			new_target.position = Vector3(rand_x, 2.0, rand_z)
 			spawn_container.add_child(new_target, true)
-	ya_hizo=true
+
+func partida_unsolojugador():
+	is_menu_mode = false
+	
+	# Desactivar cámara del menú
+	if menu_camera:
+		menu_camera.deactivate_menu_camera()
+	
+	set_process(true)
+	
