@@ -25,7 +25,7 @@ script = ExtResource("1_qypkf")
 visible = false
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]
-transform = Transform3D(1, 0, 0, 0, 0.013263269, 0.999912, 0, -0.999912, 0.013263269, -0.07335454, -0.13057774, 0.11549413)
+transform = Transform3D(2.964562, 0, 0, 0, 0.029198525, 2.0934258, 0, -2.201264, 0.027768113, -0.07335454, -0.13057774, 0.11549413)
 visible = false
 mesh = SubResource("TextMesh_20j7o")
 
