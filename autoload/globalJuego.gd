@@ -15,4 +15,4 @@ var mapa_z_max = 20
 
 
 #enemigos
-var cant_enemigos = 5 # Cantidad de enemigos en la oleada siempr activos
+var cant_enemigos = 50 # Cantidad de enemigos en la oleada siempr activos
