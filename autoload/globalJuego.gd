@@ -26,6 +26,15 @@ var mundo:Node3D
 var spawn_container: Node3D
 var un_jugador:bool = true # si es true es singleplayer
 
+#Tamaño del Mapa
+var mapa_x_min = -20
+var mapa_x_max = 20
+var mapa_z_min = -20
+var mapa_z_max = 20
+
+
+#enemigos
+var cant_enemigos = 50 # Cantidad de enemigos en la oleada siempr activos
 
 func _ready():
 	# estas son señales de red 

@@ -49,8 +49,7 @@ func spawn_enemy():
 	var cantidad_enemigos = get_tree().get_nodes_in_group("enemy").size()
 	if cantidad_enemigos > GlobalJuego.cant_enemigos:
 		return
-	# No spawnear targets si estamos en modo menú
-	print("modo menu:", is_menu_mode)
+	
 	if is_menu_mode:
 		return
 	

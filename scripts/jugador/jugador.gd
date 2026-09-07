@@ -80,8 +80,8 @@ func ready_client_visuals():
 	
 	#player_ui.option_button_color.item_selected.connect(on_color_changed)
 	#animation_library_godot_standard.hide()
-	if Global.username: 
-		nameplate.text = Global.username
+	if GlobalJuego.nombre_jugador: 
+		nameplate.text =  GlobalJuego.nombre_jugador
 	camera_3d.current = true
 	
 
