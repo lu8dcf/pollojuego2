@@ -53,7 +53,7 @@ func spawn_enemy():
 	if is_menu_mode:
 		return
 	
-	if is_multiplayer_authority() and get_tree().get_node_count_in_group('Targets') < 20:
+	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 20:
 		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = TARGET.instantiate()
 			var rand_x = randf_range(GlobalJuego.mapa_x_min, GlobalJuego.mapa_x_max)
