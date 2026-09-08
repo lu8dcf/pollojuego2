@@ -52,7 +52,13 @@ func spawn_enemy():
 	
 	if is_menu_mode:
 		return
-	
+	if not is_multiplayer_authority():
+		print("No tengo autoridad para spawnear")
+		return
+	# SOLO el servidor puede spawnear enemigos
+	if not multiplayer.is_server():
+		return  # Los clientes NO spawnean, solo reciben sincronización
+		
 	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 20:
 		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = TARGET.instantiate()

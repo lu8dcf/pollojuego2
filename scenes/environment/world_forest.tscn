@@ -44,7 +44,7 @@ unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.420815, 1.1245222, 20.807354)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=979900599]
-_spawnable_scenes = PackedStringArray("uid://c1yny3sauy8yu", "uid://b8go34qeye00a")
+_spawnable_scenes = PackedStringArray("uid://b8go34qeye00a")
 spawn_path = NodePath("../SpawnContainer")
 
 [node name="TimerEnemy" type="Timer" parent="." unique_id=32496409]
