@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 class_name Jugador
+@onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 
 @export var sensitivity: float = 0.002
 

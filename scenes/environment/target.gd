@@ -4,14 +4,19 @@ extends CharacterBody3D
 @export var animation_player: AnimationPlayer
 @export var mesh: MeshInstance3D
 @onready var crystal_timer: Timer = %CrystalTimer
+@onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 
 var is_hurt := false
 var is_dying := false
 
 func _ready():
+	if multiplayer_synchronizer:
+		multiplayer_synchronizer.root_path=".."
 	animation_player.playback_default_blend_time = 0.2
 	add_to_group('Targets')
 	look_at(goal_position)
+	var propiedades = multiplayer_synchronizer.get_synchronized_properties()
+	print("Propiedades sincronizadas: ", propiedades)
 
 	if multiplayer.is_server():
 		crystal_timer.wait_time = 2.5
