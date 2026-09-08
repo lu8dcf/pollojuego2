@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cgn8qa26kgyil"]
+
+[ext_resource type="PackedScene" uid="uid://3c36m7xriokg" path="res://assets/modelos/enemigos/enemigo_2.fbx" id="1_irb5k"]
+
+[node name="enemigo_2" unique_id=2085418257 instance=ExtResource("1_irb5k")]
+
+[node name="Skeleton3D" parent="caracol" parent_id_path=PackedInt32Array(1270793076) index="0" unique_id=967250815]
+transform = Transform3D(1.0000001, 0, 0, 0, 1.0000001, -1.4210855e-14, 0, 1.4210855e-14, 1.0000001, 0, 0, 0.0006527019)
+bones/1/rotation = Quaternion(-0.04155759, 1.8181732e-14, -9.908104e-09, 0.99913615)
+bones/2/position = Vector3(-5.440662e-17, 0.0021946467, 1.7914009e-10)
+bones/2/rotation = Quaternion(0.10066557, 7.434973e-15, 2.4000544e-08, 0.9949204)
+bones/2/scale = Vector3(1.0003877, 0.99999994, 0.99999994)
+bones/3/position = Vector3(-3.676123e-18, 0.001941615, 1.6003905e-11)
+bones/3/rotation = Quaternion(0.47320822, -9.083701e-11, 1.1299036e-07, 0.88095057)
+bones/3/scale = Vector3(1, 1.000769, 1.0000001)
+bones/4/position = Vector3(3.723557e-17, 0.0016106815, -1.5617008e-10)
+bones/4/rotation = Quaternion(0.16448782, -4.5819633e-15, 3.9216946e-08, 0.98637915)
