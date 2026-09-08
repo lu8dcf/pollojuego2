@@ -14,7 +14,8 @@ config/name="pollojuego2"
 config/description="FINAL part 3 project, with a few enhancements"
 run/main_scene="uid://drhjatayvlkyv"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="uid://cateu5bxe5nab"
+boot_splash/image="uid://dwiuj2bkbibd1"
+config/icon="uid://c4cctmjaxy7hc"
 
 [autoload]
 
