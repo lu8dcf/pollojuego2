@@ -94,8 +94,8 @@ func pedir_salvar_rpc(objetivo_id: int) -> void:
 
 	var salvador_id = multiplayer.get_remote_sender_id()
 
-	var salvador = Global.get_player(salvador_id)
-	var objetivo = Global.get_player(objetivo_id)
+	var salvador = GlobalJuego._obtener_jugador(salvador_id)
+	var objetivo = GlobalJuego._obtener_jugador(objetivo_id)
 
 	if salvador == null or objetivo == null:
 		return

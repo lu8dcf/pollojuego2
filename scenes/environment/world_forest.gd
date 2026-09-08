@@ -53,7 +53,6 @@ func spawn_enemy():
 	if is_menu_mode:
 		return
 	if not is_multiplayer_authority():
-		print("No tengo autoridad para spawnear")
 		return
 	# SOLO el servidor puede spawnear enemigos
 	if not multiplayer.is_server():
