@@ -32,7 +32,7 @@ func take_damage(damage: int, source: int):
 	var next_health = health - damage
 	
 	var player_to_notify: Player
-	for current_player in get_tree().get_nodes_in_group('Players'):
+	for current_player in get_tree().get_nodes_in_group('Jugadores'):
 		if current_player.name == str(source):
 			player_to_notify = current_player
 			break

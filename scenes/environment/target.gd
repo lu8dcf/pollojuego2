@@ -13,9 +13,7 @@ func _ready():
 	add_to_group('Targets')
 	look_at(goal_position)
 
-	if multiplayer.is_server():
-		crystal_timer.wait_time = 2.5
-		crystal_timer.timeout.connect(func(): Global.damage_crystal(10))
+	
 
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
