@@ -61,7 +61,7 @@ func remove_player(peer_id):
 		leave_server()
 		return
 	
-	var players: Array[Node] = get_tree().get_nodes_in_group('Players')
+	var players: Array[Node] = get_tree().get_nodes_in_group('Jugadores')
 	var player_to_remove = players.find_custom(func(item): return item.name == str(peer_id))
 	if player_to_remove != -1:
 		players[player_to_remove].queue_free()
@@ -94,8 +94,8 @@ func pedir_salvar_rpc(objetivo_id: int) -> void:
 
 	var salvador_id = multiplayer.get_remote_sender_id()
 
-	var salvador = Global.get_player(salvador_id)
-	var objetivo = Global.get_player(objetivo_id)
+	var salvador = GlobalJuego._obtener_jugador(salvador_id)
+	var objetivo = GlobalJuego._obtener_jugador(objetivo_id)
 
 	if salvador == null or objetivo == null:
 		return

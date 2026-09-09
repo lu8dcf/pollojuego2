@@ -15,6 +15,7 @@ var ver_cruz = true
 # Modelo
 var ver_modelo = false
 @onready var modelo= $modelo
+@onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 
 var is_hurt := false
 var is_dying := false
@@ -24,6 +25,8 @@ func _ready():
 	add_to_group('enemy')
 	look_at(goal_position)
 
+	# CONFIGURAR MultiplayerSynchronizer correctamente
+
 	
 	
 	
@@ -31,8 +34,8 @@ func _ready():
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
 	
-	var player_to_notify: Player
-	for current_player in get_tree().get_nodes_in_group('Jugadores'):
+	var player_to_notify: Jugador
+	for current_player in get_tree().get_nodes_in_group('Players'):
 		if current_player.name == str(source):
 			player_to_notify = current_player
 			break
@@ -65,7 +68,7 @@ var direction := Vector3.ZERO
 var goal_position := Vector3.ZERO
 
 func _physics_process(delta: float) -> void:
-	if not is_multiplayer_authority():
+	if not multiplayer.is_server():
 		return
 
 	if is_dying or is_hurt:
