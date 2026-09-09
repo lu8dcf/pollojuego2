@@ -11,6 +11,8 @@ var polloBasico = "res://scenes/pollos/pollo_modelo_1.tscn"
 var salud_jugador: int = 100
 var salud_maxima: int = 100
 var nombre_jugador: String = ""
+var experiencia_maxima:int = 100 # se le debe agregar un 0.25 de otra para cada nivel
+var experiencia:int = 0
 
 # ===== SISTEMA DE PUNTAJE =====
 # peer_id : { score: 0, username: str, salud: 100 }

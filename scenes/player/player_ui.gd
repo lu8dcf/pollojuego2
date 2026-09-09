@@ -3,7 +3,6 @@ extends CanvasLayer
 class_name PlayerUI
 
 @onready var menu: Control = %Menu
-@onready var button_leave: Button = %ButtonLeave
 @onready var button_copy_session: Button = %ButtonCopySession
 @onready var boton_salir: Button = %BotonSalir # para salir del servidor
 
@@ -17,6 +16,7 @@ class_name PlayerUI
 @onready var barra_salud: ProgressBar = %BarraSalud
 @onready var boton_empezar_ronda: Button = %BotonEmpezarRonda
 @onready var label_session: Label = %LabelSession
+@onready var barra_experiencia: ProgressBar = %BarraExperiencia
 
 @onready var controls_root: VBoxContainer = %ControlsRoot
 
@@ -56,7 +56,11 @@ func _ready() -> void:
 	GlobalSignal.salud_jugador_cambiada.connect(_actualizar_barra_salud)
 	GlobalSignal.sesion_actualizada.connect(_actualizar_info_sesion)
 	GlobalSignal.jugador_recibio_daño.connect(_mostrar_daño)
-	
+	#experiencia  perosanje
+	barra_experiencia.max_value = GlobalJuego.experiencia_maxima
+	barra_experiencia.value = GlobalJuego.experiencia
+	GlobalSignal.experiencia_jugador_cambiada.connect(_actualizar_experiencia)
+
 	if GlobalJuego.nombre_jugador:
 		etiqueta_nombre.text = GlobalJuego.nombre_jugador
 		
@@ -86,6 +90,9 @@ func _actualizar_barra_salud(nueva_salud: int):
 		barra_salud.modulate = Color.YELLOW
 	else:
 		barra_salud.modulate = Color.RED
+
+func _actualizar_experiencia(nueva_exp:int):
+	barra_experiencia.value = nueva_exp
 
 func _actualizar_info_sesion(info: Dictionary):
 	var jugador_local_id = multiplayer.get_unique_id()

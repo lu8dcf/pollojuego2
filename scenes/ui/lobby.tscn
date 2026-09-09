@@ -4,9 +4,6 @@
 [ext_resource type="Script" uid="uid://dny828k6oo18c" path="res://scenes/ui/lobby.gd" id="1_bnidf"]
 [ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="2_2rbxb"]
 [ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_rqagm"]
-[ext_resource type="Texture2D" uid="uid://df4owisch7ucy" path="res://icon.svg" id="4_bthuv"]
-[ext_resource type="Texture2D" uid="uid://tcmot16fb3sb" path="res://assets/kenney_prototype-textures/PNG/Red/texture_10_red.png" id="5_bnidf"]
-[ext_resource type="Texture2D" uid="uid://bgqe2fjb4ypkj" path="res://assets/kenney_prototype-textures/PNG/Green/texture_10_green.png" id="6_kghoh"]
 
 [node name="Lobby" type="CanvasLayer" unique_id=1877026316]
 script = ExtResource("1_bnidf")
@@ -18,11 +15,48 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="BotonEmpezar" parent="." unique_id=1660084449 instance=ExtResource("3_rqagm")]
+unique_name_in_owner = true
+anchors_preset = -1
+anchor_top = 0.086419754
+anchor_right = 0.99300003
+anchor_bottom = 0.988
+offset_left = 912.0
+offset_top = 512.0
+offset_right = -4.936035
+offset_bottom = 2.776001
+texto = "Empezar"
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginBotonEmpezar" type="MarginContainer" parent="." unique_id=1673644868]
+anchors_preset = -1
+anchor_left = 0.74300003
+anchor_top = 0.77800006
+anchor_right = 0.95100003
+anchor_bottom = 0.88900006
+offset_left = 12.063965
+offset_top = 21.855957
+offset_right = -0.55200195
+offset_bottom = -0.072021484
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginBotonEmpezar" unique_id=528599260]
+layout_mode = 2
+
+[node name="LabelEstado" type="Label" parent="MarginBotonEmpezar/VBoxContainer" unique_id=507714530]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Estado:"
+label_settings = ExtResource("2_2rbxb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="MarginBoton" type="MarginContainer" parent="." unique_id=753761136]
 offset_right = 219.0
 offset_bottom = 60.0
 
-[node name="TextureButton" parent="MarginBoton" unique_id=1088779155 instance=ExtResource("3_rqagm")]
+[node name="RegresarBoton" parent="MarginBoton" unique_id=1088779155 instance=ExtResource("3_rqagm")]
 layout_mode = 2
 texto = "Regresar"
 metadata/_edit_use_anchors_ = true
@@ -53,6 +87,7 @@ label_settings = ExtResource("1_5t5el")
 
 [node name="MarginContenedorJugadores" type="MarginContainer" parent="." unique_id=1062665617]
 unique_name_in_owner = true
+propagate_maximum_size = false
 anchors_preset = 14
 anchor_top = 0.5
 anchor_right = 1.0
@@ -63,116 +98,10 @@ offset_right = -57.0
 offset_bottom = 188.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
 
 [node name="HBoxJugadores" type="HBoxContainer" parent="MarginContenedorJugadores" unique_id=872944241]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Jugador1" type="Panel" parent="MarginContenedorJugadores/HBoxJugadores" unique_id=1298575079]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(250, 0)
-layout_mode = 2
-
-[node name="Label" type="Label" parent="MarginContenedorJugadores/HBoxJugadores/Jugador1" unique_id=2083559304]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -53.5
-offset_right = 53.5
-offset_bottom = 25.0
-grow_horizontal = 2
-text = "Nombre Usuario"
-label_settings = ExtResource("2_2rbxb")
-
-[node name="MarginContainer" type="MarginContainer" parent="MarginContenedorJugadores/HBoxJugadores/Jugador1" unique_id=695388436]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -86.0
-offset_top = -171.0
-offset_right = 98.0
-offset_bottom = 155.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="ImagenPollo" type="TextureRect" parent="MarginContenedorJugadores/HBoxJugadores/Jugador1/MarginContainer" unique_id=1210462855]
-layout_mode = 2
-texture = ExtResource("4_bthuv")
-
-[node name="ContenedorBoton" type="MarginContainer" parent="MarginContenedorJugadores/HBoxJugadores/Jugador1" unique_id=399548586]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -92.0
-offset_top = -64.0
-offset_right = 92.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="TextureButton" parent="MarginContenedorJugadores/HBoxJugadores/Jugador1/ContenedorBoton" unique_id=803062252 instance=ExtResource("3_rqagm")]
-layout_mode = 2
-texto = "Estoy listo"
-metadata/_edit_use_anchors_ = true
-
-[node name="CambiarAtrasPersonaje" type="TextureButton" parent="MarginContenedorJugadores/HBoxJugadores/Jugador1" unique_id=1149077647]
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 11.0
-offset_top = -20.0
-offset_right = 51.0
-offset_bottom = 20.0
-grow_vertical = 2
-texture_normal = ExtResource("5_bnidf")
-ignore_texture_size = true
-stretch_mode = 0
-
-[node name="CambiarAdelantePersonaje2" type="TextureButton" parent="MarginContenedorJugadores/HBoxJugadores/Jugador1" unique_id=605929331]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -47.0
-offset_top = -20.0
-offset_right = -7.0
-offset_bottom = 20.0
-grow_horizontal = 0
-grow_vertical = 2
-texture_normal = ExtResource("6_kghoh")
-ignore_texture_size = true
-stretch_mode = 0
-
-[node name="MarginBotonEmpezar" type="MarginContainer" parent="." unique_id=1673644868]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -219.0
-offset_top = -73.0
-offset_bottom = -13.0
-grow_horizontal = 0
-grow_vertical = 0
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginBotonEmpezar" unique_id=1743361491]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="MarginBotonEmpezar/HBoxContainer" unique_id=507714530]
-layout_mode = 2
-text = "Estado:"
-label_settings = ExtResource("2_2rbxb")
-
-[node name="TextureButton" parent="MarginBotonEmpezar/HBoxContainer" unique_id=1660084449 instance=ExtResource("3_rqagm")]
-layout_mode = 2
-texto = "Empezar"
-metadata/_edit_use_anchors_ = true
+[connection signal="pressed" from="MarginBoton/RegresarBoton" to="." method="_on_regresar_boton_pressed"]

@@ -18,12 +18,14 @@ extends CanvasLayer
 
 const MUNDO = preload("uid://yubh30707eb7")
 const PLAYER = preload("uid://bc1ek0bvbgna2")
+const LOBBY = preload("uid://oegdxwge86nk")
 
 @onready var mundo: Node3D = %Mundo
 @onready var menu_camera: MenuCameraController = %Mundo.get_node("Camera3D")
 
 @onready var temp_mundo: Node3D = %Mundo
 
+var lobby_actual :CanvasLayer = null
 
 func _ready() -> void:
 	ocultar_todo() # ocultar toso los menus 
@@ -63,26 +65,68 @@ func on_join():
 	_deactivate_menu_camera()
 	temp_mundo.queue_free()
 	Network.join_server()
-	add_world()
+	_mostrar_lobby()
 
 func add_world():
 	#temp_mundo.queue_free()
+	_limpiar_lobby() 
 	var nuevo_mundo = MUNDO.instantiate()
 	get_tree().current_scene.add_child(nuevo_mundo)
 	hide()
 
+func _mostrar_lobby():
+	hide() # se esconde el menu principal
+	_limpiar_lobby() # se limpia el lobby por si queda guardado
+	if LOBBY:
+		lobby_actual = LOBBY.instantiate()
+		get_tree().current_scene.add_child(lobby_actual)
+		if lobby_actual.has_signal("partida_iniciada"):
+			lobby_actual.partida_iniciada.connect(_on_partida_iniciada_desde_lobby)
+	else:
+		print("ERROR: No se pudo cargar la escena del lobby")
+		# crear mundo directamente, pero fue un error de falta de lobby
+		add_world()
+		
+func _limpiar_lobby():
+	if lobby_actual and is_instance_valid(lobby_actual):
+		lobby_actual.queue_free()
+	lobby_actual = null
+	
+func _on_partida_iniciada_desde_lobby():
+	# se llamacuando el host inicia la partida
+	print("arranca a partida")
+	_deactivate_menu_camera()
+	if temp_mundo:
+		temp_mundo.queue_free()
+		await  get_tree().process_frame
+	add_world()
+
 func on_unirse_tube():
 	_deactivate_menu_camera()
+	GlobalJuego.un_jugador = false
 	temp_mundo.queue_free()
 	Network.tube_join(edit_sesion.text)
-	multiplayer.connected_to_server.connect(add_world)
+	#multiplayer.connected_to_server.connect(add_world)
+	# esperar a estar conectado y luego mostrar el lobby
+	multiplayer.connected_to_server.connect(_on_conectado_para_lobby)
 
+func _on_conectado_para_lobby():
+	if multiplayer.connected_to_server.is_connected(_on_conectado_para_lobby):
+		multiplayer.connected_to_server.disconnect(_on_conectado_para_lobby)
+	
+	_mostrar_lobby()
+	
 func on_crear_partida_tube():
 	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = false
-	temp_mundo.queue_free() 
+	temp_mundo.queue_free()
+	if edit_nombre_usuario.text != "":
+		GlobalJuego.nombre_jugador = edit_nombre_usuario.text
+	elif nombre_usuario.text != "":
+		GlobalJuego.nombre_jugador = nombre_usuario.text 
+	print("Creando partida con nombre: ", GlobalJuego.nombre_jugador)
 	Network.tube_create()
-	add_world()
+	_mostrar_lobby()
 
 func update_session(new_text: String):
 	boton_unirse_tube.disabled = new_text == ""
@@ -92,13 +136,16 @@ func update_session(new_text: String):
 
 func update_username(new_text: String):
 	GlobalJuego.nombre_jugador = new_text
-
+	print("Nombre actualizado: ", GlobalJuego.nombre_jugador)
+	
 func on_error_raised(_code, _message):
 	edit_sesion.text = ''
 	boton_unirse_tube.add_theme_color_override('font_disabled_color', Color.DARK_RED)
 	boton_unirse_tube.disabled = true
 	Network.clean_up_signals()
 	
+	show()
+	_limpiar_lobby()
 
 
 func ocultar_todo():
@@ -108,29 +155,15 @@ func ocultar_todo():
 	
 func _on_un_jugador_pressed() -> void:
 	ocultar_todo()
-	if panel_un_jugador.visible:
-		pass
-	else:
-		panel_un_jugador.visible=true
+	panel_un_jugador.visible = not panel_un_jugador.visible
 	
-
-
 func _on_multijugador_pressed() -> void:
 	ocultar_todo()
-	if panel_multijugador.visible:
-		pass
-	else:
-		panel_multijugador.visible=true
-	
-
+	panel_multijugador.visible = not panel_multijugador.visible
 
 func _on_opciones_pressed() -> void:
 	ocultar_todo()
-	if panel_opciones.visible:
-		pass
-	else:
-		panel_opciones.visible=true
-
+	panel_opciones.visible =  not panel_opciones.visible
 
 func _on_creditos_pressed() -> void:
 	ocultar_todo()

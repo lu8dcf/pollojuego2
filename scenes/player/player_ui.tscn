@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://pxj3b3e28fg3" path="res://addons/tube/inspector/icons/clipboard_icon.tres" id="1_32d7b"]
 [ext_resource type="Script" uid="uid://c35unm3ykc85i" path="res://scenes/player/player_ui.gd" id="1_m6sn8"]
 [ext_resource type="Texture2D" uid="uid://b1t8eqspo4bb6" path="res://assets/keyboard-&-mouse_sheet_default.png" id="3_fatww"]
+[ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="4_mo8vb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gfjak"]
 bg_color = Color(1, 1, 1, 1)
@@ -46,6 +47,8 @@ region = Rect2(0, 128, 64, 64)
 [sub_resource type="AtlasTexture" id="AtlasTexture_mo8vb"]
 atlas = ExtResource("3_fatww")
 region = Rect2(448, 576, 64, 64)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_mo8vb"]
 
 [node name="Player_UI" type="CanvasLayer" unique_id=1188246629]
 script = ExtResource("1_m6sn8")
@@ -118,35 +121,56 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_gfjak")
 
-[node name="TopCenter" type="MarginContainer" parent="." unique_id=1042432544]
-anchors_preset = 5
+[node name="AbajoCentro" type="MarginContainer" parent="." unique_id=1042432544]
+anchors_preset = 7
 anchor_left = 0.5
+anchor_top = 1.0
 anchor_right = 0.5
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 40.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -87.0
+offset_right = 200.0
 grow_horizontal = 2
+grow_vertical = 0
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="ControlVida" type="VBoxContainer" parent="TopCenter" unique_id=1544861557]
+[node name="ControlVida" type="VBoxContainer" parent="AbajoCentro" unique_id=1544861557]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="EtiquetaNombre" type="Label" parent="TopCenter/ControlVida" unique_id=2132757498]
+[node name="Label" type="Label" parent="AbajoCentro/ControlVida" unique_id=1456244193]
+layout_mode = 2
+text = "Monedas: "
+label_settings = ExtResource("4_mo8vb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EtiquetaNombre" type="Label" parent="AbajoCentro/ControlVida" unique_id=2132757498]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "Crystal Health"
 horizontal_alignment = 1
 
-[node name="EtiquetaSalud" type="Label" parent="TopCenter/ControlVida" unique_id=171118465]
+[node name="EtiquetaSalud" type="Label" parent="AbajoCentro/ControlVida" unique_id=171118465]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 horizontal_alignment = 1
 
-[node name="BarraSalud" type="ProgressBar" parent="TopCenter/ControlVida" unique_id=1506908608]
+[node name="BarraSalud" type="ProgressBar" parent="AbajoCentro/ControlVida" unique_id=1506908608]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxTexture_nlx67")
+theme_override_styles/fill = SubResource("StyleBoxTexture_g18nd")
+value = 60.84
+show_percentage = false
+
+[node name="BarraExperiencia" type="ProgressBar" parent="AbajoCentro/ControlVida" unique_id=2017376515]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 20)
 layout_mode = 2
@@ -194,8 +218,9 @@ text = "Fire Ball"
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -40.0
-offset_bottom = 40.0
+offset_left = -168.0
+offset_top = 3.0
+offset_bottom = 43.0
 grow_horizontal = 0
 
 [node name="MonedasExp" type="VBoxContainer" parent="TopRight" unique_id=294107847]
@@ -208,6 +233,5 @@ layout_mode = 2
 [node name="TextureRect" type="TextureRect" parent="TopRight/MonedasExp/Control" unique_id=943599005]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TopRight/MonedasExp/Control" unique_id=1456244193]
-layout_mode = 2
-text = "Monedas: "
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=24842608]
+replication_config = SubResource("SceneReplicationConfig_mo8vb")
