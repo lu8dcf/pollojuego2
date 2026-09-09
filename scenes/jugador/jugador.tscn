@@ -76,7 +76,15 @@ unique_name_in_owner = true
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0.47852877, 0)
 shape = SubResource("CylinderShape3D_8w0r3")
 
+[node name="timer_caido" type="Timer" parent="." unique_id=523117100]
+
+[node name="timer_salvar" type="Timer" parent="." unique_id=2130058164]
+wait_time = 3.0
+one_shot = true
+
 [connection signal="area_entered" from="DeteccionAyuda" to="." method="_on_deteccion_ayuda_area_entered"]
+[connection signal="timeout" from="timer_caido" to="." method="_on_timer_caido_timeout"]
+[connection signal="timeout" from="timer_salvar" to="." method="_on_timer_salvar_timeout"]
 
 [editable path="camaraRig"]
 [editable path="jugador/brazos"]

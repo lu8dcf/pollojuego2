@@ -85,7 +85,7 @@ func _eliminar_jugador(peer_id: int):
 
 func _obtener_jugador(peer_id: int) -> Node:
 	"""Busca un jugador por su ID"""
-	for jugador in get_tree().get_nodes_in_group("Players"):
+	for jugador in get_tree().get_nodes_in_group("Jugadores"):
 		if jugador.name == str(peer_id):
 			return jugador
 	return null

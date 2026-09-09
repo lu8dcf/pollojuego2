@@ -26,18 +26,41 @@ var nodoJugador = $jugador
 var mousePosicion : Vector2
 
 #maquina de estados
-enum estados {
+enum Estado {
 	OLEADA, #estado generico, dutante la oleada
 	CAIDO, #incapacitado, solo peude disparar pero no moverse
 	MUERTE, #paso el tiempo de caido y muere
-	TIENDA #no puede moverse ni atacar.
+	TIENDA, #no puede moverse ni atacar.
+	DASH
 }
-@export var estadoActual : estados
+@export var estadoActual : Estado
 
 #salud jugador
 var salud = 100
+
+#temporizador de vida en estado CAIDO
+@onready var timer_caido: Timer = $timer_caido
+#tiempo que se debe presionar la tecla para salvar
+@onready var timer_salvar: Timer = $timer_salvar
+
+
+# Jugador que actualmente esta dentro de nuestra zona de ayuda.
+var objetivo_actual: Node = null
+
+
+
+#-----------------------------------------------------------------HABILIDADES
+
 #habilidad especial
 #@onready var habilidad: Habilidad = $habilidad
+#-----------------------------------------------DASH
+const DASH_SPEED := 20.0
+const DASH_DURATION := 0.25
+const DASH_COLDOWN :=3
+
+var direccion_dash := Vector3.ZERO
+var tiempo_dash := 0.0
+
 
 
 
@@ -52,7 +75,7 @@ var salud = 100
 #@export var arm_mesh_right: MeshInstance3D
 #@export var arm_mesh_left: MeshInstance3D
 
-var immobile := false
+
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(int(name)) #lo mete en el arbol
@@ -85,11 +108,23 @@ func ready_client_visuals():
 		nameplate.text =  GlobalJuego.nombre_jugador
 	camera_3d.current = true
 	
+	#------------------------------------------------------------------------------INPUTS
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_multiplayer_authority() or immobile:
+	if not is_multiplayer_authority():
 		return
 	
+	#si estoy en un estado que no peude interactuar
+	if not puede_interactuar():
+		return
+		
+# Cuando se PRESIONA E.
+	if event.is_action_pressed("attack2"):
+		if estadoActual == Estado.CAIDO:
+			return
+		if objetivo_actual == null:
+			return
+		empezar_salvar()
 	#if event is InputEventMouseMotion: #esto hace que no puedo mover mas o menos de los 90 grados
 		#$nodo_jugador.rotate_y(-event.relative.x * sensitivity)	
 		#camera_3d.rotate_x(-event.relative.y * sensitivity)
@@ -97,17 +132,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed('menu'):
-		estadoActual = estados.TIENDA
+		estadoActual = Estado.TIENDA
 		open_menu(player_ui.menu.visible)
 		
 	if Input.is_action_just_pressed("test_caido"):
-		estadoActual = estados.CAIDO
-		pedir_ser_salvado()
-		await get_tree().create_timer(4).timeout
-		pedir_salvar(2)
-		
-	if immobile:
-		return
+		estadoActual = Estado.CAIDO
+		pedir_ayuda()
 
 	if puede_disparar():
 		shoot()	
@@ -124,43 +154,169 @@ func open_menu(current_visibility: bool):
 	player_ui.menu.visible = !current_visibility
 	player_ui.controls_root.visible = current_visibility
 	
-	immobile = player_ui.menu.visible
 
 	if player_ui.menu.visible:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	#else:
 		#Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		
+		
+		
+#--------------------------------------------------------------------------------ESTADOS
+		
 func puede_moverse() -> bool:
-	return estadoActual == estados.OLEADA
+	return estadoActual == Estado.OLEADA
 
 func puede_atacar() -> bool:
-	return estadoActual == estados.OLEADA
+	return estadoActual == Estado.OLEADA
 
 func puede_disparar() -> bool:
-	return estadoActual in [estados.OLEADA, estados.CAIDO]
+	return estadoActual in [Estado.OLEADA, Estado.CAIDO]
+
+func puede_usar_habilidad() -> bool:
+	return estadoActual == Estado.OLEADA
+
+func puede_interactuar() -> bool:
+	return estadoActual == Estado.OLEADA
+
+func esta_vivo() -> bool:
+	return estadoActual != Estado.MUERTE
+
+
+func entrar_caido():
+	estadoActual = Estado.CAIDO
+	timer_caido.start()
 	
-func cambiar_estado(nuevo_estado: estados) -> void:
+func entrar_muerte():
+	estadoActual = Estado.MUERTE
+	timer_caido.stop()
+	salud = 0
+	velocity = Vector3.ZERO
+
+func entrar_oleada() -> void:
+	estadoActual = Estado.OLEADA
+	timer_caido.stop()
+
+func entrar_tienda():
+	estadoActual = Estado.TIENDA
+	velocity = Vector3.ZERO
+	
+func cambiar_estado(nuevo_estado: Estado) -> void:
 	if estadoActual == nuevo_estado:
 		return
+	match nuevo_estado:
+		Estado.CAIDO:
+			entrar_caido()
+		Estado.MUERTE:
+			entrar_muerte()
+		Estado.OLEADA:
+			entrar_oleada()
+		Estado.TIENDA:
+			entrar_tienda()
+
 	estadoActual = nuevo_estado
 	
+func _on_timer_caido_timeout() -> void:
+	cambiar_estado(Estado.MUERTE)
+	pass # Replace with function body.
+#----------------------------------------------------------------HABILIDADES
+
+#-------------------------------------------------DASH
+
+#func empezar_dash(direccion: Vector3) -> void:
+	#if estadoActual != Estado.OLEADA:
+		#return
+	#if direccion.length_squared() < 0.001:
+		#return
+	#direccion_dash = direccion.normalized()
+	#tiempo_dash = DASH_DURATION
+	#cambiar_estado(Estado.DASH)
+#
+#func procesar_dash(delta: float) -> void:
+	#tiempo_dash -= delta
+	#velocity = direccion_dash * DASH_SPEED
+	#move_and_slide()
+	#if tiempo_dash <= 0.0:
+		#terminar_dash()
+#
+#func terminar_dash() -> void:
+	#velocity = Vector3.ZERO
+	#direccion_dash = Vector3.ZERO
+	#cambiar_estado(Estado.OLEADA)
+
+# --------------------------------------------------------------SISTEMA DE SALVAR
+func procesar_salvar() -> void:
+	# Si no estamos intentando salvar,
+	# no hacemos nada.
+	if timer_salvar.is_stopped():
+		return
+	# comprobar que se sigue presionando E
+	if not Input.is_action_pressed("attack2"):
+		cancelar_salvar()
+		return
+	# Comprobar que el objetivo sigue existiendo
+	if objetivo_actual == null:
+		cancelar_salvar()
+		return
+	# Comprobar que seguimos en condiciones de salvar
+	if estadoActual != Estado.OLEADA:
+		cancelar_salvar()
+		return
+
+
+# EMPEZAR A SALVAR
+func empezar_salvar() -> void:
+	if estadoActual != Estado.OLEADA:
+		return
+	if objetivo_actual == null:
+		return
+	# Evitamos reiniciar el timer si ya estaba contando.
+	if not timer_salvar.is_stopped():
+		return
+	timer_salvar.start()
+
+# CANCELAR SALVAR
+func cancelar_salvar() -> void:
+	if timer_salvar.is_stopped():
+		return
+	timer_salvar.stop()
+
+
+# COMPLETAR SALVAR
+func _on_timer_salvar_timeout() -> void:
+	if objetivo_actual == null:
+		return
+	if estadoActual != Estado.OLEADA:
+		return
+	# Seguridad adicional:
+	# verificamos que EL BOTON DERECHP siga presionada.
+	if not Input.is_action_pressed("attack2"):
+		return
+	var objetivo_id := int(objetivo_actual.name)
+	pedir_salvar(objetivo_id)
+#
+#
+#func procesar_habilidad() -> void:
+	#if not puede_usar_habilidad():
+		#return
+	#if Input.is_action_just_pressed("habilidad"):
+		#print("usoHabilidad")
+		##habilidad.usar()
 
 func _physics_process(delta: float) -> void:
-	if estadoActual == estados.MUERTE:
-		return
+	match estadoActual:
+		#Estado.OLEADA:
+			#procesar_movimiento(delta)
+		#Estado.DASH:
+			#procesar_dash(delta)
+		Estado.CAIDO:
+			velocity = Vector3.ZERO
+		Estado.MUERTE:
+			velocity = Vector3.ZERO
+		Estado.TIENDA:
+			velocity = Vector3.ZERO
 
-	if estadoActual == estados.CAIDO:
-		# No movimiento
-		velocity = Vector3.ZERO
-		return
-
-	if estadoActual == estados.TIENDA:
-		# Tampoco movimiento
-		velocity = Vector3.ZERO
-		return
-
-	# Si llegamos acá estamos en OLEADA
+	# Si llegamos aca estamos en OLEADA
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
@@ -173,9 +329,7 @@ func _physics_process(delta: float) -> void:
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir := Input.get_vector("left", "right", "forward", "backward")
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	
-	if immobile:
-		direction = Vector3.ZERO
+
 
 	if direction:
 		velocity.x = direction.x * SPEED
@@ -308,19 +462,37 @@ func attack(version: int):
 	#weapon_animation_player.play("arm_model_animations/idle")
 	
 #cuando un jugador esta cerca, si se aprieta la E, manda la peticion de salvarlo
-func _on_deteccion_ayuda_area_entered(area: Area3D) -> void: 
-	if area.is_in_group("Jugadores") and Input.is_key_pressed(KEY_E):
-		var jugador_objetivo = area.get_parent()
-		var objetivo_id = int(jugador_objetivo.name)
-		pedir_salvar(objetivo_id)
+#func _on_deteccion_ayuda_area_entered(area: Area3D) -> void: 
+	#if(estadoActual != estados.CAIDO) and (Input.is_action_just_pressed("attack2")):
+		#var jugador_objetivo = area.get_parent()
+		#var objetivo_id = int(jugador_objetivo.name)
+		#print("id es: ",objetivo_id)
+		#pedir_salvar(objetivo_id)
 
 	
 	#-----------------------------------------SERVIDOR
 	
+	
+		
+
+#-------------------------SERVIDOR----------------------
+
 @rpc("any_peer")
-func pedir_ser_salvado():
+func pedir_ayuda():
 	print("Ayuda!")
 
 
 func pedir_salvar(objetivo_id: int) -> void:
 	Network.pedir_salvar_rpc.rpc_id(1, objetivo_id)
+	
+	objetivo_actual = null
+
+func _on_deteccion_ayuda_area_entered(area: Area3D) -> void: 
+	# Guardamos al jugador afectado solo si no estamos caídos
+	if estadoActual != Estado.CAIDO: 
+		objetivo_actual = area.get_parent()
+
+func _on_deteccion_ayuda_area_exited(area: Area3D) -> void:
+	# Si el jugador se aleja del área, limpiamos la referencia
+	if objetivo_actual == area.get_parent():
+		objetivo_actual = null
