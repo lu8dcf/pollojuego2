@@ -5,27 +5,25 @@ extends CanvasLayer
 @onready var h_box_jugadores: HBoxContainer = %HBoxJugadores
 const PANEL_JUGADOR = preload("uid://b4gmxx0tqmgc4")
 @onready var label_estado: Label = %LabelEstado
-@onready var boton_empezar: Button = $Button
+@onready var boton_empezar: TextureButtonAnimado = %BotonEmpezar
 
 var jugadores_en_lobby: Dictionary = {}  # peer_id -> {nombre: String, panel: Node, listo: bool}
 var es_host: bool = false
 var lobby_inicializado: bool = false
+var partida_iniciada_flag: bool = false
 
 signal partida_iniciada
 
 func _ready() -> void:
 	add_to_group("lobby")
 	
-	print("=== LOBBY INICIADO ===")
-	print("Mi peer_id: ", multiplayer.get_unique_id())
-	print("¿Soy servidor?: ", multiplayer.is_server())
-	
 	if Network:
 		Network.tube_client.session_created.connect(_on_session_created)
 	
 	multiplayer.peer_connected.connect(_on_jugador_conectado)
 	multiplayer.peer_disconnected.connect(_on_jugador_desconectado)
-	
+	multiplayer.server_disconnected.connect(_on_server_disconnected_lobby)
+
 	es_host = multiplayer.is_server()
 	
 	if boton_empezar:
@@ -33,7 +31,7 @@ func _ready() -> void:
 		if not boton_empezar.pressed.is_connected(_on_iniciar_partida_pressed):
 			boton_empezar.pressed.connect(_on_iniciar_partida_pressed)
 		boton_empezar.disabled = true
-		boton_empezar.text = "Esperando jugadores..."
+		boton_empezar.cambiar_texto("Esperando jugadores...")
 	
 	mostrar_usuarios()
 	
@@ -71,7 +69,7 @@ func _on_session_created():
 	if boton_empezar:
 		boton_empezar.visible = true
 		boton_empezar.disabled = true
-		boton_empezar.text = "Esperando jugadores..."
+		boton_empezar.cambiar_texto("Esperando jugadores...")
 	
 	if not jugadores_en_lobby.has(1):
 		_agregar_jugador_al_lobby(1, _obtener_nombre_jugador())
@@ -108,6 +106,18 @@ func _on_jugador_desconectado(peer_id: int):
 		jugadores_en_lobby.erase(peer_id)
 	
 	_actualizar_estado_lobby()
+
+func _on_server_disconnected_lobby():
+	print("Host desconectado en el lobby")
+	
+	if multiplayer.is_server():
+		return
+	
+	# Limpiar y volver al menú
+	if Network:
+		Network._volver_al_menu_por_desconexion_host()
+	else:
+		get_tree().reload_current_scene()
 
 func _agregar_jugador_al_lobby(peer_id: int, nombre: String):
 	if nombre == "":
@@ -217,11 +227,11 @@ func _verificar_todos_listos():
 	if boton_empezar:
 		if todos_listos:
 			boton_empezar.disabled = false
-			boton_empezar.text = "¡Comenzar partida!"
+			boton_empezar.cambiar_texto("¡Comenzar partida!")
 			boton_empezar.modulate = Color.GREEN
 		else:
 			boton_empezar.disabled = true
-			boton_empezar.text = "Esperando jugadores..."
+			boton_empezar.cambiar_texto("Esperando jugadores...")
 			boton_empezar.modulate = Color.WHITE
 	
 	if label_estado:
@@ -277,10 +287,17 @@ func _iniciar_partida():
 	_comenzar_partida()
 
 func _comenzar_partida():
+	if partida_iniciada_flag:
+		return
+	partida_iniciada_flag = true
+	
 	print("¡Comenzando partida!")
+	
+	# Cambiar Network a modo partida
 	if Network and Network.has_method("iniciar_partida_desde_lobby"):
 		Network.iniciar_partida_desde_lobby()
 	
+	# Emitir señal SOLAMENTE
 	partida_iniciada.emit()
 	hide()
 

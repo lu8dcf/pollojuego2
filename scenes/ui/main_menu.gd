@@ -26,6 +26,7 @@ const LOBBY = preload("uid://oegdxwge86nk")
 @onready var temp_mundo: Node3D = %Mundo
 
 var lobby_actual :CanvasLayer = null
+var mundo_creado: bool = false
 
 func _ready() -> void:
 	ocultar_todo() # ocultar toso los menus 
@@ -93,14 +94,36 @@ func _limpiar_lobby():
 	lobby_actual = null
 	
 func _on_partida_iniciada_desde_lobby():
-	# se llamacuando el host inicia la partida
-	print("arranca a partida")
+	if mundo_creado:
+		print("El mundo ya fue creado, ignorando...")
+		return
+	
+	mundo_creado = true
+	
+	print("Partida iniciada desde el lobby")
 	_deactivate_menu_camera()
+	
 	if temp_mundo:
 		temp_mundo.queue_free()
-		await  get_tree().process_frame
-	add_world()
-
+		await get_tree().process_frame
+	
+	# Crear el mundo LOCALMENTE en cada cliente
+	var nuevo_mundo = MUNDO.instantiate()
+	nuevo_mundo.name = "Mundo"
+	nuevo_mundo.add_to_group("mundo")
+	get_tree().current_scene.add_child(nuevo_mundo)
+	
+	await get_tree().create_timer(0.5).timeout
+	
+	if multiplayer.is_server():
+		print("HOST: Creando jugadores...")
+		Network.crear_todos_los_jugadores()
+	else:
+		print("CLIENTE: Esperando jugadores del host...")
+	
+	hide()
+	
+	
 func on_unirse_tube():
 	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = false

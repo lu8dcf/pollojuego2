@@ -56,7 +56,11 @@ var immobile := false
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(int(name)) #lo mete en el arbol
+	print("Jugador ", name, " - Autoridad: ", get_multiplayer_authority())
 
+	if not is_multiplayer_authority():
+		set_process(false)
+		set_physics_process(false)
 func _ready():
 	#add_child(personajePollo.instantiate())
 	add_to_group("Jugadores")
@@ -67,8 +71,7 @@ func _ready():
 	player_ui.hide()
 
 	if not is_multiplayer_authority(): #
-		set_process(false)
-		set_physics_process(false)
+		player_ui.hide()
 		return
 	
 	ready_client_visuals() 
