@@ -165,7 +165,7 @@ func on_error_raised(_code, _message):
 	edit_sesion.text = ''
 	boton_unirse_tube.add_theme_color_override('font_disabled_color', Color.DARK_RED)
 	boton_unirse_tube.disabled = true
-	Network.clean_up_signals()
+	#Network.clean_up_signals()
 	
 	show()
 	_limpiar_lobby()

@@ -15,7 +15,7 @@ config/description="FINAL part 3 project, with a few enhancements"
 run/main_scene="uid://drhjatayvlkyv"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/image="uid://ctbo1jwngtbpb"
-config/icon="uid://c4cctmjaxy7hc"
+config/icon="uid://bfwl40d0w1p2y"
 boot_splash/minimum_display_time=120
 
 [autoload]
