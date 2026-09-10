@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://cqy6sq80q31lu"]
+
+[ext_resource type="PackedScene" uid="uid://d0sgljgf8jdqs" path="res://assets/modelos/enemigos/enemigo_1.fbx" id="1_64bgc"]
+
+[node name="enemigo_1" unique_id=1270794210 instance=ExtResource("1_64bgc")]
+
+[node name="Skeleton3D" parent="Babosa" parent_id_path=PackedInt32Array(1767601469) index="0" unique_id=69120969]
+bones/1/position = Vector3(-6.32903e-18, 0.002150768, -7.1206747e-12)
+bones/1/rotation = Quaternion(0.15966074, -2.899995e-09, 2.0989297e-08, 0.98717195)
+bones/1/scale = Vector3(1, 1, 0.9999999)
+bones/2/position = Vector3(-6.325642e-18, 0.001407971, 6.8464456e-11)
+bones/2/rotation = Quaternion(0.29211143, -7.481386e-09, 8.8325045e-08, 0.95638436)
+bones/2/scale = Vector3(1, 1.0000002, 1.0000001)
+bones/4/position = Vector3(-6.325642e-18, 0.001407971, 6.8464456e-11)
+bones/4/rotation = Quaternion(0.6119519, -1.36134295e-08, 1.6071954e-07, 0.790895)
+bones/5/position = Vector3(-4.7003552e-17, 0.0013122848, 1.2221846e-10)
+bones/5/rotation = Quaternion(0.045319308, -0.011570131, -0.10027106, 0.9938602)
+bones/5/scale = Vector3(1, 0.9999999, 0.99999994)
+bones/6/position = Vector3(2.4126886e-17, 0.00080233393, -1.07044804e-10)
+bones/6/rotation = Quaternion(-0.12558202, 1.4081322e-09, -2.9339747e-08, 0.99208325)
+bones/6/scale = Vector3(1, 0.99999994, 0.99999994)
+bones/7/position = Vector3(-7.799479e-18, 0.0005485607, 2.8754676e-11)
+bones/7/rotation = Quaternion(-0.17753069, 9.463583e-10, -2.8420242e-08, 0.9841153)
+bones/7/scale = Vector3(1, 1.0000001, 1)
+bones/8/position = Vector3(4.463186e-17, 0.00031114125, -2.0571841e-10)
+bones/8/rotation = Quaternion(-0.4177468, -3.283358e-09, -1.0836693e-07, 0.9085635)
+bones/8/scale = Vector3(1, 0.99999994, 0.9999999)
+bones/9/position = Vector3(-2.1524801e-17, 0.0002608696, 8.519925e-11)
+bones/9/scale = Vector3(1, 1, 1)
+bones/10/position = Vector3(-1.0475087e-16, 0.0002608694, 4.3472315e-10)
+bones/10/rotation = Quaternion(-0.4373603, -1.3592532e-09, -1.0608674e-07, 0.8992864)
+bones/10/scale = Vector3(1, 1.0000001, 1)
+bones/11/position = Vector3(9.6490605e-17, 0.00028620195, -3.3965936e-10)
+bones/11/rotation = Quaternion(-5.4885476e-07, -1.0385362e-15, -1.5141068e-13, 1)
+bones/11/scale = Vector3(1, 0.99999994, 0.99999994)

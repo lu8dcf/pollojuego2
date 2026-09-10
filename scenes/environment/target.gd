@@ -18,9 +18,7 @@ func _ready():
 	var propiedades = multiplayer_synchronizer.get_synchronized_properties()
 	print("Propiedades sincronizadas: ", propiedades)
 
-	if multiplayer.is_server():
-		crystal_timer.wait_time = 2.5
-		crystal_timer.timeout.connect(func(): Global.damage_crystal(10))
+	
 
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
