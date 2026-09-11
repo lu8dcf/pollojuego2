@@ -83,7 +83,7 @@ func spawn_enemy():
 		return  # Los clientes NO spawnean, solo reciben sincronización
 		
 		#nueva verificacion de autoridad y limite d eenemigos
-	if is_multiplayer_authority() and get_tree().get_node_in_group('enemy') < 20:
+	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 20:
 		#dependiedno de cuantos jugadores klas veces ques e replican los enemigos
 		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = TARGET.instantiate()
