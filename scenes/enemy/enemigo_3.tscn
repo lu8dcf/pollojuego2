@@ -127,7 +127,7 @@ tracks/16/keys = PackedFloat32Array(0, 1, -0.00017707943, -9.255611e-07, -0.0007
 
 [sub_resource type="Animation" id="Animation_1sy2v"]
 resource_name = "caminar_bicho"
-length = 1.7666666666666666
+length = 1.1666666
 loop_mode = 1
 tracks/0/type = "rotation_3d"
 tracks/0/imported = true
@@ -249,7 +249,7 @@ tracks/16/interp = 1
 tracks/16/loop_wrap = true
 tracks/16/keys = PackedFloat32Array(0, 1, 0.70418906, -0.06553635, -0.06447586, 0.7040353)
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_gvr5s"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qv8j6"]
 _data = {
 &"ataque_bicho": SubResource("Animation_qv8j6"),
 &"caminar_bicho": SubResource("Animation_1sy2v")
@@ -258,23 +258,22 @@ _data = {
 [node name="enemigo_3" unique_id=955269760 instance=ExtResource("1_qv8j6")]
 
 [node name="Skeleton3D" parent="acaro" parent_id_path=PackedInt32Array(1163147084) index="0" unique_id=1246387530]
-bones/0/rotation = Quaternion(0.68744725, -0.28482157, -0.04492614, 0.6665394)
-bones/1/rotation = Quaternion(0.17237861, -0.5607305, 0.78115934, -0.21367547)
-bones/3/rotation = Quaternion(0.75666803, -0.19889842, 0.4165668, 0.4629958)
-bones/4/rotation = Quaternion(-0.3794092, 0.34472483, 0.7755708, 0.3683795)
-bones/6/rotation = Quaternion(0.2787825, -0.28276578, -0.4614233, 0.79335517)
-bones/7/rotation = Quaternion(0.25912082, -0.55477494, 0.78952396, 0.04163317)
-bones/9/rotation = Quaternion(0.3774295, 0.5752951, 0.725387, -0.019907603)
-bones/10/rotation = Quaternion(0.8271766, -0.42023343, 0.34089592, 0.1515676)
-bones/12/rotation = Quaternion(0.8032245, -0.09505901, -0.03280606, 0.587127)
-bones/13/position = Vector3(-0.000387375, -0.00015432644, -0.004056216)
-bones/13/scale = Vector3(1.075522, 1.0000002, 1.5588756)
-bones/15/position = Vector3(-0.0023924322, -0.0023396118, 0.0023832633)
+bones/0/rotation = Quaternion(0.44347253, -0.30305588, 0.2380493, 0.8092107)
+bones/1/rotation = Quaternion(0.27100024, -0.53001994, 0.7567629, 0.27008823)
+bones/3/rotation = Quaternion(0.4540426, 0.14177655, 0.09997186, 0.8739282)
+bones/4/rotation = Quaternion(-0.38335803, 0.09955804, 0.9166647, 0.05339106)
+bones/6/rotation = Quaternion(0.2621413, -0.21264443, -0.37204015, 0.8646678)
+bones/7/rotation = Quaternion(0.24297492, -0.7471838, 0.5880042, 0.19217372)
+bones/9/rotation = Quaternion(0.51607877, 0.49257103, 0.6921002, -0.109698966)
+bones/10/rotation = Quaternion(0.7275576, -0.58209896, 0.335576, 0.13859823)
+bones/13/position = Vector3(-0.0033730955, -0.002187386, -0.0027087005)
+bones/13/scale = Vector3(1, 1.0000002, 1)
+bones/15/position = Vector3(-0.0014159104, -0.001209994, 0.0026201897)
 bones/15/scale = Vector3(0.9866757, 1.0000002, 0.85604596)
-bones/17/position = Vector3(0.0023875805, -0.0023484575, -0.0027135357)
+bones/17/position = Vector3(0.001971432, -0.0013077466, -0.004938619)
 bones/17/scale = Vector3(0.99901, 1.0000001, 0.7594413)
-bones/19/position = Vector3(0.003111901, -0.0023480859, 0.001358088)
-bones/21/rotation = Quaternion(-0.16354091, 0.000114676564, -0.031150911, 0.98604465)
+bones/19/position = Vector3(0.0032761004, -0.0022945518, 0.0022589983)
+bones/21/rotation = Quaternion(-0.013901927, 9.353095e-06, -0.0032926789, 0.99989796)
 
 [node name="AnimationPlayer" parent="." index="1" unique_id=239423262]
-libraries/ = SubResource("AnimationLibrary_gvr5s")
+libraries/ = SubResource("AnimationLibrary_qv8j6")
