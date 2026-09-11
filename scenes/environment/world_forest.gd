@@ -45,32 +45,46 @@ func disable_menu_mode() -> void:
 		pass  # El timer ya está corriendo
 
 func spawn_enemy():
-	
+	#Si no existe una conexión multijugador, la función termina inmediatamente.
 	if not multiplayer.has_multiplayer_peer():
 		return
 	
+	#Comprueba si la conexión está desconectada.
+	#CONNECTION_DISCONNECTED
+	#CONNECTION_CONNECTING
+	#CONNECTION_CONNECTED
 	if multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
 		return
 	
-	# Verificar que tengamos un ID válido
+	# Verificar que tengamos un ID válido y unico del jugador
+	#servidor ID-> 1
+	#Cliente 1 ID -> 245675
 	var mi_id = multiplayer.get_unique_id()
+	
+	#evitar que un cliente tenga el 1 como server
 	if mi_id == 0 or mi_id == 1 and not multiplayer.is_server():
 		# Si somos cliente y nos devuelve 1, hay un problema
 		if not multiplayer.is_server():
 			return
+			
 	var cantidad_enemigos = get_tree().get_nodes_in_group("enemy").size()
 	if cantidad_enemigos > GlobalJuego.cant_enemigos:
 		return
-	
+	#evitar iniiar en modo menu
 	if is_menu_mode:
 		return
+		
+		#Si este nodo no tiene autoridad:
 	if not is_multiplayer_authority():
 		return
+		
 	# SOLO el servidor puede spawnear enemigos
 	if not multiplayer.is_server():
 		return  # Los clientes NO spawnean, solo reciben sincronización
 		
-	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 20:
+		#nueva verificacion de autoridad y limite d eenemigos
+	if is_multiplayer_authority() and get_tree().get_node_in_group('enemy') < 20:
+		#dependiedno de cuantos jugadores klas veces ques e replican los enemigos
 		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = TARGET.instantiate()
 			var rand_x = randf_range(GlobalJuego.mapa_x_min, GlobalJuego.mapa_x_max)

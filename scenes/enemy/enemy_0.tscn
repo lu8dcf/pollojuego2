@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ce82pcvnetebn" path="res://scenes/enemy/enemy_0.gd" id="1_qypkf"]
 [ext_resource type="PackedScene" uid="uid://c437bxs0s6tp7" path="res://assets/modelos/enemigos/enemy1.fbx" id="2_20j7o"]
+[ext_resource type="PackedScene" uid="uid://cqy6sq80q31lu" path="res://scenes/enemy/enemigo_1.tscn" id="2_l1is7"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l1is7"]
 albedo_color = Color(1, 0.05882353, 0.09019608, 1)
@@ -35,6 +36,9 @@ properties/4/replication_mode = 2
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 collision_layer = 2
 script = ExtResource("1_qypkf")
+
+[node name="enemigo_1" parent="." unique_id=1270794210 instance=ExtResource("2_l1is7")]
+visible = false
 
 [node name="modelo" parent="." unique_id=1655325594 instance=ExtResource("2_20j7o")]
 visible = false
