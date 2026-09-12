@@ -244,11 +244,11 @@ func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
 		nameplate.text = nombre
 	
 	print("Jugador spawneado en cliente: ", peer_id, " - ", nombre)
-
-func clean_up_signals():
-	multiplayer.peer_connected.disconnect(add_player) 
-	multiplayer.peer_disconnected.disconnect(remove_player)
-	multiplayer.connected_to_server.disconnect(on_connected_to_server)
+#
+#func clean_up_signals():
+	#multiplayer.peer_connected.disconnect(add_player) 
+	#multiplayer.peer_disconnected.disconnect(remove_player)
+	#multiplayer.connected_to_server.disconnect(on_connected_to_server)
 
 func _exit_tree() -> void:
 	if tube_enabled:
