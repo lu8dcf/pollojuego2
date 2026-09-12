@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Arma" format=3 uid="uid://da5wa2v0xgjrv"]
+
+[ext_resource type="Script" uid="uid://jotbeoqr0ybl" path="res://scripts/armas/comportamiento/comportamientoComun.gd" id="1_2vlg0"]
+[ext_resource type="Script" uid="uid://ckltpinun1cgl" path="res://scripts/armas/arma.gd" id="1_uvkn2"]
+
+[sub_resource type="Resource" id="Resource_2vlg0"]
+script = ExtResource("1_2vlg0")
+metadata/_custom_type_script = "uid://jotbeoqr0ybl"
+
+[resource]
+script = ExtResource("1_uvkn2")
+id = 3
+nombre = "x"
+danio = 2.0
+tiempoDeAtaque = 2
+tipo = 1
+comportamiento = SubResource("Resource_2vlg0")
+metadata/_custom_type_script = "uid://ckltpinun1cgl"

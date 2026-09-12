@@ -36,19 +36,16 @@ shape = SubResource("CapsuleShape3D_8w0r3")
 
 [node name="jugador" type="Node3D" parent="." unique_id=977801473]
 
-[node name="pollo_1" parent="jugador" unique_id=1188442573 instance=ExtResource("2_f0vko")]
-
 [node name="brazos" parent="jugador" unique_id=50839711 instance=ExtResource("2_1d7gi")]
-script = null
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
 [node name="mark_izq" parent="jugador/brazos/izquierdo" parent_id_path=PackedInt32Array(50839711, 1700125377) index="0" unique_id=1157031558]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49213523, 0, 0)
 
-[node name="derecho" parent="jugador/brazos" index="1" unique_id=1881658879]
-script = null
+[node name="mark_der" parent="jugador/brazos/derecho" parent_id_path=PackedInt32Array(50839711, 1881658879) index="0" unique_id=478729798]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4950328, 0, 0)
 
-[node name="mark_der" parent="jugador/brazos/derecho" index="0" unique_id=478729798]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, 0)
+[node name="pollo_1" parent="jugador" unique_id=1188442573 instance=ExtResource("2_f0vko")]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1038503219]
 unique_name_in_owner = true
