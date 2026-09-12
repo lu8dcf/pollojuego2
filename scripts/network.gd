@@ -222,6 +222,7 @@ func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
 	"""El host ordena spawnear un jugador en todos los clientes"""
 	print("RPC: Spawneando jugador: ", peer_id, " - ", nombre)
 	
+
 	var mundo = obtener_mundo_actual()
 	if not mundo:
 		print("ERROR: No hay mundo para spawnear en cliente")
@@ -243,3 +244,37 @@ func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
 		nameplate.text = nombre
 	
 	print("Jugador spawneado en cliente: ", peer_id, " - ", nombre)
+
+func clean_up_signals():
+	multiplayer.peer_connected.disconnect(add_player) 
+	multiplayer.peer_disconnected.disconnect(remove_player)
+	multiplayer.connected_to_server.disconnect(on_connected_to_server)
+
+func _exit_tree() -> void:
+	if tube_enabled:
+		tube_client.leave_session()
+
+
+#----------------------------------------------------- Interacciones Jugador
+@rpc("any_peer", "call_local")
+func pedir_salvar_rpc(objetivo_id: int) -> void:
+
+	if not multiplayer.is_server():
+		return
+
+	var salvador_id := multiplayer.get_remote_sender_id()
+
+	var salvador := GlobalJuego._obtener_jugador(salvador_id)
+	var objetivo := GlobalJuego._obtener_jugador(objetivo_id)
+
+	if salvador == null or objetivo == null:
+		return
+
+	# comprobar que el objetivo esta caido
+	if objetivo.estadoActual != Jugador.Estado.CAIDO:
+		print("El jugador no está caido")
+		return
+
+	# Cambiar el estado del objetivo
+	objetivo.cambiar_estado(Jugador.Estado.OLEADA)
+	print("¡Salvado!")

@@ -1,6 +1,7 @@
 extends Resource
 class_name Arma
 
+
 enum TipoArma {
 	MELEE,
 	COMUN,
@@ -10,9 +11,10 @@ enum TipoArma {
 @export var nombre: String
 
 @export var danio: float
-@export var cadencia: float
 
-@export var sprite: Texture #el tipo que sea esto
+@export var sprite: PackedScene #el tipo que sea esto
+
+@export var tiempoDeAtaque: int
 
 @export var tipo : TipoArma
 @export var comportamiento: comportamientoArma

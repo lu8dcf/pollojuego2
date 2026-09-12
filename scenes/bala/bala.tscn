@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://beawwqs832562"]
+
+[ext_resource type="Script" uid="uid://b5nlexba6mjke" path="res://scripts/bala/bala.gd" id="1_7pqqq"]
+[ext_resource type="PackedScene" uid="uid://6dr1scr4fnwt" path="res://scenes/pollos/pollo_modelo_1.tscn" id="2_vwsfi"]
+[ext_resource type="Texture2D" uid="uid://df4owisch7ucy" path="res://icon.svg" id="3_tdw23"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_8w0r3"]
+radius = 0.25221992
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_8w0r3"]
+height = 0.21520996
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_h4t55"]
+height = 0.43041992
+
+[node name="bala" type="Node3D" unique_id=1580871014]
+script = ExtResource("1_7pqqq")
+
+[node name="tiempoVida" type="Timer" parent="." unique_id=1022337294]
+wait_time = 5.0
+
+[node name="pollo_1" parent="." unique_id=1188442573 instance=ExtResource("2_vwsfi")]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, -0.25, 0)
+visible = false
+
+[node name="area_comun" type="Area3D" parent="." unique_id=840675643]
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="area_comun" unique_id=432064733]
+shape = SubResource("SphereShape3D_8w0r3")
+
+[node name="area_explosion" type="Area3D" parent="." unique_id=1826380081]
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="area_explosion" unique_id=162247654]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.09454346, 0)
+shape = SubResource("CylinderShape3D_8w0r3")
+
+[node name="area_melee" type="Area3D" parent="." unique_id=1774809152]
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="area_melee" unique_id=1293047433]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.01184082, 0)
+shape = SubResource("CylinderShape3D_h4t55")
+debug_color = Color(0.70030665, 0.15977025, 0.75651777, 0.41960785)
+
+[node name="Sprite3D" type="Sprite3D" parent="area_melee" unique_id=1263656593]
+transform = Transform3D(1.565, 0, 0, 0, -6.8408326e-08, -1.565, 0, 1.565, -6.8408326e-08, 0, 0, 0)
+texture = ExtResource("3_tdw23")
+
+[connection signal="timeout" from="tiempoVida" to="." method="_on_tiempo_vida_timeout"]
