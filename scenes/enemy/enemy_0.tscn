@@ -8,7 +8,7 @@ albedo_color = Color(1, 0.05882353, 0.09019608, 1)
 
 [sub_resource type="TextMesh" id="TextMesh_20j7o"]
 material = SubResource("StandardMaterial3D_l1is7")
-text = "X"
+text = "+"
 font_size = 63
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_2rcni"]
@@ -16,6 +16,21 @@ height = 0.5541992
 radius = 0.6074219
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qypkf"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:health")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:collision_layer")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("modelo:visible")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("cruz:visible")
+properties/4/spawn = true
+properties/4/replication_mode = 2
 
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 collision_layer = 2

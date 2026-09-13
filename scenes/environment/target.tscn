@@ -56,7 +56,7 @@ outline_size = 4
 [node name="AnimationLibrary_Godot_Standard" parent="." unique_id=1638584414 instance=ExtResource("3_yyeac")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
-[node name="Skeleton3D" parent="AnimationLibrary_Godot_Standard/Rig" parent_id_path=PackedInt32Array(1638584414, 315755375) index="0" unique_id=509392244]
+[node name="Skeleton3D" parent="AnimationLibrary_Godot_Standard/Rig" parent_id_path=PackedInt32Array(1638584414, 327172703) index="0" unique_id=2118634639]
 bones/1/position = Vector3(0.027964044, 0.08448892, 0.8772038)
 bones/1/rotation = Quaternion(0.7152891, -0.2622676, -0.2303257, 0.60541505)
 bones/3/rotation = Quaternion(-0.039844085, -0.034301095, -0.0054115774, 0.9986024)
@@ -110,7 +110,7 @@ bones/50/rotation = Quaternion(0.16952859, 0.3527075, -0.06514985, 0.9179396)
 bones/51/rotation = Quaternion(-0.5241328, -0.27034187, -0.2491132, 0.7682075)
 bones/52/rotation = Quaternion(-0.00013714054, 0.9643068, -0.26478708, -0.0004994165)
 
-[node name="AnimationPlayer" parent="AnimationLibrary_Godot_Standard" index="1" unique_id=655818753]
+[node name="AnimationPlayer" parent="AnimationLibrary_Godot_Standard" index="1" unique_id=490010708]
 autoplay = &"Walk_Formal"
 
 [node name="CrystalTimer" type="Timer" parent="." unique_id=1654839943]

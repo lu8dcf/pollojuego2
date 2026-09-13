@@ -1,0 +1,107 @@
+[gd_scene format=3 uid="uid://b4gmxx0tqmgc4"]
+
+[ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="1_assl2"]
+[ext_resource type="Script" uid="uid://dg6hg5ln4lacb" path="res://scenes/ui/panel_jugador.gd" id="1_w18h1"]
+[ext_resource type="Texture2D" uid="uid://df4owisch7ucy" path="res://icon.svg" id="2_w18h1"]
+[ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_wo01u"]
+[ext_resource type="Texture2D" uid="uid://tcmot16fb3sb" path="res://assets/kenney_prototype-textures/PNG/Red/texture_10_red.png" id="4_s8xn3"]
+[ext_resource type="Texture2D" uid="uid://bgqe2fjb4ypkj" path="res://assets/kenney_prototype-textures/PNG/Green/texture_10_green.png" id="5_x6hcr"]
+
+[node name="Jugador1" type="Panel" unique_id=748620973]
+custom_minimum_size = Vector2(250, 400)
+script = ExtResource("1_w18h1")
+
+[node name="NombreUsuario" type="Label" parent="." unique_id=1218786579]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -53.5
+offset_right = 53.5
+offset_bottom = 25.0
+grow_horizontal = 2
+text = "Nombre Usuario"
+label_settings = ExtResource("1_assl2")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=795708525]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -86.0
+offset_top = -171.0
+offset_right = 98.0
+offset_bottom = 155.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ImagenJugador" type="TextureRect" parent="MarginContainer" unique_id=1719127222]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("2_w18h1")
+
+[node name="ContenedorBoton" type="MarginContainer" parent="." unique_id=928059794]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -92.0
+offset_top = -64.0
+offset_right = 92.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="EstoyListoBoton" parent="ContenedorBoton" unique_id=1088779155 instance=ExtResource("3_wo01u")]
+layout_mode = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="CambiarAtrasPersonaje" type="TextureButton" parent="." unique_id=924549578]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 11.0
+offset_top = -20.0
+offset_right = 51.0
+offset_bottom = 20.0
+grow_vertical = 2
+texture_normal = ExtResource("4_s8xn3")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="CambiarAdelantePersonaje2" type="TextureButton" parent="." unique_id=431456567]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -47.0
+offset_top = -20.0
+offset_right = -7.0
+offset_bottom = 20.0
+grow_horizontal = 0
+grow_vertical = 2
+texture_normal = ExtResource("5_x6hcr")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="IndicadorListo" type="Label" parent="." unique_id=790417070]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.024
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = 360.0
+offset_right = -64.0
+offset_bottom = -17.0
+text = "¿Listo?"
+label_settings = ExtResource("1_assl2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="ContenedorBoton/EstoyListoBoton" to="." method="_on_estoy_listo_boton_pressed"]

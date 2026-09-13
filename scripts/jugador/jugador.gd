@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 class_name Jugador
+@onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 
 @export var sensitivity: float = 0.002
 
@@ -55,7 +56,11 @@ var immobile := false
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(int(name)) #lo mete en el arbol
+	print("Jugador ", name, " - Autoridad: ", get_multiplayer_authority())
 
+	if not is_multiplayer_authority():
+		set_process(false)
+		set_physics_process(false)
 func _ready():
 	#add_child(personajePollo.instantiate())
 	add_to_group("Jugadores")
@@ -66,8 +71,7 @@ func _ready():
 	player_ui.hide()
 
 	if not is_multiplayer_authority(): #
-		set_process(false)
-		set_physics_process(false)
+		player_ui.hide()
 		return
 	
 	ready_client_visuals() 
@@ -80,8 +84,8 @@ func ready_client_visuals():
 	
 	#player_ui.option_button_color.item_selected.connect(on_color_changed)
 	#animation_library_godot_standard.hide()
-	if Global.username: 
-		nameplate.text = Global.username
+	if GlobalJuego.nombre_jugador: 
+		nameplate.text =  GlobalJuego.nombre_jugador
 	camera_3d.current = true
 	
 

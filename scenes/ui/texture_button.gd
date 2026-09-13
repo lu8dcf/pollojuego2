@@ -57,6 +57,8 @@ func _ready() -> void:
 	# Asegurarse de que el botón se redibuje
 	queue_redraw()
 
+func cambiar_texto(texto:String):
+	label.text = texto
 func _process(delta: float) -> void:
 	# Actualizar saturación suavemente
 	_actualizar_saturacion(delta)
