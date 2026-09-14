@@ -30,6 +30,9 @@ script = ExtResource("1_ueyq7")
 [node name="camaraRig" parent="." unique_id=654216859 node_paths=PackedStringArray("jugador") instance=ExtResource("2_6htac")]
 jugador = NodePath("..")
 
+[node name="Camera3D" parent="camaraRig/OffsetRig" parent_id_path=PackedInt32Array(654216859, 718635097) index="0" unique_id=603299156]
+transform = Transform3D(1, 0, 0, 0, 0.7874249, 0.61641055, 0, -0.61641055, 0.7874249, 0, 7.0005903, 7.729801)
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1479857195]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5012207, 0)
 shape = SubResource("CapsuleShape3D_8w0r3")
