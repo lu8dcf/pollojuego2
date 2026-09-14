@@ -8,8 +8,8 @@
 [ext_resource type="Script" uid="uid://bmit8wdp3lyfr" path="res://scenes/ui/menu_principal.gd" id="3_x2yvf"]
 [ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="4_q85j6"]
 [ext_resource type="FontFile" uid="uid://b6kads1hhoxfx" path="res://assets/fuentes/Anton.ttf" id="5_8g5eo"]
-[ext_resource type="Texture2D" uid="uid://ci51yp4wvpvqg" path="res://assets/ui/menu/2.png" id="7_7suek"]
-[ext_resource type="Texture2D" uid="uid://sjnh5n2c7ejm" path="res://assets/ui/menu/1.png" id="7_q85j6"]
+[ext_resource type="Texture2D" uid="uid://2d6xjs1r1x0u" path="res://assets/ui/menu/2.png" id="7_7suek"]
+[ext_resource type="Texture2D" uid="uid://bx7jrstq2veg" path="res://assets/ui/menu/1.png" id="7_q85j6"]
 [ext_resource type="Script" uid="uid://4oan6lux30sb" path="res://scenes/ui/fondo_de_botones.gd" id="8_otr3d"]
 [ext_resource type="Script" uid="uid://u58yougmjulp" path="res://scenes/ui/fondo_movil.gd" id="10_otr3d"]
 [ext_resource type="Shader" uid="uid://bxv8phnk55knj" path="res://scenes/ui/aberracion_cromatica.gdshader" id="13_8ekit"]
@@ -224,6 +224,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -48.0
 offset_top = -44.0
+offset_right = -552.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -337,7 +338,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 48.0
 offset_top = 41.0
-offset_right = 48.0
+offset_right = -560.0
 offset_bottom = 41.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -399,8 +400,8 @@ texto = "SALIR"
 [node name="ColorRect" type="ColorRect" parent="Control" unique_id=850618677]
 material = SubResource("ShaderMaterial_dklp6")
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
+anchors_preset = -1
+anchor_right = 0.5277778
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
