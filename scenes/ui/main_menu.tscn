@@ -22,6 +22,7 @@ shader_parameter/intensidad = 0.0
 script = ExtResource("1_sl1te")
 
 [node name="Control" type="Control" parent="." unique_id=2009268844]
+propagate_maximum_size = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -216,70 +217,78 @@ label_settings = ExtResource("4_q85j6")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="barra1" type="TextureRect" parent="Control" unique_id=431577663]
+[node name="Control" type="Control" parent="Control" unique_id=1634658503]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -48.0
+offset_top = -44.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="barra1" type="TextureRect" parent="Control/Control" unique_id=431577663]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.0220001
-offset_left = -156.0
-offset_top = -188.99997
-offset_right = -102.34367
-offset_bottom = 1149.7698
+offset_right = 53.656326
+offset_bottom = 1959.12
 grow_vertical = 2
 rotation = -0.3518548
 scale = Vector2(0.30848238, 0.47627354)
 texture = ExtResource("7_7suek")
 script = ExtResource("8_otr3d")
 
-[node name="barra2" type="TextureRect" parent="Control" unique_id=1509827364]
+[node name="barra2" type="TextureRect" parent="Control/Control" unique_id=1509827364]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.0220001
-offset_left = -127.000015
-offset_top = -190.99998
-offset_right = -37.127747
-offset_bottom = 1147.4697
+offset_left = 28.999985
+offset_top = -2.0000153
+offset_right = 118.87225
+offset_bottom = 1957.12
 grow_vertical = 2
 rotation = -0.3518548
 scale = Vector2(0.30848238, 0.47627354)
 texture = ExtResource("7_7suek")
 script = ExtResource("8_otr3d")
 
-[node name="barra4" type="TextureRect" parent="Control" unique_id=1223816561]
+[node name="barra4" type="TextureRect" parent="Control/Control" unique_id=1223816561]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.0220001
-offset_left = -31.0
-offset_top = -168.63702
-offset_right = 641.4844
-offset_bottom = 1169.1069
+offset_left = 125.0
+offset_top = 20.362946
+offset_right = 797.4844
+offset_bottom = 1979.4829
 grow_vertical = 2
 rotation = -0.3518548
 scale = Vector2(0.30848238, 0.47627354)
 texture = ExtResource("7_7suek")
 script = ExtResource("8_otr3d")
 
-[node name="barra5" type="TextureRect" parent="Control" unique_id=1982006388]
+[node name="barra5" type="TextureRect" parent="Control/Control" unique_id=1982006388]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.0220001
-offset_left = 180.0
-offset_top = -212.99998
-offset_right = 263.4866
-offset_bottom = 1124.7441
+offset_left = 336.0
+offset_top = -24.000015
+offset_right = 419.4866
+offset_bottom = 1935.12
 grow_vertical = 2
 rotation = -0.3518548
 scale = Vector2(0.30848238, 0.47627354)
 texture = ExtResource("7_7suek")
 script = ExtResource("8_otr3d")
 
-[node name="barra6" type="TextureRect" parent="Control" unique_id=1642486410]
+[node name="barra6" type="TextureRect" parent="Control/Control" unique_id=1642486410]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.0220001
-offset_left = 220.00003
-offset_top = -198.99997
-offset_right = 270.00006
-offset_bottom = 1142.7305
+offset_left = 376.00003
+offset_top = -10.0
+offset_right = 426.00006
+offset_bottom = 1949.12
 grow_vertical = 2
 rotation = -0.3518548
 scale = Vector2(0.30848238, 0.47627354)
@@ -288,30 +297,30 @@ script = ExtResource("8_otr3d")
 retraso_maximo_x = 0.78
 tiempo_espera_inicial = 0.305
 
-[node name="barra3" type="TextureRect" parent="Control" unique_id=1708873367]
+[node name="barra3" type="TextureRect" parent="Control/Control" unique_id=1708873367]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.0220001
-offset_left = -82.000015
-offset_top = -175.0
-offset_right = 47.39731
-offset_bottom = 1162.7441
+offset_left = 73.999985
+offset_top = 13.9999695
+offset_right = 203.39731
+offset_bottom = 1973.12
 grow_vertical = 2
 rotation = -0.3518548
 scale = Vector2(0.30848238, 0.47627354)
 texture = ExtResource("7_7suek")
 script = ExtResource("8_otr3d")
 
-[node name="fondo movil" type="TextureRect" parent="Control" unique_id=1516643926]
+[node name="fondo movil" type="TextureRect" parent="Control/Control" unique_id=1516643926]
 z_index = -4
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 147.00002
-offset_top = -423.0
-offset_right = 915.0
-offset_bottom = 9.0
+offset_left = 303.0
+offset_top = -234.00003
+offset_right = 1071.0
+offset_bottom = 197.99997
 grow_horizontal = 2
 grow_vertical = 2
 rotation = 1.2162958
@@ -321,59 +330,70 @@ expand_mode = 1
 stretch_mode = 1
 script = ExtResource("10_otr3d")
 
-[node name="menu_principal" type="Control" parent="Control" unique_id=1694592496]
+[node name="menu_principal" type="Control" parent="Control/Control" unique_id=1694592496]
 layout_mode = 1
-anchors_preset = 9
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 41.0
+offset_right = 48.0
+offset_bottom = 41.0
+grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_x2yvf")
 
-[node name="un_jugador" parent="Control/menu_principal" unique_id=493601890 instance=ExtResource("3_m1kxf")]
+[node name="un_jugador" parent="Control/Control/menu_principal" unique_id=493601890 instance=ExtResource("3_m1kxf")]
 layout_mode = 0
-offset_left = 31.0
-offset_top = 33.0
-offset_right = 321.46136
-offset_bottom = 125.00001
+offset_left = 75.0
+offset_top = 37.430485
+offset_right = 365.46136
+offset_bottom = 129.4305
 rotation = -0.0014820776
+stretch_mode = 4
 tamanio = 40
 color = "#ffff32"
 texto = "UN JUGADOR"
 
-[node name="multijugador" parent="Control/menu_principal" unique_id=1422080423 instance=ExtResource("3_m1kxf")]
+[node name="multijugador" parent="Control/Control/menu_principal" unique_id=1422080423 instance=ExtResource("3_m1kxf")]
 layout_mode = 0
-offset_left = 73.0
-offset_top = 141.0
-offset_right = 363.46136
-offset_bottom = 233.0
+offset_left = 117.0
+offset_top = 145.43048
+offset_right = 407.46136
+offset_bottom = 237.43048
 rotation = -0.0014820776
+stretch_mode = 4
 texto = "MULTIJUGADOR"
 
-[node name="opciones" parent="Control/menu_principal" unique_id=38685769 instance=ExtResource("3_m1kxf")]
+[node name="opciones" parent="Control/Control/menu_principal" unique_id=38685769 instance=ExtResource("3_m1kxf")]
 layout_mode = 0
-offset_left = 113.0
-offset_top = 253.0
-offset_right = 403.46136
-offset_bottom = 345.0
+offset_left = 157.0
+offset_top = 257.43048
+offset_right = 447.46136
+offset_bottom = 349.43048
 rotation = -0.0014820776
+ignore_texture_size = true
 texto = "OPCIONES"
 
-[node name="creditos" parent="Control/menu_principal" unique_id=274386862 instance=ExtResource("3_m1kxf")]
+[node name="creditos" parent="Control/Control/menu_principal" unique_id=274386862 instance=ExtResource("3_m1kxf")]
 layout_mode = 0
-offset_left = 154.0
-offset_top = 358.00003
-offset_right = 444.46136
-offset_bottom = 450.00003
+offset_left = 198.0
+offset_top = 362.4305
+offset_right = 488.46136
+offset_bottom = 454.4305
 rotation = -0.0014820776
+ignore_texture_size = true
 texto = "CRÉDITOS"
 
-[node name="BotonSalir" parent="Control/menu_principal" unique_id=533371450 instance=ExtResource("3_m1kxf")]
+[node name="BotonSalir" parent="Control/Control/menu_principal" unique_id=533371450 instance=ExtResource("3_m1kxf")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 193.0
-offset_top = 476.0
-offset_right = 483.46136
-offset_bottom = 568.0
+offset_left = 237.0
+offset_top = 480.43048
+offset_right = 527.46136
+offset_bottom = 572.4305
 rotation = -0.0014820776
+ignore_texture_size = true
 texto = "SALIR"
 
 [node name="ColorRect" type="ColorRect" parent="Control" unique_id=850618677]
@@ -391,7 +411,7 @@ metadata/_edit_use_anchors_ = true
 unique_name_in_owner = true
 
 [connection signal="pressed" from="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu/empezar_solo" to="." method="_on_empezar_solo_pressed"]
-[connection signal="pressed" from="Control/menu_principal/un_jugador" to="." method="_on_un_jugador_pressed"]
-[connection signal="pressed" from="Control/menu_principal/multijugador" to="." method="_on_multijugador_pressed"]
-[connection signal="pressed" from="Control/menu_principal/opciones" to="." method="_on_opciones_pressed"]
-[connection signal="pressed" from="Control/menu_principal/creditos" to="." method="_on_creditos_pressed"]
+[connection signal="pressed" from="Control/Control/menu_principal/un_jugador" to="." method="_on_un_jugador_pressed"]
+[connection signal="pressed" from="Control/Control/menu_principal/multijugador" to="." method="_on_multijugador_pressed"]
+[connection signal="pressed" from="Control/Control/menu_principal/opciones" to="." method="_on_opciones_pressed"]
+[connection signal="pressed" from="Control/Control/menu_principal/creditos" to="." method="_on_creditos_pressed"]
