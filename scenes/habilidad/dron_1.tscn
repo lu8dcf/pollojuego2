@@ -43,10 +43,11 @@ _data = {
 [node name="dron_1" unique_id=429770227 instance=ExtResource("1_uvfwq")]
 
 [node name="Skeleton3D" parent="Esqueleto_004" parent_id_path=PackedInt32Array(94566636) index="0" unique_id=1910461178]
-bones/1/rotation = Quaternion(-0.21861084, -0.008971122, -0.049649276, 0.9745069)
-bones/2/rotation = Quaternion(0.077902794, -0.480643, 0.016859628, 0.87328655)
-bones/5/rotation = Quaternion(0.65601206, -0.5109098, -0.21909177, 0.51050776)
-bones/8/rotation = Quaternion(0.6830781, 0.51090974, -0.1084321, 0.51050776)
+bones/1/rotation = Quaternion(-0.2316045, -0.0096873, -0.049542412, 0.9714994)
+bones/2/rotation = Quaternion(0.06012144, -4.2067295e-05, 0.05233072, 0.9968184)
+bones/5/rotation = Quaternion(0.6186702, 8.529123e-08, 0.30919293, 0.72225136)
+bones/8/rotation = Quaternion(0.40611565, -3.3633683e-09, -0.559842, 0.72225136)
 
 [node name="AnimationPlayer" parent="." index="1" unique_id=2084649001]
 libraries/ = SubResource("AnimationLibrary_ryp3p")
+autoplay = &"dron_vuelo"

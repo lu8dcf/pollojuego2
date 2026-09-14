@@ -16,6 +16,7 @@ sky = SubResource("Sky_3pli8")
 tonemap_mode = 3
 fog_enabled = true
 fog_mode = 1
+fog_light_color = Color(0.200793, 0.31894302, 0, 1)
 fog_density = 0.4
 fog_sky_affect = 0.3
 
