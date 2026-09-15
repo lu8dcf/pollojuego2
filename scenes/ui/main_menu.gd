@@ -15,6 +15,11 @@ extends CanvasLayer
 
 @onready var tube_menu: VBoxContainer = %TubeMenu
 
+# botones de multijugador opiciones de local y online
+@onready var boton_online: TextureButtonAnimado = %BotonOnline
+@onready var boton_local: TextureButtonAnimado = %BotonLocal
+
+
 # Referencia al ColorRect con el shader de aberración cromática
 @export var color_rect_shader: ColorRect
 
@@ -217,6 +222,8 @@ func on_error_raised(_code, _message):
 	_limpiar_lobby()
 
 func ocultar_todo():
+	boton_local.visible = false
+	boton_online.visible = false
 	panel_un_jugador.visible = false
 	panel_multijugador.visible = false
 	panel_opciones.visible = false
@@ -229,11 +236,24 @@ func _on_un_jugador_pressed() -> void:
 func _on_multijugador_pressed() -> void:
 	aplicar_impacto()
 	ocultar_todo()
+	boton_local.visible = not boton_local.visible
+	boton_online.visible = not boton_online.visible
+	
+	
+
+
+func _on_boton_online_pressed() -> void:
 	panel_multijugador.visible = not panel_multijugador.visible
+
+
+func _on_boton_local_pressed() -> void:
+	pass # Replace with function body.
+
 
 func _on_opciones_pressed() -> void:
 	aplicar_impacto()
 	ocultar_todo()
+	
 	panel_opciones.visible = not panel_opciones.visible
 
 func _on_creditos_pressed() -> void:

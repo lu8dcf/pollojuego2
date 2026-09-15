@@ -30,19 +30,36 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="BotonOnline" parent="Control" unique_id=1088779155 instance=ExtResource("3_m1kxf")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 566.0
+offset_top = 5.0
+offset_right = 778.0
+offset_bottom = 45.0
+texto = "Online"
+
+[node name="BotonLocal" parent="Control" unique_id=208812627 instance=ExtResource("3_m1kxf")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 811.0
+offset_top = 5.0
+offset_right = 1023.0
+offset_bottom = 45.0
+texto = "Local"
+
 [node name="PanelMultijugador" type="PanelContainer" parent="Control" unique_id=882952804]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 116.5
-offset_top = -198.0
-offset_right = 377.5
-offset_bottom = 198.0
+offset_left = 247.5
+offset_top = -200.0
+offset_right = 516.5
+offset_bottom = 196.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -173,7 +190,7 @@ max_length = 12
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="empezar_solo" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1088779155 instance=ExtResource("3_m1kxf")]
+[node name="empezar_solo" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1804414237 instance=ExtResource("3_m1kxf")]
 custom_minimum_size = Vector2(40, 50)
 clip_contents = true
 layout_mode = 2
@@ -182,6 +199,7 @@ metadata/_edit_use_anchors_ = true
 
 [node name="PanelOpciones" type="PanelContainer" parent="Control" unique_id=500977056]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -411,6 +429,8 @@ metadata/_edit_use_anchors_ = true
 [node name="Mundo" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
 unique_name_in_owner = true
 
+[connection signal="pressed" from="Control/BotonOnline" to="." method="_on_boton_online_pressed"]
+[connection signal="pressed" from="Control/BotonLocal" to="." method="_on_boton_local_pressed"]
 [connection signal="pressed" from="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu/empezar_solo" to="." method="_on_empezar_solo_pressed"]
 [connection signal="pressed" from="Control/Control/menu_principal/un_jugador" to="." method="_on_un_jugador_pressed"]
 [connection signal="pressed" from="Control/Control/menu_principal/multijugador" to="." method="_on_multijugador_pressed"]
