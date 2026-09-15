@@ -26,7 +26,7 @@ func _ready():
 	look_at(goal_position)
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
-
+	
 	
 	
 	
@@ -79,7 +79,7 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta 
 		#print (position)
-		if position.y < -1:
+		if position.y < -2:
 			#print ("cayo")
 			queue_free()
 		move_and_slide()	
