@@ -2,10 +2,11 @@ extends Node3D
 
 var tipoComportamiento = comportamientoArma
 @onready var tiempoDeVida = $tiempoVida
+var posicionInicio
 
 #comun y explosiva
 var avanza = false
-var velocidadBala = 2
+var velocidadBala = 15
 var direccion
 
 #solo comun
@@ -22,14 +23,15 @@ var direccion
 
 
 func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3) -> void:
-	if(comp == null):
+
+	if comp == null: #si por alguna razon no tiene comportamiento, vuelve
 		return
-	tipoComportamiento = comp
+
 	global_position = posicion_inicial
+	posicionInicio = posicion_inicial
+	tipoComportamiento = comp
 	direccion = direccion_inicial.normalized()
 
-func _ready() -> void:
-	textureBullet.visible=true
 	if tipoComportamiento is comportamientoComun:
 		balaComun()
 	elif tipoComportamiento is comportamientoExplosiva:
@@ -37,9 +39,18 @@ func _ready() -> void:
 	elif tipoComportamiento is ComportamientoMelee:
 		balaMelee()
 
+
+	
+func _ready() -> void:
+
+	textureBullet.visible=true
+
+
 func _physics_process(delta: float) -> void:
+	if !is_multiplayer_authority():
+		return
 	if(avanza): #bala comun y explosiva
-		global_position  += direccion * velocidadBala  * delta
+		global_position += direccion * velocidadBala * delta
 #--------------------------------------------------------------------melee
 
 func balaMelee():
@@ -57,10 +68,6 @@ func balaMelee():
 			#cuerpo.take_damage(damage * GlobalItem.potenciando_danio_arma)
 	await get_tree().create_timer(0.5).timeout
 	eliminarBala()
-
-
-
-
 
 #------------------------------------------------------------------comun
 
@@ -94,7 +101,7 @@ func explosion():
 	areaExplosiva.visible = true
 	var cuerpos_en_area = areaExplosiva.get_overlapping_bodies()
 	if(cuerpos_en_area != null):
-		print("en la explosion me llevo a : x")
+		print("en la explosion me llevo a :")
 	else:
 		print("vacio")
 	#for cuerpo in cuerpos_en_area:
@@ -103,11 +110,11 @@ func explosion():
 	await get_tree().create_timer(0.5).timeout
 	eliminarBala()
 
-
-
 #-----------------------------------------------------------------------------comun y explosiva
 func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
 	eliminarBala()
 	
 func eliminarBala():
+	if !is_multiplayer_authority():
+		return
 	queue_free()

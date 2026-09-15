@@ -14,7 +14,7 @@ enum TipoArma {
 
 @export var sprite: PackedScene #el tipo que sea esto
 
-@export var tiempoDeAtaque: int
+@export var tiempoDeAtaque: float
 
 @export var tipo : TipoArma
 @export var comportamiento: comportamientoArma

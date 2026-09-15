@@ -2,7 +2,6 @@ extends CharacterBody3D
 
 class_name Jugador
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
-
 @export var sensitivity: float = 0.002
 
 const SPEED = 5.0
@@ -141,9 +140,9 @@ func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("test_caido"):
 		estadoActual = Estado.CAIDO
 		pedir_ayuda()
-
-	if puede_disparar():
-		shoot()	
+#
+	#if puede_disparar():
+		#shoot()	
 
 	if Input.is_action_just_pressed("attack1"): # Mouse Izq
 		attack(1) 
@@ -410,9 +409,9 @@ func mirar_al_mouse(delta: float) -> void:
 		#animation_player.play("Jump")
 
 	
-func shoot():
-	var force = 100
-	var pos = global_position
+#func shoot():
+	#var force = 100
+	#var pos = global_position
 	#var shoot_dir = get_shoot_direction()
 	#Global.shoot_ball.rpc_id(1, pos, shoot_dir, force)
 	#

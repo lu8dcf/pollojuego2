@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://c23nf7t55y5ta"]
+
+[ext_resource type="PackedScene" uid="uid://b184d2u487fm0" path="res://scenes/armas/testArrow/RightArrow.fbx" id="1_b7mk5"]
+
+[node name="testArma" type="Node3D" unique_id=111605971]
+
+[node name="RightArrow" parent="." unique_id=62085363 instance=ExtResource("1_b7mk5")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
