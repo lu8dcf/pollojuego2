@@ -8,11 +8,11 @@
 [ext_resource type="Script" uid="uid://bmit8wdp3lyfr" path="res://scenes/ui/menu_principal.gd" id="3_x2yvf"]
 [ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="4_q85j6"]
 [ext_resource type="FontFile" uid="uid://b6kads1hhoxfx" path="res://assets/fuentes/Anton.ttf" id="5_8g5eo"]
-[ext_resource type="Texture2D" uid="uid://ci51yp4wvpvqg" path="res://assets/ui/menu/2.png" id="7_7suek"]
-[ext_resource type="Texture2D" uid="uid://sjnh5n2c7ejm" path="res://assets/ui/menu/1.png" id="7_q85j6"]
+[ext_resource type="Texture2D" uid="uid://2d6xjs1r1x0u" path="res://assets/ui/menu/2.png" id="7_7suek"]
+[ext_resource type="Texture2D" uid="uid://bx7jrstq2veg" path="res://assets/ui/menu/1.png" id="7_q85j6"]
 [ext_resource type="Script" uid="uid://4oan6lux30sb" path="res://scenes/ui/fondo_de_botones.gd" id="8_otr3d"]
 [ext_resource type="Script" uid="uid://u58yougmjulp" path="res://scenes/ui/fondo_movil.gd" id="10_otr3d"]
-[ext_resource type="Texture2D" uid="uid://co0pit3vhunjj" path="res://assets/ui/menu/texto.png" id="11_n4uci"]
+[ext_resource type="Texture2D" uid="uid://dx2wxef0utuvw" path="res://assets/ui/menu/texto.png" id="11_n4uci"]
 [ext_resource type="Shader" uid="uid://bxv8phnk55knj" path="res://scenes/ui/aberracion_cromatica.gdshader" id="13_8ekit"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dklp6"]
@@ -34,34 +34,33 @@ grow_vertical = 2
 [node name="BotonOnline" parent="Control" unique_id=1088779155 instance=ExtResource("3_m1kxf")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 566.0
-offset_top = 5.0
-offset_right = 778.0
-offset_bottom = 45.0
+offset_left = 529.0
+offset_top = 302.0
+offset_right = 741.0
+offset_bottom = 342.0
 texto = "Online"
 
 [node name="BotonLocal" parent="Control" unique_id=208812627 instance=ExtResource("3_m1kxf")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 811.0
-offset_top = 5.0
-offset_right = 1023.0
-offset_bottom = 45.0
+offset_left = 529.0
+offset_top = 204.0
+offset_right = 741.0
+offset_bottom = 244.0
 texto = "Local"
 
 [node name="PanelMultijugador" type="PanelContainer" parent="Control" unique_id=882952804]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.71500003
 anchor_top = 0.19100001
 anchor_right = 0.95100003
 anchor_bottom = 0.80200005
-offset_left = -0.18005371
-offset_top = 0.231987
-offset_right = -3.052002
-offset_bottom = 0.30395508
+offset_left = -55.180054
+offset_top = 52.231987
+offset_right = 51.947998
+offset_bottom = 52.303955
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -137,10 +136,10 @@ anchor_left = 0.71500003
 anchor_top = 0.17300001
 anchor_right = 0.95100003
 anchor_bottom = 0.82400006
-offset_left = -0.18005371
-offset_top = 11.895996
-offset_right = -3.052002
-offset_bottom = -13.952026
+offset_left = -55.180054
+offset_top = 60.395996
+offset_right = 51.947998
+offset_bottom = 45.547974
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -174,6 +173,7 @@ label_settings = ExtResource("3_wb0q5")
 [node name="EditNombreUsuarioEnet" type="LineEdit" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=177040593]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_8g5eo")
+placeholder_text = "Jugador"
 max_length = 12
 
 [node name="HSeparator" type="HSeparator" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=172378781]
@@ -197,6 +197,7 @@ label_settings = ExtResource("3_wb0q5")
 [node name="EditPuerto" type="LineEdit" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=889863081]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_8g5eo")
+text = "9999"
 
 [node name="BotonUnirseEnet" type="Button" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=596335283]
 layout_mode = 2
