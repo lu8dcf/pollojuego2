@@ -8,10 +8,11 @@
 [ext_resource type="Script" uid="uid://bmit8wdp3lyfr" path="res://scenes/ui/menu_principal.gd" id="3_x2yvf"]
 [ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="4_q85j6"]
 [ext_resource type="FontFile" uid="uid://b6kads1hhoxfx" path="res://assets/fuentes/Anton.ttf" id="5_8g5eo"]
-[ext_resource type="Texture2D" uid="uid://2d6xjs1r1x0u" path="res://assets/ui/menu/2.png" id="7_7suek"]
-[ext_resource type="Texture2D" uid="uid://bx7jrstq2veg" path="res://assets/ui/menu/1.png" id="7_q85j6"]
+[ext_resource type="Texture2D" uid="uid://ci51yp4wvpvqg" path="res://assets/ui/menu/2.png" id="7_7suek"]
+[ext_resource type="Texture2D" uid="uid://sjnh5n2c7ejm" path="res://assets/ui/menu/1.png" id="7_q85j6"]
 [ext_resource type="Script" uid="uid://4oan6lux30sb" path="res://scenes/ui/fondo_de_botones.gd" id="8_otr3d"]
 [ext_resource type="Script" uid="uid://u58yougmjulp" path="res://scenes/ui/fondo_movil.gd" id="10_otr3d"]
+[ext_resource type="Texture2D" uid="uid://co0pit3vhunjj" path="res://assets/ui/menu/texto.png" id="11_n4uci"]
 [ext_resource type="Shader" uid="uid://bxv8phnk55knj" path="res://scenes/ui/aberracion_cromatica.gdshader" id="13_8ekit"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dklp6"]
@@ -367,7 +368,6 @@ grow_vertical = 2
 rotation = -0.3518548
 scale = Vector2(0.30848238, 0.47627354)
 texture = ExtResource("7_7suek")
-script = ExtResource("8_otr3d")
 
 [node name="barra5" type="TextureRect" parent="Control/Control" unique_id=1982006388]
 layout_mode = 1
@@ -396,8 +396,6 @@ rotation = -0.3518548
 scale = Vector2(0.30848238, 0.47627354)
 texture = ExtResource("7_7suek")
 script = ExtResource("8_otr3d")
-retraso_maximo_x = 0.78
-tiempo_espera_inicial = 0.305
 
 [node name="barra3" type="TextureRect" parent="Control/Control" unique_id=1708873367]
 layout_mode = 1
@@ -430,6 +428,46 @@ scale = Vector2(0.5988982, 0.5988982)
 texture = ExtResource("7_q85j6")
 expand_mode = 1
 stretch_mode = 1
+script = ExtResource("10_otr3d")
+
+[node name="fondo movil3" type="TextureRect" parent="Control/Control" unique_id=1541256773]
+z_index = -4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 309.0
+offset_top = -447.00003
+offset_right = 1077.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -0.08334162
+scale = Vector2(0.5988982, 0.5988982)
+texture = ExtResource("7_q85j6")
+expand_mode = 1
+stretch_mode = 1
+script = ExtResource("10_otr3d")
+
+[node name="fondo movil2" type="TextureRect" parent="Control/Control" unique_id=2130265394]
+z_index = -4
+texture_repeat = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 361.00003
+offset_top = 71.0
+offset_right = 1713.0
+offset_bottom = 517.59985
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -0.08429955
+scale = Vector2(0.41880766, 0.38938397)
+mouse_filter = 2
+texture = ExtResource("11_n4uci")
+expand_mode = 1
+stretch_mode = 2
 script = ExtResource("10_otr3d")
 
 [node name="menu_principal" type="Control" parent="Control/Control" unique_id=1694592496]
@@ -506,6 +544,7 @@ anchor_right = 0.5277778
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(1.9211432, 1.031997)
 mouse_filter = 2
 metadata/_edit_use_anchors_ = true
 
