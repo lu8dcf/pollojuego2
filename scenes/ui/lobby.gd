@@ -1,11 +1,16 @@
 extends CanvasLayer
 
-@onready var label_id: Label = %LabelId
 @onready var margin_contenedor_jugadores: MarginContainer = %MarginContenedorJugadores
 @onready var h_box_jugadores: HBoxContainer = %HBoxJugadores
 const PANEL_JUGADOR = preload("uid://b4gmxx0tqmgc4")
 @onready var label_estado: Label = %LabelEstado
 @onready var boton_empezar: TextureButtonAnimado = %BotonEmpezar
+
+# vista de puerto e ip
+@onready var label_id: Label = %LabelId
+@onready var label_ip: Label = %LabelIp
+@onready var label_puerto: Label = %LabelPuerto
+
 
 var jugadores_en_lobby: Dictionary = {}  # peer_id -> {nombre: String, panel: Node, listo: bool}
 var es_host: bool = false
@@ -60,7 +65,18 @@ func mostrar_usuarios():
 				boton_empezar.visible = true
 				boton_empezar.disabled = false
 		else:
-			label_id.text = "ID: " + Network.tube_client.session_id
+			if not Network.tube_enabled or Network.tube_client.session_id == "":
+				if es_host:
+					if label_ip: label_ip.text = "IP: "+Network.ip_local
+					if label_puerto: label_puerto.text = "Puerto: " + str(Network.puerto_actual)
+				else:
+					if label_ip: label_ip.text = ""
+					if label_puerto: label_puerto.text = ""
+			else:
+				label_id.text = "ID: " + Network.tube_client.session_id
+				if label_ip: label_ip.text = ""
+				if label_puerto: label_puerto.text = ""
+				
 
 func _on_session_created():
 	print("Sesión creada, configurando lobby...")
@@ -83,7 +99,7 @@ func _on_session_created():
 	
 	lobby_inicializado = true
 
-func _on_jugador_conectado(peer_id: int):
+func _on_jugador_conectado(peer_id: int): #245698
 	print("Jugador conectado: ", peer_id)
 	
 	if peer_id == 1 or peer_id == multiplayer.get_unique_id():

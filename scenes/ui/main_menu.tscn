@@ -50,16 +50,17 @@ texto = "Local"
 
 [node name="PanelMultijugador" type="PanelContainer" parent="Control" unique_id=882952804]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 247.5
-offset_top = -200.0
-offset_right = 516.5
-offset_bottom = 196.0
+anchors_preset = -1
+anchor_left = 0.71500003
+anchor_top = 0.19100001
+anchor_right = 0.95100003
+anchor_bottom = 0.80200005
+offset_left = -0.18005371
+offset_top = 0.231987
+offset_right = -3.052002
+offset_bottom = 0.30395508
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -126,6 +127,88 @@ layout_mode = 2
 theme_override_constants/icon_max_width = 24
 text = "CREAR PARTIDA"
 icon = ExtResource("2_fe2o3")
+
+[node name="PanelMultijugadorEnet" type="PanelContainer" parent="Control" unique_id=1983011787]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.71500003
+anchor_top = 0.17300001
+anchor_right = 0.95100003
+anchor_bottom = 0.82400006
+offset_left = -0.18005371
+offset_top = 11.895996
+offset_right = -3.052002
+offset_bottom = -13.952026
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Control/PanelMultijugadorEnet" unique_id=90851719]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/PanelMultijugadorEnet/MarginContainer" unique_id=2080386204]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TubeMenu" type="VBoxContainer" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer" unique_id=1801079203]
+layout_mode = 2
+
+[node name="Titulo" type="Label" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=413970402]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "CREAR USUARIO"
+label_settings = ExtResource("4_q85j6")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelNombreUsuarioEnet" type="Label" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=388509384]
+layout_mode = 2
+text = "Nombre usuario:"
+label_settings = ExtResource("3_wb0q5")
+
+[node name="EditNombreUsuarioEnet" type="LineEdit" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=177040593]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("5_8g5eo")
+max_length = 12
+
+[node name="HSeparator" type="HSeparator" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=172378781]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="LabelIp" type="Label" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=1290975090]
+layout_mode = 2
+text = "IP:"
+label_settings = ExtResource("3_wb0q5")
+
+[node name="EditIp" type="LineEdit" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=2075543117]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("5_8g5eo")
+
+[node name="LabelPuerto" type="Label" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=1668496600]
+layout_mode = 2
+text = "Puerto:"
+label_settings = ExtResource("3_wb0q5")
+
+[node name="EditPuerto" type="LineEdit" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=889863081]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("5_8g5eo")
+
+[node name="BotonUnirseEnet" type="Button" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=596335283]
+layout_mode = 2
+text = "UNIRSE"
+
+[node name="HSeparator2" type="HSeparator" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=1194197307]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="BotonCrearPartidaEnet" type="Button" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=1942831671]
+layout_mode = 2
+theme_override_constants/icon_max_width = 24
+text = "CREAR PARTIDA"
 
 [node name="PanelUnJugador" type="PanelContainer" parent="Control" unique_id=605970837]
 unique_name_in_owner = true

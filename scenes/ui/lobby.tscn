@@ -81,8 +81,21 @@ label_settings = ExtResource("1_5t5el")
 
 [node name="LabelId" type="Label" parent="MarginTitulo/HBoxContainer" unique_id=1376093879]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "ID: "
+label_settings = ExtResource("1_5t5el")
+
+[node name="LabelIp" type="Label" parent="MarginTitulo/HBoxContainer" unique_id=1767096886]
+unique_name_in_owner = true
+layout_mode = 2
+text = "IP: "
+label_settings = ExtResource("1_5t5el")
+
+[node name="LabelPuerto" type="Label" parent="MarginTitulo/HBoxContainer" unique_id=805113461]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Puerto:"
 label_settings = ExtResource("1_5t5el")
 
 [node name="MarginContenedorJugadores" type="MarginContainer" parent="." unique_id=1062665617]

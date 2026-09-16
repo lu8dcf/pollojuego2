@@ -7,8 +7,8 @@ var enet_peer := ENetMultiplayerPeer.new()
 var tube_client := TubeClient.new()
 var tube_enabled = true
 
-var PORT = 9999
-var IP_ADDRESS = '26.47.107.144'
+var puerto_actual: int = 9999
+var ip_local: String = '127.0.0.1'
 
 var en_lobby: bool = false
 
@@ -17,6 +17,8 @@ func _ready() -> void:
 		tube_client.context = TUBE_CONTEXT
 		get_tree().root.add_child.call_deferred(tube_client)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
+	
+	_actualizar_ip_local()
 
 func tube_create():
 	en_lobby = true
@@ -31,20 +33,43 @@ func tube_join(session_id: String):
 	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
 	tube_client.join_session(session_id)
 
-func start_server():
+func _actualizar_ip_local() -> void:
+	var ips = IP.get_local_addresses() # obtener el ip
+	for ip in ips:
+		if ip.begins_with("192.168.") or ip.begins_with("10.") or ip.begins_with("172."):
+			ip_local = ip
+			break
+	if ip_local == "127.0.0.1" and ips.size() >0:
+		ip_local = ips[0]
+		print("ip detectada: ", ip_local)
+		
+func start_server(puerto: int = 9999):
 	en_lobby = true
-	enet_peer.create_server(PORT)
+	puerto_actual=puerto
+	
+	var error = enet_peer.create_server(puerto_actual)
+	if error != OK:
+		print("ERROR al crear servidor en puerto ", puerto_actual, ": ", error)
+		return false
 	multiplayer.multiplayer_peer = enet_peer
 	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
+	print("Servidor LAN creado en ", ip_local, ":", puerto_actual)
+	return true
 
-func join_server():
+func join_server(direccion_ip:String, puerto:int)-> bool:
 	en_lobby = true
-	enet_peer.create_client(IP_ADDRESS, PORT)
+	puerto_actual = puerto
+	var error = enet_peer.create_client(direccion_ip, puerto)
+	if error != OK:
+		print("ERROR al conectar a ", direccion_ip, ":", puerto, " -> ", error)
+		return false
 	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
 	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
 	multiplayer.multiplayer_peer = enet_peer
+	print("Conectando a ", direccion_ip, ":", puerto)
+	return true
 
 # ------------------------------------------------------------
 # LOBBY HANDLERS

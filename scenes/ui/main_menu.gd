@@ -1,17 +1,27 @@
 extends CanvasLayer
 
-@onready var edit_sesion: LineEdit = %EditSesion
-@onready var edit_nombre_usuario: LineEdit = %EditNombreUsuario
 # para un solo jugador
 @onready var nombre_usuario: LineEdit = %nombre_usuario
 
+# para el multijugador tube
 @onready var boton_unirse_tube: Button = %BotonUnirseTube
 @onready var boton_crear_partida_tube: Button = %BotonCrearPartidaTube
 @onready var boton_salir: TextureButtonAnimado = %BotonSalir
+@onready var edit_sesion: LineEdit = %EditSesion
+@onready var edit_nombre_usuario: LineEdit = %EditNombreUsuario
+
+#para el multijugador lan
+@onready var edit_nombre_usuario_enet: LineEdit = $Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu/EditNombreUsuarioEnet
+@onready var edit_ip: LineEdit = $Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu/EditIp
+@onready var edit_puerto: LineEdit = $Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu/EditPuerto
+@onready var boton_unirse_enet: Button = $Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu/BotonUnirseEnet
+@onready var boton_crear_partida_enet: Button = $Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu/BotonCrearPartidaEnet
+
 
 @onready var panel_un_jugador: PanelContainer = %PanelUnJugador
 @onready var panel_multijugador: PanelContainer = %PanelMultijugador
 @onready var panel_opciones: PanelContainer = %PanelOpciones
+@onready var panel_multijugador_enet: PanelContainer = %PanelMultijugadorEnet
 
 @onready var tube_menu: VBoxContainer = %TubeMenu
 
@@ -46,6 +56,8 @@ func _ready() -> void:
 	
 	boton_unirse_tube.disabled = true
 	boton_unirse_tube.pressed.connect(on_unirse_tube)
+	boton_unirse_enet.pressed.connect(on_join_enet)
+	boton_crear_partida_enet.pressed.connect(on_crear_partida_enet)
 	boton_salir.pressed.connect(func(): get_tree().quit())
 	boton_crear_partida_tube.pressed.connect(on_crear_partida_tube)
 	
@@ -123,10 +135,59 @@ func _deactivate_menu_camera() -> void:
 	if mundo and mundo.has_method("disable_menu_mode"):
 		mundo.disable_menu_mode()
 
-func on_join():
+func on_join_enet():
+	var ip = edit_ip.text.strip_edges()
+	var puerto_str = edit_puerto.text.strip_edges()
+	
+	if ip == "":
+		print("ERROR: Debes escribir una IP")
+		return
+	if puerto_str == "" or not puerto_str.is_valid_int():
+		print("ERROR: Puerto inválido")
+		return
+	
+	var puerto = int(puerto_str)
+	
+	if edit_nombre_usuario_enet.text != "":
+		GlobalJuego.nombre_jugador = edit_nombre_usuario_enet.text
+	
 	_deactivate_menu_camera()
-	temp_mundo.queue_free()
-	Network.join_server()
+	GlobalJuego.un_jugador = false
+	
+	if temp_mundo:
+		temp_mundo.queue_free()
+	
+	# Conectar
+	var ok = Network.join_server(ip, puerto)
+	if not ok:
+		print("No se pudo conectar al servidor LAN")
+		return
+	
+	_mostrar_lobby()
+
+func on_crear_partida_enet():
+	var puerto_str = edit_puerto.text.strip_edges()
+	if puerto_str == "" or not puerto_str.is_valid_int():
+		print("ERROR: Debes escribir un puerto válido")
+		return
+	
+	var puerto = int(puerto_str)
+	
+	if edit_nombre_usuario_enet.text != "":
+		GlobalJuego.nombre_jugador = edit_nombre_usuario_enet.text
+	
+	_deactivate_menu_camera()
+	GlobalJuego.un_jugador = false
+	
+	if temp_mundo:
+		temp_mundo.queue_free()
+	
+	# Crear servidor
+	var ok = Network.start_server(puerto)
+	if not ok:
+		print("No se pudo crear el servidor LAN en el puerto ", puerto)
+		return
+	
 	_mostrar_lobby()
 
 func add_world():
@@ -227,6 +288,7 @@ func ocultar_todo():
 	panel_un_jugador.visible = false
 	panel_multijugador.visible = false
 	panel_opciones.visible = false
+	panel_multijugador_enet.visible = false
 	
 func _on_un_jugador_pressed() -> void:
 	aplicar_impacto()
@@ -244,11 +306,12 @@ func _on_multijugador_pressed() -> void:
 
 func _on_boton_online_pressed() -> void:
 	panel_multijugador.visible = not panel_multijugador.visible
-
+	panel_multijugador_enet.visible = false
+	
 
 func _on_boton_local_pressed() -> void:
-	pass # Replace with function body.
-
+	panel_multijugador_enet.visible = not panel_multijugador_enet.visible
+	panel_multijugador.visible = false
 
 func _on_opciones_pressed() -> void:
 	aplicar_impacto()
