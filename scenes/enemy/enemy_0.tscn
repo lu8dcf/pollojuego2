@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ce82pcvnetebn" path="res://scenes/enemy/enemy_0.gd" id="1_qypkf"]
 [ext_resource type="PackedScene" uid="uid://c437bxs0s6tp7" path="res://assets/modelos/enemigos/enemy1.fbx" id="2_20j7o"]
+[ext_resource type="PackedScene" uid="uid://cqy6sq80q31lu" path="res://scenes/enemy/enemigo_1.tscn" id="2_l1is7"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l1is7"]
 albedo_color = Color(1, 0.05882353, 0.09019608, 1)
@@ -36,15 +37,18 @@ properties/4/replication_mode = 2
 collision_layer = 2
 script = ExtResource("1_qypkf")
 
+[node name="enemigo_3" parent="." unique_id=955269760 instance=ExtResource("2_l1is7")]
+
 [node name="modelo" parent="." unique_id=1655325594 instance=ExtResource("2_20j7o")]
 visible = false
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]
-transform = Transform3D(2.964562, 0, 0, 0, 0.029198525, 2.0934258, 0, -2.201264, 0.027768113, -0.07335454, -0.13057774, 0.11549413)
+transform = Transform3D(2.964562, 0, 0, 0, 0.029198525, 2.0934258, 0, -2.201264, 0.027768113, -0.0014315248, 0.17043361, 0.00023493171)
 visible = false
 mesh = SubResource("TextMesh_20j7o")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=746515846]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48812735, 0)
 shape = SubResource("CylinderShape3D_2rcni")
 debug_color = Color(0.52156866, 0.07058824, 0.07058824, 1)
 

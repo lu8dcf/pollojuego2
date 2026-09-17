@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dxqc4fvj0bhc4"]
 
-[ext_resource type="Script" uid="uid://dga30h57lxpav" path="res://fabrica_enemigo.gd" id="1_jmt5b"]
+[ext_resource type="Script" uid="uid://dga30h57lxpav" path="res://scenes/enemy/fabrica_enemigo.gd" id="1_jmt5b"]
 
 [node name="fabrica_enemigo" type="Node3D" unique_id=2091791646]
 script = ExtResource("1_jmt5b")
