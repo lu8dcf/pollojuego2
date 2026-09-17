@@ -1,4 +1,5 @@
 extends CharacterBody3D
+class_name EnemigoBase
 
 @export var health := 100
 # @export var animation_player: AnimationPlayer
@@ -16,20 +17,46 @@ var ver_cruz = true
 var ver_modelo = false
 @onready var modelo= $modelo
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
+var animation_player : AnimationPlayer
+#@export var enemigos: Array[PackedScene] = [
+#preload("uid://cqy6sq80q31lu"),
+#preload("uid://cgn8qa26kgyil"),
+#preload("uid://lpniycrdwhlo"),
+#preload("uid://drhx2vi2udeec"),
+#]
+@export var tipo: int # tipo d enemigo
 
 var is_hurt := false
 var is_dying := false
 
 func _ready():
 	#animation_player.playback_default_blend_time = 0.2
+	cargar_modelo()
 	add_to_group('enemy')
 	look_at(goal_position)
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
 	
+func cargar_modelo(): # tipo de enemigo
+	var escena_glb = load("res://scenes/enemy/enemigo_"+ str(tipo)+".tscn")
+	var instancia_glb = escena_glb.instantiate()
 	
+	#asignarle un pullups
+	#instancia_objeto_pieza.id=id
+		
 	
+	modelo.add_child(instancia_glb)
+	# Buscar el AnimationPlayer dentro de esta instancia
+	animation_player = _find_animation_player(instancia_glb)	
 	
+func _find_animation_player(node: Node) -> AnimationPlayer: # agrega las animaciones del mnodelo a la pieza
+	for child in node.get_children():
+		if child is AnimationPlayer:
+			return child
+		var found = _find_animation_player(child)
+		if found:
+			return found
+	return null	
 
 func take_damage(damage: int, source: int):
 	var next_health = health - damage

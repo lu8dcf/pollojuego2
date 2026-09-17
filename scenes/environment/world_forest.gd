@@ -5,11 +5,9 @@ extends Node3D
 @onready var menu_camera: MenuCameraController = $Camera3D
 #@onready var contenedor_mapa: Node3D = $Conteendor_mapa
 
-const TARGET = preload("uid://b8go34qeye00a") # Escena enemy0
-const enemy1 = preload("uid://cqy6sq80q31lu")
-const enemy2 = preload("uid://cgn8qa26kgyil")
-const enemy3 = preload("uid://lpniycrdwhlo")
-const enemy4 = preload("uid://lpniycrdwhlo")
+
+const enemigo_base = preload("uid://b8go34qeye00a") # Escena enemy0
+
 
 var is_menu_mode: bool = false
 var ya_hizo=false
@@ -87,7 +85,7 @@ func spawn_enemy():
 func otro():
 	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 20:
 		for player in get_tree().get_node_count_in_group("Jugadores"):
-			var new_target = fabrica_enemigos(1)
+			var new_target = fabrica_enemigos(2)
 			var rand_x = randf_range(GlobalJuego.mapa_x_min, GlobalJuego.mapa_x_max)
 			var rand_z = randf_range(GlobalJuego.mapa_z_min, GlobalJuego.mapa_z_max)
 			#print (rand_x," ",rand_z)
@@ -95,8 +93,14 @@ func otro():
 			spawn_container.add_child(new_target, true)
 
 func fabrica_enemigos(tipo):
-	var new_enemy = TARGET.instantiate()
-	return new_enemy
+	
+	if tipo < 1 or tipo > GlobalJuego.cant_tipo_enemigos: # hasta aca solo 4 enemigos
+		push_error("Valor X fuera de rango: " + str(tipo))
+		return
+	var nuevo_enemigo = enemigo_base.instantiate()
+	nuevo_enemigo.tipo = tipo
+	
+	return nuevo_enemigo
 
 
 func partida_unsolojugador():
