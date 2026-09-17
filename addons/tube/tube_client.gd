@@ -160,7 +160,7 @@ var _upnp := TubeUPNP.new()
 
 func _raise_error(p_code: int, p_message: String):
 	printerr(p_message)
-	error_raised.emit(p_code, p_message)
+	error_raised.emit(p_message)
 
 
 func _ready() -> void:

@@ -3,6 +3,10 @@ extends CanvasLayer
 # para un solo jugador
 @onready var nombre_usuario: LineEdit = %nombre_usuario
 
+# cartel de error:
+@onready var mensaje_error: AcceptDialog = $MensajeError
+
+
 # para el multijugador tube
 @onready var boton_unirse_tube: Button = %BotonUnirseTube
 @onready var boton_crear_partida_tube: Button = %BotonCrearPartidaTube
@@ -69,16 +73,18 @@ func _ready() -> void:
 	# Conectar efecto de impacto/shake a los botones
 	_conectar_efectos_botones()
 	
-	Network.tube_client.error_raised.connect(on_error_raised)
-	
+	Network.tube_client.error_raised.connect(_on_error_conexion)
 	_activate_menu_camera() # activa la camara tipo cine del menu
 	
 	# si es servidor dedicado, iniciar servidor automáticamente
 	if OS.has_feature('server'):
 		temp_mundo.queue_free()
-		Network.start_server()
+		Network.empezar_servidor_lan()
 		await get_tree().create_timer(0.1).timeout
 		add_world()
+	
+	#manejo de errores:
+	GlobalSignal.error_conexion.connect(_on_error_conexion)
 
 func _conectar_efectos_botones() -> void:
 	"""Conecta la sacudida y aberración cromática a los clics de los botones"""
@@ -145,10 +151,10 @@ func on_join_enet():
 	var puerto_str = edit_puerto.text.strip_edges()
 	
 	if ip == "":
-		print("ERROR: Debes escribir una IP")
+		_on_error_conexion("ERROR: Debes escribir una IP")
 		return
 	if puerto_str == "" or not puerto_str.is_valid_int():
-		print("ERROR: Puerto inválido")
+		_on_error_conexion("ERROR: Puerto inválido")
 		return
 	
 	var puerto = int(puerto_str)
@@ -163,9 +169,8 @@ func on_join_enet():
 		temp_mundo.queue_free()
 	
 	# Conectar
-	var ok = Network.join_server(ip, puerto)
+	var ok = Network.unirse_servidor_lan(ip, puerto)
 	if not ok:
-		print("No se pudo conectar al servidor LAN")
 		return
 	
 	_mostrar_lobby()
@@ -174,12 +179,16 @@ func on_crear_partida_enet():
 	var puerto_str = edit_puerto.text.strip_edges()
 	var ip_str = edit_ip.text.strip_edges()
 	if puerto_str == "" or not puerto_str.is_valid_int():
-		#print("ERROR: Debes escribir un puerto válido")
+		_on_error_conexion("Debes escribir un puerto válido")
+		return
+	
+	var puerto = int(puerto_str)
+	if puerto < 1024 or puerto > 65535:
+		_on_error_conexion("El puerto debe estar entre 1024 y 65535.")
 		return
 	if ip_str != "":
 		Network.otro_ip = true
 		Network.ip_local = ip_str
-	var puerto = int(puerto_str)
 	
 	if edit_nombre_usuario_enet.text != "":
 		GlobalJuego.nombre_jugador = edit_nombre_usuario_enet.text
@@ -192,9 +201,8 @@ func on_crear_partida_enet():
 	
 	# Crear servidor
 	
-	var ok = Network.start_server(puerto)
+	var ok = Network.empezar_servidor_lan(puerto)
 	if not ok:
-		print("No se pudo crear el servidor LAN en el puerto ", puerto)
 		return
 	
 	_mostrar_lobby()
@@ -287,13 +295,6 @@ func update_username(nuevo_texto: String):
 	GlobalJuego.nombre_jugador = nuevo_texto
 	print("Nombre actualizado: ", GlobalJuego.nombre_jugador)
 	
-func on_error_raised(_code, _message):
-	edit_sesion.text = ''
-	boton_unirse_tube.add_theme_color_override('font_disabled_color', Color.DARK_RED)
-	boton_unirse_tube.disabled = true
-	show()
-	_limpiar_lobby()
-
 func ocultar_todo():
 	boton_local.visible = false
 	boton_online.visible = false
@@ -301,6 +302,7 @@ func ocultar_todo():
 	panel_multijugador.visible = false
 	panel_opciones.visible = false
 	panel_multijugador_enet.visible = false
+	mensaje_error.visible=false
 	
 func _on_un_jugador_pressed() -> void:
 	aplicar_impacto()
@@ -357,3 +359,38 @@ func _crear_jugador_local(mundo_instancia: Node3D):
 	jugador.global_position = Vector3(22, 2, 22)
 	GlobalJuego.un_jugador = true
 	mundo_instancia.add_child(jugador)
+
+
+#manejo de errores:
+func _on_error_conexion(mensaje:String)->void:
+	show()
+	ocultar_todo()
+	
+	# Limpiar el lobby si existe
+	_limpiar_lobby()
+	
+	# Crear el popup
+	if mensaje_error and is_instance_valid(mensaje_error):
+		mensaje_error.queue_free()
+	
+	mensaje_error = AcceptDialog.new()
+	mensaje_error.title = "Error de conexión"
+	mensaje_error.dialog_text = mensaje
+	mensaje_error.ok_button_text = "Volver al menú"
+	mensaje_error.dialog_autowrap = true
+	mensaje_error.min_size = Vector2(400, 150)
+	mensaje_error.exclusive = true
+	
+	# Centrar el popup
+	mensaje_error.initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_PRIMARY_SCREEN
+	
+	add_child(mensaje_error)
+	mensaje_error.popup_centered()
+	
+	# Cuando cierre el popup, recargar escena
+	mensaje_error.confirmed.connect(_on_error_confirmado)
+	mensaje_error.canceled.connect(_on_error_confirmado)
+	mensaje_error.close_requested.connect(_on_error_confirmado)
+
+func _on_error_confirmado() -> void:
+	get_tree().reload_current_scene()

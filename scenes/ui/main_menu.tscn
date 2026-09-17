@@ -558,6 +558,12 @@ metadata/_edit_use_anchors_ = true
 [node name="Mundo" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
 unique_name_in_owner = true
 
+[node name="MensajeError" type="AcceptDialog" parent="." unique_id=72186245]
+oversampling_override = 1.0
+title = "Error!"
+initial_position = 4
+visible = true
+
 [connection signal="pressed" from="Control/BotonOnline" to="." method="_on_boton_online_pressed"]
 [connection signal="pressed" from="Control/BotonLocal" to="." method="_on_boton_local_pressed"]
 [connection signal="pressed" from="Control/PanelUnJugador/MarginContainer/HBoxContainer/MenuSolo/MarginContainer/empezar_solo" to="." method="_on_empezar_solo_pressed"]

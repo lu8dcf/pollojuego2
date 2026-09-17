@@ -16,6 +16,10 @@ signal seleccion_pollo_confirmada(pollo_id: String)
 @warning_ignore("unused_signal")
 signal sesion_actualizada(info_sesion: Dictionary)
 
+# ===== SEÑALES DE LOBBY =====
+@warning_ignore("unused_signal")
+signal error_conexion(mensaje :String)
+
 
 # ===== SEÑALES DE INVENTARIO =====
 @warning_ignore("unused_signal")

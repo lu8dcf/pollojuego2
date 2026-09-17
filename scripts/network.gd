@@ -12,13 +12,18 @@ var ip_local: String = '127.0.0.1'
 var otro_ip :bool = false
 var en_lobby: bool = false
 
+# temporizador de time out de espera
+var _timeout_conexion : SceneTreeTimer  = null
+
 func _ready() -> void:
 	if tube_enabled:
 		tube_client.context = TUBE_CONTEXT
 		get_tree().root.add_child.call_deferred(tube_client)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
+	multiplayer.connection_failed.connect(_on_conexion_fallida)
 	
 	_actualizar_ip_local()
+
 
 func tube_create():
 	en_lobby = true
@@ -32,6 +37,7 @@ func tube_join(session_id: String):
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
 	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
 	tube_client.join_session(session_id)
+	_iniciar_timeout_conexion(10.0)
 
 func _actualizar_ip_local() -> void:
 	if not otro_ip:
@@ -45,32 +51,50 @@ func _actualizar_ip_local() -> void:
 			print("ip detectada: ", ip_local)
 	else:
 		print("la ip elegida por el usuario es: ", ip_local)
-func start_server(puerto: int = 9999):
+
+func empezar_servidor_lan(puerto: int = 9999):
 	en_lobby = true
 	puerto_actual=puerto
 	
 	var error = enet_peer.create_server(puerto_actual)
 	if error != OK:
-		print("ERROR al crear servidor en puerto ", puerto_actual, ": ", error)
+		var mensaje = "No se pudo crear el servidor en el puerto " + str(puerto_actual) + ".\n"
+		match  error:
+			ERR_ALREADY_IN_USE:
+				mensaje += "El puerto ya está en uso. Prueba con otro."
+			ERR_CANT_CREATE:
+				mensaje += "No se pudo crear el servidor. Verifica permisos del firewall."
+			_:
+				mensaje += "Código de error: " + str(error)
+		GlobalSignal.error_conexion.emit(mensaje) # se emite el error de conexion para poder manejarlo en el hud
 		return false
+		
 	multiplayer.multiplayer_peer = enet_peer
 	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
-	print("Servidor LAN creado en ", ip_local, ":", puerto_actual)
+	_iniciar_timeout_conexion(8.0)
 	return true
 
-func join_server(direccion_ip:String, puerto:int)-> bool:
+func unirse_servidor_lan(direccion_ip:String, puerto:int)-> bool:
 	en_lobby = true
 	puerto_actual = puerto
 	var error = enet_peer.create_client(direccion_ip, puerto)
 	if error != OK:
-		print("ERROR al conectar a ", direccion_ip, ":", puerto, " -> ", error)
+		var mensaje = "No se pudo conectar a " + direccion_ip + ":" + str(puerto) + ".\n"
+		match error:
+			ERR_CANT_CONNECT:
+				mensaje += "No se pudo conectar. Verifica la IP y el puerto."
+			ERR_ALREADY_IN_USE:
+				mensaje += "Ya hay una conexión activa."
+			_:
+				mensaje += "Código de error: " + str(error)
+		GlobalSignal.error_conexion.emit(mensaje)
 		return false
+		
 	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
 	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
 	multiplayer.multiplayer_peer = enet_peer
-	print("Conectando a ", direccion_ip, ":", puerto)
 	return true
 
 # ------------------------------------------------------------
@@ -92,7 +116,13 @@ func _on_peer_disconnected_lobby(peer_id: int):
 		GlobalJuego.session_info.erase(peer_id)
 
 func _on_connected_to_server_lobby():
-	print("Conectado al servidor en modo lobby")
+
+	if _timeout_conexion: # si existe el timeout, cancelarlo
+		if _timeout_conexion.timeout.is_connected(_on_timeout_conexion):
+			_timeout_conexion.timeout.disconnect(_on_timeout_conexion)
+		_timeout_conexion = null
+	
+
 	var peer_id = multiplayer.get_unique_id()
 	if GlobalJuego and not GlobalJuego.session_info.has(peer_id):
 		GlobalJuego.session_info[peer_id] = {
@@ -242,6 +272,62 @@ func leave_server():
 	multiplayer.multiplayer_peer.close()
 	multiplayer.multiplayer_peer = null
 	get_tree().reload_current_scene()
+
+# MANEJO DE ERRORES:
+
+func _iniciar_timeout_conexion(segundos: float = 8.0) -> void:
+	# Cancelar timeout anterior si existe
+	if _timeout_conexion:
+		_timeout_conexion.timeout.disconnect(_on_timeout_conexion)
+	
+	_timeout_conexion = get_tree().create_timer(segundos)
+	_timeout_conexion.timeout.connect(_on_timeout_conexion)
+	
+	
+func _on_timeout_conexion() -> void:
+	# Si seguimos en lobby y NO estamos conectados, es un timeout
+	if not en_lobby:
+		return
+	
+	# En LAN: comprobar si ya estamos conectados
+	if multiplayer.multiplayer_peer is ENetMultiplayerPeer:
+		var status = multiplayer.multiplayer_peer.get_connection_status()
+		if status == MultiplayerPeer.CONNECTION_CONNECTED:
+			return  # Ya estamos conectados, no es timeout
+	elif multiplayer.multiplayer_peer is WebRTCMultiplayerPeer:
+		# Para Tube, comprobar si estamos conectados al servidor
+		if multiplayer.has_multiplayer_peer() and multiplayer.get_unique_id() != 0:
+			return
+	
+	# No nos conectamos a tiempo
+	var mensaje = "Tiempo de espera agotado. No se pudo conectar.\n"
+	mensaje += "Verifica la IP/puerto o el ID de sesión."
+	
+	# Limpiar conexión
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
+	
+	GlobalSignal.error_conexion.emit(mensaje)
+
+
+func _on_conexion_fallida():
+	if _timeout_conexion:
+		if _timeout_conexion.timeout.is_connected(_on_timeout_conexion):
+			_timeout_conexion.timeout.disconnect(_on_timeout_conexion)
+		_timeout_conexion = null
+	
+	var mensaje = "No se pudo conectar al servidor.\n"
+	mensaje += "Verifica que la IP y el puerto sean correctos,\n"
+	mensaje += "y que el host esté ejecutando el juego."
+	
+	# Limpiar conexión
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
+	
+	GlobalSignal.error_conexion.emit(mensaje)
+
 
 # ------------------------------------------------------------
 # RPC PARA SINCRONIZAR JUGADORES
