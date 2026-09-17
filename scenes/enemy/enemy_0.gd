@@ -15,7 +15,7 @@ var ver_cruz = true
 
 # Modelo
 var ver_modelo = false
-@onready var modelo= $enemigo_1
+@onready var modelo= $modelo
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 var animation_player : AnimationPlayer
 #@export var enemigos: Array[PackedScene] = [
@@ -38,6 +38,7 @@ func _ready():
 	# CONFIGURAR MultiplayerSynchronizer correctamente
 	
 func cargar_modelo(): # tipo de enemigo
+	
 	var escena_glb = load("res://scenes/enemy/enemigo_"+ str(tipo)+".tscn")
 	var instancia_glb = escena_glb.instantiate()
 	
