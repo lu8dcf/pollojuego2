@@ -6,6 +6,10 @@ extends Node3D
 #@onready var contenedor_mapa: Node3D = $Conteendor_mapa
 
 const TARGET = preload("uid://b8go34qeye00a") # Escena enemy0
+const enemy1 = preload("uid://cqy6sq80q31lu")
+const enemy2 = preload("uid://cgn8qa26kgyil")
+const enemy3 = preload("uid://lpniycrdwhlo")
+const enemy4 = preload("uid://lpniycrdwhlo")
 
 var is_menu_mode: bool = false
 var ya_hizo=false
