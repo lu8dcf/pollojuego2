@@ -11,6 +11,9 @@ class_name armaBase
 @onready var sprite = $Sprite3D
 @onready var tiempo = $tiempoEntreDisparo
 
+var objetivoMasCercano
+
+
 @onready var objetivo = null
 var datos: Arma
 
@@ -35,28 +38,14 @@ func _physics_process(delta: float) -> void:
 	
 func mirarObjetivo(delta):
 	# direccion desde el jugador hacia el mouse
-	var direccion = -(buscarObjetivoMasCercano() - global_position) #MUCHO MUY IMPORTANTE ESE MENOOOS
-
+	objetivoMasCercano = buscarObjetivoMasCercano()
+	if(objetivoMasCercano == null):
+		return
 	
-	# sin contar la altura
+	var direccion = -(objetivoMasCercano - global_position) #MUCHO MUY IMPORTANTE ESE MENOOOS
+# sin contar la altura
 	direccion.y = 0
 
-	#if direccion.length_squared() < 0.001:
-		#return
-
-	## rotacion
-	#var rotacion_objetivo = atan2(
-		#direccion.x,
-		#direccion.z
-	#)
-#
-	## roto el nodo pollo, no todo
-	#rotation.y = lerp_angle(
-		#rotation.y,
-		#rotacion_objetivo,
-		#delta * 10.0
-	#)
-	
 	# direccion actual del puntero
 	var direccion_marker = -(puntero.global_position - global_position)
 	direccion_marker.y = 0
@@ -135,15 +124,15 @@ func disparo():
 	#var tipo_bala = datos.comportamiento.tipo_bala
 
 	if multiplayer.is_server():
-		# Si este ArmaBase está en el servidor,
-		# no necesitamos hacer un RPC.
-		crear_bala(
-			puntero.global_position,
-			direccion,
-			#tipo_bala
-		)
-	else:
-		# Si este ArmaBase pertenece a un cliente,
+		## Si este ArmaBase está en el servidor,
+		## no necesitamos hacer un RPC.
+		#crear_bala(
+			#puntero.global_position,
+			#direccion,
+			##tipo_bala
+		#)
+	#else:
+		## Si este ArmaBase pertenece a un cliente,
 		# le pedimos al servidor que cree la bala.
 		solicitar_disparo.rpc_id(
 			1,
