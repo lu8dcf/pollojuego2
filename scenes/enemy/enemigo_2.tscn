@@ -3,3 +3,14 @@
 [ext_resource type="PackedScene" uid="uid://bfxvq61dbk2pt" path="res://assets/modelos/enemigos/enemigo_2.fbx" id="1_irb5k"]
 
 [node name="enemigo_2" unique_id=1964573739 instance=ExtResource("1_irb5k")]
+
+[node name="Skeleton3D" parent="caracol" parent_id_path=PackedInt32Array(1525110730) index="0" unique_id=2077706935]
+bones/1/rotation = Quaternion(-0.04155759, 1.8181732e-14, -9.908104e-09, 0.99913615)
+bones/2/position = Vector3(-5.440662e-17, 0.0021946467, 1.7914009e-10)
+bones/2/rotation = Quaternion(0.10066557, 7.434973e-15, 2.4000544e-08, 0.9949204)
+bones/2/scale = Vector3(1.0506535, 0.99999994, 0.99999994)
+bones/3/position = Vector3(-3.676123e-18, 0.001941615, 1.6003905e-11)
+bones/3/rotation = Quaternion(0.37755206, -1.201993e-08, 1.1234925e-07, 0.92598844)
+bones/3/scale = Vector3(1, 1.1017584, 1.0825295)
+bones/4/position = Vector3(3.723557e-17, 0.0016106815, -1.5617008e-10)
+bones/4/rotation = Quaternion(0.16448782, -4.5819633e-15, 3.9216946e-08, 0.98637915)
