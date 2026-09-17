@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://c1uh3pf0og1vi" path="res://scenes/environment/mapa_1.tscn" id="2_1o1l2"]
 [ext_resource type="Script" uid="uid://c7p2vuotjcwys" path="res://scenes/environment/camera_3d.gd" id="3_1o1l2"]
 [ext_resource type="PackedScene" uid="uid://cypdi1lb7klts" path="res://assets/models/crystal/scene.gltf" id="4_1o1l2"]
+[ext_resource type="Script" uid="uid://d4goam1r77jor" path="res://scenes/environment/fabrica_enemigo.gd" id="5_j6fc8"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_b5dff"]
 
@@ -54,3 +55,6 @@ autostart = true
 
 [node name="Sketchfab_Scene" parent="." unique_id=1802840441 instance=ExtResource("4_1o1l2")]
 transform = Transform3D(1, 0, 0, 0, 0.8622221, 0.50653046, 0, -0.50653046, 0.8622221, 19.1661, -0.7236707, 20.906834)
+
+[node name="Fabrica_enemigo" type="Node3D" parent="." unique_id=1187503114]
+script = ExtResource("5_j6fc8")

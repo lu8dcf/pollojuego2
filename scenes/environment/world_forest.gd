@@ -69,7 +69,9 @@ func spawn_enemy():
 	# SOLO el servidor puede spawnear enemigos
 	if not multiplayer.is_server():
 		return  # Los clientes NO spawnean, solo reciben sincronización
-		
+	GlobalSignal.
+	
+func extra():	
 	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 20:
 		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = TARGET.instantiate()
@@ -78,6 +80,9 @@ func spawn_enemy():
 			#print (rand_x," ",rand_z)
 			new_target.position = Vector3(rand_x, 2.0, rand_z)
 			spawn_container.add_child(new_target, true)
+
+
+
 
 func partida_unsolojugador():
 	is_menu_mode = false
