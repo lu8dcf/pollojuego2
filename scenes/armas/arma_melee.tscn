@@ -1,11 +1,19 @@
 [gd_scene format=3 uid="uid://b80erlmjspkl8"]
 
-[ext_resource type="Script" uid="uid://cybnnng3yrjei" path="res://scripts/armas/armas_escenas/arma_melee.gd" id="1_d4448"]
+[sub_resource type="GDScript" id="GDScript_3idsg"]
+script/source = "extends Node3D
+
+var datos: Arma
+
+
+func atacar():
+	print(\"Zaas!\")
+"
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_8w0r3"]
 
 [node name="armaMelee" type="Node3D" unique_id=133555939]
-script = ExtResource("1_d4448")
+script = SubResource("GDScript_3idsg")
 
 [node name="Area3D" type="Area3D" parent="." unique_id=1697476524]
 

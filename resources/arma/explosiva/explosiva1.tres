@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Arma" format=3 uid="uid://dybf5h0m432n4"]
+
+[ext_resource type="Script" uid="uid://b0h5wuf4brlk1" path="res://scripts/armas/comportamiento/comportamientoExplosivo.gd" id="1_4juux"]
+[ext_resource type="Script" uid="uid://ckltpinun1cgl" path="res://scripts/armas/arma.gd" id="1_h7l8e"]
+[ext_resource type="PackedScene" uid="uid://bskyk4ur6lr8m" path="res://assets/modelos/pollos/pollo_1.fbx" id="3_wlq20"]
+
+[sub_resource type="Resource" id="Resource_m28bd"]
+script = ExtResource("1_4juux")
+rango_explosivo = 6
+danio_explosion = 10.0
+tiempo_espoleta = 4.0
+metadata/_custom_type_script = "uid://b0h5wuf4brlk1"
+
+[resource]
+script = ExtResource("1_h7l8e")
+id = 2
+danio = 5.0
+sprite = ExtResource("3_wlq20")
+tiempoDeAtaque = 4
+tipo = 2
+comportamiento = SubResource("Resource_m28bd")
+metadata/_custom_type_script = "uid://ckltpinun1cgl"

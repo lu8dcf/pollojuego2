@@ -15,7 +15,7 @@ var ver_cruz = true
 
 # Modelo
 var ver_modelo = false
-@onready var modelo= $modelo
+@onready var modelo= $enemigo_1
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 var animation_player : AnimationPlayer
 #@export var enemigos: Array[PackedScene] = [

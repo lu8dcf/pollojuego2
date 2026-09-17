@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://iu2fyn4b04b3"]
+
+[ext_resource type="Script" uid="uid://hfrys7mbd3nm" path="res://scripts/armas/armas_escenas/armaBase.gd" id="1_xu1fw"]
+[ext_resource type="PackedScene" uid="uid://c23nf7t55y5ta" path="res://scenes/armas/testArrow/test_arma.tscn" id="2_q77go"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_xu1fw"]
+properties/0/path = NodePath(".:visible")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath("Sprite3D:visible")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:rotation")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+
+[node name="ArmaBase" type="Node3D" unique_id=88539004]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+script = ExtResource("1_xu1fw")
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1162458376]
+modulate = Color(0.24705882, 1, 1, 1)
+
+[node name="Marker3D" type="Marker3D" parent="." unique_id=1885476176]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.94608486, 0, 0)
+
+[node name="tiempoEntreDisparo" type="Timer" parent="." unique_id=1059315536]
+wait_time = 7.0
+autostart = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2103318625]
+replication_config = SubResource("SceneReplicationConfig_xu1fw")
+
+[node name="SpawnContainerBalas" type="Node3D" parent="." unique_id=831218319]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1437828170]
+_spawnable_scenes = PackedStringArray("uid://beawwqs832562")
+spawn_path = NodePath("../SpawnContainerBalas")
+
+[node name="testArma" parent="." unique_id=111605971 instance=ExtResource("2_q77go")]
+
+[connection signal="timeout" from="tiempoEntreDisparo" to="." method="_on_tiempo_disparo_timeout"]

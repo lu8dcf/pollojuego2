@@ -56,7 +56,8 @@ func _configurar_sesion():
 	session_info[1] = {
 		"score": 0,
 		"username": nombre_temp,
-		"salud": SALUD_DEFAULT
+		"salud": SALUD_DEFAULT,
+		"personaje":0
 	}
 	
 	_replicar_session_info.rpc(session_info)
@@ -71,7 +72,8 @@ func _agregar_jugador(peer_id: int):
 		session_info[peer_id] = {
 			"score": 0,
 			"username": jugador.nameplate.text if jugador.nameplate else "Jugador " + str(peer_id),
-			"salud": SALUD_DEFAULT
+			"salud": SALUD_DEFAULT,
+			"personaje":0
 		}
 		_replicar_session_info.rpc(session_info)
 		
@@ -89,7 +91,7 @@ func _eliminar_jugador(peer_id: int):
 
 func _obtener_jugador(peer_id: int) -> Node:
 	"""Busca un jugador por su ID"""
-	for jugador in get_tree().get_nodes_in_group("Players"):
+	for jugador in get_tree().get_nodes_in_group("Jugadores"):
 		if jugador.name == str(peer_id):
 			return jugador
 	return null
@@ -171,7 +173,8 @@ func configurar_singleplayer():
 	session_info[1] = {
 		"score": 0,
 		"username": nombre_temp,
-		"salud": SALUD_DEFAULT
+		"salud": SALUD_DEFAULT,
+		"personaje":0
 	}
 	
 	# Emitir señal global

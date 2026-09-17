@@ -7,9 +7,9 @@ var enet_peer := ENetMultiplayerPeer.new()
 var tube_client := TubeClient.new()
 var tube_enabled = true
 
-var PORT = 9999
-var IP_ADDRESS = '26.47.107.144'
-
+var puerto_actual: int = 9999
+var ip_local: String = '127.0.0.1'
+var otro_ip :bool = false
 var en_lobby: bool = false
 
 func _ready() -> void:
@@ -17,6 +17,8 @@ func _ready() -> void:
 		tube_client.context = TUBE_CONTEXT
 		get_tree().root.add_child.call_deferred(tube_client)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
+	
+	_actualizar_ip_local()
 
 func tube_create():
 	en_lobby = true
@@ -31,20 +33,45 @@ func tube_join(session_id: String):
 	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
 	tube_client.join_session(session_id)
 
-func start_server():
+func _actualizar_ip_local() -> void:
+	if not otro_ip:
+		var ips = IP.get_local_addresses() # obtener el ip
+		for ip in ips:
+			if ip.begins_with("192.168.") or ip.begins_with("10.") or ip.begins_with("172."):
+				ip_local = ip
+				break
+		if ip_local == "127.0.0.1" and ips.size() >0:
+			ip_local = ips[0]
+			print("ip detectada: ", ip_local)
+	else:
+		print("la ip elegida por el usuario es: ", ip_local)
+func start_server(puerto: int = 9999):
 	en_lobby = true
-	enet_peer.create_server(PORT)
+	puerto_actual=puerto
+	
+	var error = enet_peer.create_server(puerto_actual)
+	if error != OK:
+		print("ERROR al crear servidor en puerto ", puerto_actual, ": ", error)
+		return false
 	multiplayer.multiplayer_peer = enet_peer
 	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
+	print("Servidor LAN creado en ", ip_local, ":", puerto_actual)
+	return true
 
-func join_server():
+func join_server(direccion_ip:String, puerto:int)-> bool:
 	en_lobby = true
-	enet_peer.create_client(IP_ADDRESS, PORT)
+	puerto_actual = puerto
+	var error = enet_peer.create_client(direccion_ip, puerto)
+	if error != OK:
+		print("ERROR al conectar a ", direccion_ip, ":", puerto, " -> ", error)
+		return false
 	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
 	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
 	multiplayer.multiplayer_peer = enet_peer
+	print("Conectando a ", direccion_ip, ":", puerto)
+	return true
 
 # ------------------------------------------------------------
 # LOBBY HANDLERS
@@ -71,7 +98,8 @@ func _on_connected_to_server_lobby():
 		GlobalJuego.session_info[peer_id] = {
 			"score": 0,
 			"username": GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else "Jugador " + str(peer_id),
-			"salud": GlobalJuego.SALUD_DEFAULT
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"personaje":0
 		}
 
 # ------------------------------------------------------------
@@ -162,7 +190,8 @@ func _on_peer_connected_partida(peer_id: int):
 		GlobalJuego.session_info[peer_id] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id),
-			"salud": GlobalJuego.SALUD_DEFAULT
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"personaje":0
 		}
 
 func _on_peer_disconnected_partida(peer_id: int):
@@ -222,6 +251,7 @@ func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
 	"""El host ordena spawnear un jugador en todos los clientes"""
 	print("RPC: Spawneando jugador: ", peer_id, " - ", nombre)
 	
+
 	var mundo = obtener_mundo_actual()
 	if not mundo:
 		print("ERROR: No hay mundo para spawnear en cliente")
@@ -243,3 +273,37 @@ func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
 		nameplate.text = nombre
 	
 	print("Jugador spawneado en cliente: ", peer_id, " - ", nombre)
+#
+#func clean_up_signals():
+	#multiplayer.peer_connected.disconnect(add_player) 
+	#multiplayer.peer_disconnected.disconnect(remove_player)
+	#multiplayer.connected_to_server.disconnect(on_connected_to_server)
+
+func _exit_tree() -> void:
+	if tube_enabled:
+		tube_client.leave_session()
+
+
+#----------------------------------------------------- Interacciones Jugador
+@rpc("any_peer", "call_local")
+func pedir_salvar_rpc(objetivo_id: int) -> void:
+
+	if not multiplayer.is_server():
+		return
+
+	var salvador_id := multiplayer.get_remote_sender_id()
+
+	var salvador := GlobalJuego._obtener_jugador(salvador_id)
+	var objetivo := GlobalJuego._obtener_jugador(objetivo_id)
+
+	if salvador == null or objetivo == null:
+		return
+
+	# comprobar que el objetivo esta caido
+	if objetivo.estadoActual != Jugador.Estado.CAIDO:
+		print("El jugador no está caido")
+		return
+
+	# Cambiar el estado del objetivo
+	objetivo.cambiar_estado(Jugador.Estado.OLEADA)
+	print("¡Salvado!")
