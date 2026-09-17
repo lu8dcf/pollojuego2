@@ -49,17 +49,22 @@ var offset_original_layer: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	offset_original_layer = offset
 	ocultar_todo() # ocultar todos los menus 
-
+	
+	#online
 	edit_sesion.text_changed.connect(update_session)
 	edit_nombre_usuario.text_changed.connect(update_username)
 	nombre_usuario.text_changed.connect(update_username)
 	
 	boton_unirse_tube.disabled = true
 	boton_unirse_tube.pressed.connect(on_unirse_tube)
-	boton_unirse_enet.pressed.connect(on_join_enet)
-	boton_crear_partida_enet.pressed.connect(on_crear_partida_enet)
 	boton_salir.pressed.connect(func(): get_tree().quit())
 	boton_crear_partida_tube.pressed.connect(on_crear_partida_tube)
+	
+	# lan
+	boton_unirse_enet.disabled = true
+	edit_ip.text_changed.connect(update_ip)
+	boton_unirse_enet.pressed.connect(on_join_enet)
+	boton_crear_partida_enet.pressed.connect(on_crear_partida_enet)
 	
 	# Conectar efecto de impacto/shake a los botones
 	_conectar_efectos_botones()
@@ -167,10 +172,13 @@ func on_join_enet():
 
 func on_crear_partida_enet():
 	var puerto_str = edit_puerto.text.strip_edges()
+	var ip_str = edit_ip.text.strip_edges()
 	if puerto_str == "" or not puerto_str.is_valid_int():
-		print("ERROR: Debes escribir un puerto válido")
+		#print("ERROR: Debes escribir un puerto válido")
 		return
-	
+	if ip_str != "":
+		Network.otro_ip = true
+		Network.ip_local = ip_str
 	var puerto = int(puerto_str)
 	
 	if edit_nombre_usuario_enet.text != "":
@@ -183,6 +191,7 @@ func on_crear_partida_enet():
 		temp_mundo.queue_free()
 	
 	# Crear servidor
+	
 	var ok = Network.start_server(puerto)
 	if not ok:
 		print("No se pudo crear el servidor LAN en el puerto ", puerto)
@@ -265,14 +274,17 @@ func on_crear_partida_tube():
 	Network.tube_create()
 	_mostrar_lobby()
 
-func update_session(new_text: String):
-	boton_unirse_tube.disabled = new_text == ""
+func update_ip(nuevo_texto:String):
+	boton_unirse_enet.disabled = nuevo_texto == ""
+
+func update_session(nuevo_texto: String):
+	boton_unirse_tube.disabled = nuevo_texto == ""
 	var caret_pos: int = edit_sesion.caret_column
-	edit_sesion.text = new_text.to_upper()
+	edit_sesion.text = nuevo_texto.to_upper()
 	edit_sesion.caret_column = caret_pos
 
-func update_username(new_text: String):
-	GlobalJuego.nombre_jugador = new_text
+func update_username(nuevo_texto: String):
+	GlobalJuego.nombre_jugador = nuevo_texto
 	print("Nombre actualizado: ", GlobalJuego.nombre_jugador)
 	
 func on_error_raised(_code, _message):

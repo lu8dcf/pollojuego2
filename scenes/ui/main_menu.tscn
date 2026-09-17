@@ -51,6 +51,7 @@ texto = "Local"
 
 [node name="PanelMultijugador" type="PanelContainer" parent="Control" unique_id=882952804]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.71500003
@@ -130,6 +131,7 @@ icon = ExtResource("2_fe2o3")
 
 [node name="PanelMultijugadorEnet" type="PanelContainer" parent="Control" unique_id=1983011787]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.71500003
@@ -214,7 +216,6 @@ text = "CREAR PARTIDA"
 
 [node name="PanelUnJugador" type="PanelContainer" parent="Control" unique_id=605970837]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -249,10 +250,11 @@ label_settings = ExtResource("3_wb0q5")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TubeMenu" type="VBoxContainer" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer" unique_id=1040404985]
+[node name="MenuSolo" type="VBoxContainer" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer" unique_id=1040404985]
 layout_mode = 2
+theme_override_constants/separation = 24
 
-[node name="titulo" type="Label" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=171721742]
+[node name="titulo" type="Label" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/MenuSolo" unique_id=171721742]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Un Solo Jugador"
@@ -260,22 +262,26 @@ label_settings = ExtResource("4_q85j6")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="label_usuario" type="Label" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1541034621]
+[node name="label_usuario" type="Label" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/MenuSolo" unique_id=1541034621]
 layout_mode = 2
 text = "Usuario:"
 label_settings = ExtResource("3_wb0q5")
 
-[node name="nombre_usuario" type="LineEdit" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1314644862]
+[node name="nombre_usuario" type="LineEdit" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/MenuSolo" unique_id=1314644862]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_8g5eo")
 max_length = 12
 
-[node name="HSeparator2" type="HSeparator" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=885743908]
+[node name="HSeparator2" type="HSeparator" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/MenuSolo" unique_id=885743908]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="empezar_solo" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu" unique_id=1804414237 instance=ExtResource("3_m1kxf")]
+[node name="MarginContainer" type="MarginContainer" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/MenuSolo" unique_id=164589668]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="empezar_solo" parent="Control/PanelUnJugador/MarginContainer/HBoxContainer/MenuSolo/MarginContainer" unique_id=1804414237 instance=ExtResource("3_m1kxf")]
 custom_minimum_size = Vector2(40, 50)
 clip_contents = true
 layout_mode = 2
@@ -554,7 +560,7 @@ unique_name_in_owner = true
 
 [connection signal="pressed" from="Control/BotonOnline" to="." method="_on_boton_online_pressed"]
 [connection signal="pressed" from="Control/BotonLocal" to="." method="_on_boton_local_pressed"]
-[connection signal="pressed" from="Control/PanelUnJugador/MarginContainer/HBoxContainer/TubeMenu/empezar_solo" to="." method="_on_empezar_solo_pressed"]
+[connection signal="pressed" from="Control/PanelUnJugador/MarginContainer/HBoxContainer/MenuSolo/MarginContainer/empezar_solo" to="." method="_on_empezar_solo_pressed"]
 [connection signal="pressed" from="Control/Control/menu_principal/un_jugador" to="." method="_on_un_jugador_pressed"]
 [connection signal="pressed" from="Control/Control/menu_principal/multijugador" to="." method="_on_multijugador_pressed"]
 [connection signal="pressed" from="Control/Control/menu_principal/opciones" to="." method="_on_opciones_pressed"]

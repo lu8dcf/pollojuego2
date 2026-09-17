@@ -9,7 +9,7 @@ var tube_enabled = true
 
 var puerto_actual: int = 9999
 var ip_local: String = '127.0.0.1'
-
+var otro_ip :bool = false
 var en_lobby: bool = false
 
 func _ready() -> void:
@@ -34,15 +34,17 @@ func tube_join(session_id: String):
 	tube_client.join_session(session_id)
 
 func _actualizar_ip_local() -> void:
-	var ips = IP.get_local_addresses() # obtener el ip
-	for ip in ips:
-		if ip.begins_with("192.168.") or ip.begins_with("10.") or ip.begins_with("172."):
-			ip_local = ip
-			break
-	if ip_local == "127.0.0.1" and ips.size() >0:
-		ip_local = ips[0]
-		print("ip detectada: ", ip_local)
-		
+	if not otro_ip:
+		var ips = IP.get_local_addresses() # obtener el ip
+		for ip in ips:
+			if ip.begins_with("192.168.") or ip.begins_with("10.") or ip.begins_with("172."):
+				ip_local = ip
+				break
+		if ip_local == "127.0.0.1" and ips.size() >0:
+			ip_local = ips[0]
+			print("ip detectada: ", ip_local)
+	else:
+		print("la ip elegida por el usuario es: ", ip_local)
 func start_server(puerto: int = 9999):
 	en_lobby = true
 	puerto_actual=puerto
@@ -96,7 +98,8 @@ func _on_connected_to_server_lobby():
 		GlobalJuego.session_info[peer_id] = {
 			"score": 0,
 			"username": GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else "Jugador " + str(peer_id),
-			"salud": GlobalJuego.SALUD_DEFAULT
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"personaje":0
 		}
 
 # ------------------------------------------------------------
@@ -187,7 +190,8 @@ func _on_peer_connected_partida(peer_id: int):
 		GlobalJuego.session_info[peer_id] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id),
-			"salud": GlobalJuego.SALUD_DEFAULT
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"personaje":0
 		}
 
 func _on_peer_disconnected_partida(peer_id: int):
