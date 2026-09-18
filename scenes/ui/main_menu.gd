@@ -40,6 +40,9 @@ extends CanvasLayer
 const MUNDO = preload("uid://yubh30707eb7")
 const PLAYER = preload("uid://bc1ek0bvbgna2")
 const LOBBY = preload("uid://oegdxwge86nk")
+const PANTALLA_CARGA = preload("uid://bym6i52jnwycp")
+
+var pantalla_carga_actual: CanvasLayer = null
 
 @onready var mundo: Node3D = %Mundo
 @onready var menu_camera: MenuCameraController = %Mundo.get_node("Camera3D")
@@ -77,14 +80,43 @@ func _ready() -> void:
 	_activate_menu_camera() # activa la camara tipo cine del menu
 	
 	# si es servidor dedicado, iniciar servidor automáticamente
-	if OS.has_feature('server'):
-		temp_mundo.queue_free()
-		Network.empezar_servidor_lan()
-		await get_tree().create_timer(0.1).timeout
-		add_world()
+	#if OS.has_feature('server'):
+		#temp_mundo.queue_free()
+		#Network.empezar_servidor_lan()
+		#await get_tree().create_timer(0.1).timeout
+		#add_world()
 	
 	#manejo de errores:
 	GlobalSignal.error_conexion.connect(_on_error_conexion)
+
+func _mostrar_pantalla_carga(mensaje:String = "Conectando...") -> void:
+	_ocultar_pantalla_carga()
+	pantalla_carga_actual = PANTALLA_CARGA.instantiate()
+	pantalla_carga_actual.set_mensaje(mensaje)
+	add_child(pantalla_carga_actual)
+	pantalla_carga_actual.cancelado.connect(_on_pantalla_carga_cancelada)
+
+
+func _ocultar_pantalla_carga() -> void:
+	if pantalla_carga_actual and is_instance_valid(pantalla_carga_actual):
+		pantalla_carga_actual.queue_free()
+	pantalla_carga_actual = null
+
+func _on_pantalla_carga_cancelada() -> void:
+	_ocultar_pantalla_carga()
+	
+	# Limpiar la conexión
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
+	
+	# Restaurar la escena si fue liberada
+	if not is_instance_valid(temp_mundo):
+		get_tree().reload_current_scene() # se recarga el menu
+	
+	show()  # Mostrar el menú de nuevo
+	_activate_menu_camera()
+
 
 func _conectar_efectos_botones() -> void:
 	"""Conecta la sacudida y aberración cromática a los clics de los botones"""
@@ -165,13 +197,15 @@ func on_join_enet():
 	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = false
 	
-	if temp_mundo:
-		temp_mundo.queue_free()
+	
 	
 	# Conectar
 	var ok = Network.unirse_servidor_lan(ip, puerto)
 	if not ok:
 		return
+	
+	if temp_mundo:
+		temp_mundo.queue_free()
 	
 	_mostrar_lobby()
 
@@ -261,9 +295,10 @@ func _on_partida_iniciada_desde_lobby():
 func on_unirse_tube():
 	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = false
-	temp_mundo.queue_free()
+	
 	Network.tube_join(edit_sesion.text)
 	multiplayer.connected_to_server.connect(_on_conectado_para_lobby)
+	temp_mundo.queue_free()
 
 func _on_conectado_para_lobby():
 	if multiplayer.connected_to_server.is_connected(_on_conectado_para_lobby):
