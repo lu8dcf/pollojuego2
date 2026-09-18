@@ -12,6 +12,8 @@ var puede_moverse = false
 # Cruz
 var ver_cruz = true
 @onready var cruz: MeshInstance3D = $cruz
+#Componentes
+var movimiento_especifico = preload("res://scenes/enemy/movimiento/movimiento.tscn")
 
 # Modelo
 var ver_modelo = false
@@ -32,6 +34,7 @@ var is_dying := false
 func _ready():
 	#animation_player.playback_default_blend_time = 0.2
 	cargar_modelo()
+	cargar_movimiento()
 	add_to_group('enemy')
 	look_at(goal_position)
 
@@ -58,6 +61,15 @@ func _find_animation_player(node: Node) -> AnimationPlayer: # agrega las animaci
 		if found:
 			return found
 	return null	
+
+func cargar_movimiento():
+	var movimiento = movimiento_especifico.instantiate()
+	var movimiento_script = "res://scenes/enemy/movimiento/mov_"+str(tipo)+".gd"
+	var script = load(movimiento_script)
+	movimiento.set_script(script)
+	add_child(movimiento)
+	movimiento.owner = self  #  Establece el owner manualmente
+
 
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
