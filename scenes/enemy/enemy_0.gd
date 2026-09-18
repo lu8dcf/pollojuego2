@@ -24,7 +24,7 @@ var animation_player : AnimationPlayer
 #preload("uid://lpniycrdwhlo"),
 #preload("uid://drhx2vi2udeec"),
 #]
-@export var tipo: int # tipo d enemigo
+@export var tipo: int = 4 # tipo d enemigo
 
 var is_hurt := false
 var is_dying := false
