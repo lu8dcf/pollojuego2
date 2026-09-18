@@ -26,7 +26,7 @@ var animation_player : AnimationPlayer
 var is_hurt := false
 var is_dying := false
 var jugador: Node3D = null
-@onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
+
 @export var velocidad: float = 0.5
 
 func _ready():
@@ -106,21 +106,21 @@ func death(source):
 	queue_free()
 
 
-var SPEED := 0.5
-var direction := Vector3.ZERO
-var goal_position := Vector3.ZERO
+#var SPEED := 0.5
+#var direction := Vector3.ZERO
+#var goal_position := Vector3.ZERO
 
 func _physics_process(delta: float) -> void:
-	if not multiplayer.is_server():
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
 	
 
-	if is_dying or is_hurt:
+	if is_dying or is_hurt: # si esta atacando no cambia el movimiento
 		return
 
 	# Add the gravity.
 	
-	if not is_on_floor():
+	if not is_on_floor(): # detecta la llegada al piso
 		velocity += get_gravity() * delta 
 		#print (position)
 		if position.y < -2:
@@ -131,28 +131,27 @@ func _physics_process(delta: float) -> void:
 	elif is_on_floor() and ver_cruz: #Mostrar cruz
 		mostrar_cruz()
 		
-	if not puede_moverse:
+	if not puede_moverse: # si esta vedado a moverse por cualquie cosa
 		return
 	
-	# Actualizar el objetivo del NavigationAgent
-	nav_agent.target_position = jugador.global_position
+	look_at(jugador.global_position, Vector3.UP)
 	
-	# Obtener el siguiente punto del camino
-	var siguiente_punto = nav_agent.get_next_path_position()
-	var direccion = (siguiente_punto - global_position).normalized()
+	
+	 # Moverse hacia adelante (eje -Z)
+	var direccion = (jugador.global_position - global_position)
 	direccion.y = 0
+	direccion = direccion.normalized()
 	
-	# Aplicar velocidad
 	velocity.x = direccion.x * velocidad
 	velocity.z = direccion.z * velocidad
+	
+	if not is_on_floor():
+		velocity.y += get_gravity().y * delta
 	
 
 	move_and_slide()
 	
-	# Rotar hacia el jugador
-	if direccion.length() > 0.1:
-		var angulo = atan2(direccion.x, direccion.z)
-		rotation.y = lerp_angle(rotation.y, angulo, delta * 5.0)
+	
 
 
 func mostrar_cruz(): # titila la cruz 

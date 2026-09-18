@@ -15,8 +15,7 @@ var ya_hizo=false
 func _ready() -> void:
 	GlobalJuego.mundo = self
 	GlobalJuego.spawn_container = spawn_container
-	
-	
+		
 	timer_enemy.timeout.connect(spawn_enemy)
 	
 	# Configurar la cámara

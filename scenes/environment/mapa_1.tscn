@@ -25,5 +25,5 @@ collision_mask = 6
 transform = Transform3D(100, 0, 0, 0, -1.1920929e-05, 99.99999, 0, -99.99999, -1.1920929e-05, 0, 0, 0)
 shape = SubResource("ConcavePolygonShape3D_2djxk")
 
-[node name="coliciones" parent="." index="2" unique_id=470626227]
+[node name="coliciones" parent="." index="2" unique_id=1138942667]
 visible = false

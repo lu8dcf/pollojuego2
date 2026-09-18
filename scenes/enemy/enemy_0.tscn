@@ -34,6 +34,9 @@ properties/4/replication_mode = 2
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 collision_layer = 2
 script = ExtResource("1_qypkf")
+health = null
+tipo = null
+velocidad = null
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]
 transform = Transform3D(2.964562, 0, 0, 0, 0.029198525, 2.0934258, 0, -2.201264, 0.027768113, -0.0014315248, 0.17043361, 0.00023493171)
@@ -55,5 +58,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0020587444, 0)
 visible = false
 
 [node name="movimiento" type="Node3D" parent="." unique_id=2038556398]
-
-[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=382922058]
