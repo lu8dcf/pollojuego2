@@ -55,3 +55,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0020587444, 0)
 visible = false
 
 [node name="movimiento" type="Node3D" parent="." unique_id=2038556398]
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=382922058]

@@ -20,23 +20,26 @@ var ver_modelo = false
 @onready var modelo= $modelo
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 var animation_player : AnimationPlayer
-#@export var enemigos: Array[PackedScene] = [
-#preload("uid://cqy6sq80q31lu"),
-#preload("uid://cgn8qa26kgyil"),
-#preload("uid://lpniycrdwhlo"),
-#preload("uid://drhx2vi2udeec"),
-#]
+
 @export var tipo: int = 4 # tipo d enemigo
 
 var is_hurt := false
 var is_dying := false
+var jugador: Node3D = null
+@onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
+@export var velocidad: float = 0.5
 
 func _ready():
 	#animation_player.playback_default_blend_time = 0.2
 	cargar_modelo()
 	cargar_movimiento()
 	add_to_group('enemy')
-	look_at(goal_position)
+	
+	jugador = get_tree().get_first_node_in_group("Jugadores")
+	# Esperar un frame para que el NavigationServer se inicialice
+	await get_tree().physics_frame
+	
+	#look_at(goal_position)
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
 	
@@ -75,7 +78,7 @@ func take_damage(damage: int, source: int):
 	var next_health = health - damage
 	
 	var player_to_notify: Jugador
-	for current_player in get_tree().get_nodes_in_group('Players'):
+	for current_player in get_tree().get_nodes_in_group('Jugadores'):
 		if current_player.name == str(source):
 			player_to_notify = current_player
 			break
@@ -110,6 +113,7 @@ var goal_position := Vector3.ZERO
 func _physics_process(delta: float) -> void:
 	if not multiplayer.is_server():
 		return
+	
 
 	if is_dying or is_hurt:
 		return
@@ -130,23 +134,25 @@ func _physics_process(delta: float) -> void:
 	if not puede_moverse:
 		return
 	
-	if position.distance_to(goal_position) > 3.0: 
-		direction = position.direction_to(goal_position)
-		#animation_player.play("andar")
-	else:
-		direction = Vector3.ZERO
-		#animation_player.play("Spell_Simple_Shoot")
-		if crystal_timer.is_stopped():
-			crystal_timer.start()
-
-	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+	# Actualizar el objetivo del NavigationAgent
+	nav_agent.target_position = jugador.global_position
+	
+	# Obtener el siguiente punto del camino
+	var siguiente_punto = nav_agent.get_next_path_position()
+	var direccion = (siguiente_punto - global_position).normalized()
+	direccion.y = 0
+	
+	# Aplicar velocidad
+	velocity.x = direccion.x * velocidad
+	velocity.z = direccion.z * velocidad
+	
 
 	move_and_slide()
+	
+	# Rotar hacia el jugador
+	if direccion.length() > 0.1:
+		var angulo = atan2(direccion.x, direccion.z)
+		rotation.y = lerp_angle(rotation.y, angulo, delta * 5.0)
 
 
 func mostrar_cruz(): # titila la cruz 
