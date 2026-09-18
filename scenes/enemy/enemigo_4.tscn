@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://drhx2vi2udeec"]
 
-[ext_resource type="PackedScene" uid="uid://i26a861vv6u6" path="res://assets/modelos/enemigos/enemigo_4.fbx" id="1_4pobs"]
+[ext_resource type="PackedScene"  path="res://assets/modelos/enemigos/enemigo_4.fbx" id="1_4pobs"]
 
 [node name="enemigo_4" unique_id=1314486548 instance=ExtResource("1_4pobs")]
 
