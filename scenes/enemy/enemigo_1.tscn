@@ -2,14 +2,4 @@
 
 [ext_resource type="PackedScene" uid="uid://blrbt778fj1ii" path="res://assets/modelos/enemigos/enemigo_1.fbx" id="1_64bgc"]
 
-[node name="enemigo_1" unique_id=988913052 instance=ExtResource("1_64bgc")]
-
-[node name="Skeleton3D" parent="Babosa" parent_id_path=PackedInt32Array(1870931991) index="0" unique_id=1345180836]
-bones/1/rotation = Quaternion(0.15966074, -2.899995e-09, 2.0989297e-08, 0.98717195)
-bones/2/rotation = Quaternion(0.3717887, 6.8899163e-15, 8.864131e-08, 0.9283174)
-bones/4/rotation = Quaternion(0.6765206, 1.010924e-14, 1.6129505e-07, 0.73642373)
-bones/5/rotation = Quaternion(0.045319308, -0.011570131, -0.10027106, 0.9938602)
-bones/6/rotation = Quaternion(-0.12558202, 1.4081322e-09, -2.9339747e-08, 0.99208325)
-bones/7/rotation = Quaternion(-0.17753069, 9.463583e-10, -2.8420242e-08, 0.9841153)
-bones/8/rotation = Quaternion(-0.4177468, -3.283358e-09, -1.0836693e-07, 0.9085635)
-bones/10/rotation = Quaternion(-0.4373603, -1.3592532e-09, -1.0608674e-07, 0.8992864)
+[node name="enemigo_1" unique_id=2040406608 instance=ExtResource("1_64bgc")]
