@@ -54,3 +54,7 @@ signal juego_reanudado()
 # ===== SEÑALES DE PUNTAJE =====
 @warning_ignore("unused_signal")
 signal puntaje_actualizado(peer_id: int, nuevo_puntaje: int)
+
+# ===== ENEMIGOS =================
+@warning_ignore("unused_signal")
+signal agrega_enemigo(tipo: int)

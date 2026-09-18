@@ -4,29 +4,20 @@
 [ext_resource type="PackedScene" uid="uid://c1uh3pf0og1vi" path="res://scenes/environment/mapa_1.tscn" id="2_1o1l2"]
 [ext_resource type="Script" uid="uid://c7p2vuotjcwys" path="res://scenes/environment/camera_3d.gd" id="3_1o1l2"]
 [ext_resource type="PackedScene" uid="uid://cypdi1lb7klts" path="res://assets/models/crystal/scene.gltf" id="4_1o1l2"]
-[ext_resource type="Texture2D" uid="uid://crpe86v1j2sp1" path="res://assets/ui/prueba entorno.jpg" id="4_j6fc8"]
+[ext_resource type="Script" uid="uid://d4goam1r77jor" path="res://scenes/environment/fabrica_enemigo.gd" id="5_j6fc8"]
 
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_dxoa6"]
-panorama = ExtResource("4_j6fc8")
-filter = false
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_b5dff"]
 
 [sub_resource type="Sky" id="Sky_3pli8"]
-sky_material = SubResource("PanoramaSkyMaterial_dxoa6")
+sky_material = SubResource("ProceduralSkyMaterial_b5dff")
 
 [sub_resource type="Environment" id="Environment_1o1l2"]
 background_mode = 2
 sky = SubResource("Sky_3pli8")
-sky_rotation = Vector3(0, 1.6423548, 0)
 tonemap_mode = 3
-ssao_radius = 4.26
-ssao_intensity = 6.3
-ssil_enabled = true
-sdfgi_enabled = true
-sdfgi_use_occlusion = true
-sdfgi_bounce_feedback = 0.55
-glow_enabled = true
-glow_bloom = 0.18
-fog_light_energy = 0.1
+fog_enabled = true
+fog_mode = 1
+fog_density = 0.4
 fog_sky_affect = 0.3
 
 [node name="WorldForest" type="Node3D" unique_id=451922858]
@@ -46,15 +37,8 @@ smooth_follow_speed = 2.0
 environment = SubResource("Environment_1o1l2")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=98634334]
-transform = Transform3D(0.9618124, -0.20252427, 0.18412183, -0.07382491, 0.4558088, 0.8870109, -0.26356557, -0.8667308, 0.42345122, 0, 8, 0)
-light_energy = 0.676
-light_indirect_energy = 10.522
-light_volumetric_fog_energy = 0.741
-light_angular_distance = 36.44
+transform = Transform3D(-0.8660254, -0.25000003, 0.43301275, 0, 0.8660254, 0.5, -0.50000006, 0.4330127, -0.75, 0, 8, 0)
 shadow_enabled = true
-shadow_bias = 0.0
-shadow_opacity = 0.32
-shadow_blur = 0.879
 
 [node name="SpawnContainer" type="Node3D" parent="." unique_id=284707713]
 unique_name_in_owner = true
@@ -71,3 +55,6 @@ autostart = true
 
 [node name="Sketchfab_Scene" parent="." unique_id=1802840441 instance=ExtResource("4_1o1l2")]
 transform = Transform3D(1, 0, 0, 0, 0.8622221, 0.50653046, 0, -0.50653046, 0.8622221, 19.1661, -0.7236707, 20.906834)
+
+[node name="Fabrica_enemigo" type="Node3D" parent="." unique_id=1187503114]
+script = ExtResource("5_j6fc8")
