@@ -1,5 +1,8 @@
 [gd_scene format=3 uid="uid://drhx2vi2udeec"]
 
-[ext_resource type="PackedScene" uid="uid://c535sce6rgehn" path="res://assets/modelos/enemigos/enemigo_4.fbx" id="1_4pobs"]
+[ext_resource type="PackedScene"  path="res://assets/modelos/enemigos/enemigo_4.fbx" id="1_4pobs"]
 
-[node name="enemigo_4" unique_id=390134778 instance=ExtResource("1_4pobs")]
+[node name="enemigo_4" unique_id=1314486548 instance=ExtResource("1_4pobs")]
+
+[node name="saltamontes" parent="." index="0" unique_id=834761443]
+transform = Transform3D(11.307489, -3.1766902e-08, -0.7267419, 2.4499884e-15, 11.330818, -4.9528586e-07, 0.7267419, 4.9426603e-07, 11.307489, -0.0003874302, 0.6518216, -0.0013261437)
