@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ce82pcvnetebn" path="res://scenes/enemy/enemy_0.gd" id="1_qypkf"]
 [ext_resource type="Script" uid="uid://cgurjt66va6fc" path="res://scenes/enemy/movimiento/wander.gd" id="2_20j7o"]
+[ext_resource type="Script" uid="uid://l7d3wjko47fj" path="res://scenes/enemy/movimiento/flee.gd" id="3_l1is7"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l1is7"]
 albedo_color = Color(1, 0.05882353, 0.09019608, 1)
@@ -38,6 +39,9 @@ radius = 5.5029297
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 collision_layer = 2
 script = ExtResource("1_qypkf")
+health = null
+tipo = null
+velocidad_base = null
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]
 transform = Transform3D(2.964562, 0, 0, 0, 0.029198525, 2.0934258, 0, -2.201264, 0.027768113, -0.0014315248, 0.17043361, 0.00023493171)
@@ -70,6 +74,9 @@ shape = SubResource("CylinderShape3D_sugfe")
 
 [node name="Wander" type="Node" parent="." unique_id=410622742]
 script = ExtResource("2_20j7o")
+
+[node name="Flee" type="Node" parent="." unique_id=1132736876]
+script = ExtResource("3_l1is7")
 
 [connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]
 [connection signal="body_exited" from="vision" to="." method="_on_vision_body_exited"]

@@ -21,7 +21,7 @@ var ver_modelo = false
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 var animation_player : AnimationPlayer
 
-@export var tipo: int = 4 # tipo d enemigo
+@export var tipo: int = 1 # tipo d enemigo
 
 var is_hurt := false
 var is_dying := false
@@ -32,7 +32,11 @@ var jugador: Node3D = null
 var velocidad: float = velocidad_base # velocidad actual
 var direccion_actual: Vector3 = Vector3.FORWARD
 @onready var wander: Wander = $Wander
+@onready var flee: Flee = $Flee
 var velocidad_actual: Vector3 = Vector3.ZERO
+var direccion: Vector3  = Vector3.ZERO
+
+
 
 #  una variable para almacenar el estado actual
 var estado_actual: estado = estado.INACTIVO
@@ -40,7 +44,8 @@ var estado_actual: estado = estado.INACTIVO
 enum estado {
 	INACTIVO,
 	WANDER,
-	PERSIGUE
+	PERSIGUE,
+	FLEE
 }
 
 func _ready():
@@ -95,7 +100,7 @@ func tipo_enemigo():
 			estado_actual=estado.WANDER
 		2:
 			#Coward (payaso) debe hacer Flee para huir del jugador cuando éste se acerca, o cuando Coward se acerca al jugador mientras hace Wander. Si el jugador (o Coward) se aleja una cierta distancia, Coward debe volver a hacer Wander
-			pass
+			estado_actual=estado.WANDER
 		3:
 			#Wanderer (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
 			estado_actual=estado.WANDER
@@ -181,13 +186,25 @@ func _physics_process(delta: float) -> void:
 			#----------------  sigue al jugador
 			look_at(jugador.global_position, Vector3.UP)
 			 # Moverse hacia adelante (eje -Z)
-			var direccion = (jugador.global_position - global_position)
+			direccion = (jugador.global_position - global_position)
 			direccion.y = 0
 			direccion = direccion.normalized()
 			velocidad_actual.x = direccion.x * velocidad
 			velocidad_actual.z = direccion.z * velocidad
 	
-	
+		estado.FLEE:
+			# Si se aleja lo suficiente, volver a WANDER
+			if flee.esta_a_salvo(global_position, jugador.global_position):
+				estado_actual = estado.WANDER
+				print("🎭 El payaso se calmó y vuelve a deambular")
+				velocidad_actual = wander.calcular_velocidad(
+					global_position, direccion_actual, delta
+				)
+			else:
+				velocidad_actual = flee.calcular_velocidad(
+					global_position, jugador.global_position, direccion_actual, delta
+				)
+			
 	
 	
 	
@@ -232,11 +249,17 @@ func mostrar_cruz(): # titila la cruz
 			puede_moverse = true # permino que se empiece a movere
 			set_collision_mask_value(4, true))  # Agrego las pareces de colision
 
+
+
+
+
 # player entra al area de vision
 func _on_vision_body_entered(body: Node3D) -> void: 
 	if tipo==1 and estado_actual==estado.WANDER:
 		estado_actual=estado.PERSIGUE
-		
+	
+	if tipo==2 and estado_actual==estado.WANDER:
+		estado_actual=estado.FLEE	
 		
 
 
