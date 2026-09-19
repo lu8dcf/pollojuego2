@@ -15,8 +15,7 @@ var ya_hizo=false
 func _ready() -> void:
 	GlobalJuego.mundo = self
 	GlobalJuego.spawn_container = spawn_container
-	
-	
+		
 	timer_enemy.timeout.connect(spawn_enemy)
 	
 	# Configurar la cámara
@@ -80,9 +79,9 @@ func spawn_enemy():
 		return  # Los clientes NO spawnean, solo reciben sincronización
 	
 	#GlobalSignal.agrega_enemigo.emit(1)
-	otro()
+	instanciar_enemigo()
 
-func otro():
+func instanciar_enemigo():
 	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 20:
 		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = fabrica_enemigos(4)

@@ -12,28 +12,34 @@ var puede_moverse = false
 # Cruz
 var ver_cruz = true
 @onready var cruz: MeshInstance3D = $cruz
+#Componentes
+var movimiento_especifico = preload("res://scenes/enemy/movimiento/movimiento.tscn")
 
 # Modelo
 var ver_modelo = false
 @onready var modelo= $modelo
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 var animation_player : AnimationPlayer
-#@export var enemigos: Array[PackedScene] = [
-#preload("uid://cqy6sq80q31lu"),
-#preload("uid://cgn8qa26kgyil"),
-#preload("uid://lpniycrdwhlo"),
-#preload("uid://drhx2vi2udeec"),
-#]
+
 @export var tipo: int = 4 # tipo d enemigo
 
 var is_hurt := false
 var is_dying := false
+var jugador: Node3D = null
+
+@export var velocidad: float = 0.5
 
 func _ready():
 	#animation_player.playback_default_blend_time = 0.2
 	cargar_modelo()
+	cargar_movimiento()
 	add_to_group('enemy')
-	look_at(goal_position)
+	
+	jugador = get_tree().get_first_node_in_group("Jugadores")
+	# Esperar un frame para que el NavigationServer se inicialice
+	await get_tree().physics_frame
+	
+	#look_at(goal_position)
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
 	
@@ -59,11 +65,20 @@ func _find_animation_player(node: Node) -> AnimationPlayer: # agrega las animaci
 			return found
 	return null	
 
+func cargar_movimiento():
+	var movimiento = movimiento_especifico.instantiate()
+	var movimiento_script = "res://scenes/enemy/movimiento/mov_"+str(tipo)+".gd"
+	var script = load(movimiento_script)
+	movimiento.set_script(script)
+	add_child(movimiento)
+	movimiento.owner = self  #  Establece el owner manualmente
+
+
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
 	
 	var player_to_notify: Jugador
-	for current_player in get_tree().get_nodes_in_group('Players'):
+	for current_player in get_tree().get_nodes_in_group('Jugadores'):
 		if current_player.name == str(source):
 			player_to_notify = current_player
 			break
@@ -91,20 +106,21 @@ func death(source):
 	queue_free()
 
 
-var SPEED := 0.5
-var direction := Vector3.ZERO
-var goal_position := Vector3.ZERO
+#var SPEED := 0.5
+#var direction := Vector3.ZERO
+#var goal_position := Vector3.ZERO
 
 func _physics_process(delta: float) -> void:
-	if not multiplayer.is_server():
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
+	
 
-	if is_dying or is_hurt:
+	if is_dying or is_hurt: # si esta atacando no cambia el movimiento
 		return
 
 	# Add the gravity.
 	
-	if not is_on_floor():
+	if not is_on_floor(): # detecta la llegada al piso
 		velocity += get_gravity() * delta 
 		#print (position)
 		if position.y < -2:
@@ -115,26 +131,27 @@ func _physics_process(delta: float) -> void:
 	elif is_on_floor() and ver_cruz: #Mostrar cruz
 		mostrar_cruz()
 		
-	if not puede_moverse:
+	if not puede_moverse: # si esta vedado a moverse por cualquie cosa
 		return
 	
-	if position.distance_to(goal_position) > 3.0: 
-		direction = position.direction_to(goal_position)
-		#animation_player.play("andar")
-	else:
-		direction = Vector3.ZERO
-		#animation_player.play("Spell_Simple_Shoot")
-		if crystal_timer.is_stopped():
-			crystal_timer.start()
-
-	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+	look_at(jugador.global_position, Vector3.UP)
+	
+	
+	 # Moverse hacia adelante (eje -Z)
+	var direccion = (jugador.global_position - global_position)
+	direccion.y = 0
+	direccion = direccion.normalized()
+	
+	velocity.x = direccion.x * velocidad
+	velocity.z = direccion.z * velocidad
+	
+	if not is_on_floor():
+		velocity.y += get_gravity().y * delta
+	
 
 	move_and_slide()
+	
+	
 
 
 func mostrar_cruz(): # titila la cruz 
