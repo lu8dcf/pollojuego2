@@ -28,21 +28,33 @@ var is_dying := false
 var jugador: Node3D = null
 
 # datos de movimiento
-@export var velocidad: float = 0.5
+@export var velocidad_base: float = 1
+var velocidad: float = velocidad_base # velocidad actual
 var direccion_actual: Vector3 = Vector3.FORWARD
 @onready var wander: Wander = $Wander
+var velocidad_actual: Vector3 = Vector3.ZERO
+
+#  una variable para almacenar el estado actual
+var estado_actual: estado = estado.INACTIVO
+# posibles estados
+enum estado {
+	INACTIVO,
+	WANDER,
+	PERSIGUE
+}
 
 func _ready():
 	#animation_player.playback_default_blend_time = 0.2
 	cargar_modelo()
 	cargar_movimiento()
 	add_to_group('enemy')
+	tipo_enemigo()
 	
 	jugador = get_tree().get_first_node_in_group("Jugadores")
 	# Esperar un frame para que el NavigationServer se inicialice
 	await get_tree().physics_frame
 	
-	#look_at(goal_position)
+	
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
 	
@@ -76,6 +88,19 @@ func cargar_movimiento():
 	add_child(movimiento)
 	movimiento.owner = self  #  Establece el owner manualmente
 
+func tipo_enemigo():
+	match tipo:
+		1:
+			#Chaser (ninja) debe hacer Seek para perseguir al jugador cuando éste se acerca, o cuando Chaser se acerca al jugador mientras hace Wander. Si el jugador se aleja una cierta distancia, Chaser debe volver a hacer Wander. Además Chaser debe hacer Arrive cuando llega a la posición del jugador.
+			estado_actual=estado.WANDER
+		2:
+			#Coward (payaso) debe hacer Flee para huir del jugador cuando éste se acerca, o cuando Coward se acerca al jugador mientras hace Wander. Si el jugador (o Coward) se aleja una cierta distancia, Coward debe volver a hacer Wander
+			pass
+		3:
+			#Wanderer (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
+			estado_actual=estado.WANDER
+		4:
+			pass
 
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
@@ -109,9 +134,6 @@ func death(source):
 	queue_free()
 
 
-#var SPEED := 0.5
-#var direction := Vector3.ZERO
-#var goal_position := Vector3.ZERO
 
 func _physics_process(delta: float) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
@@ -137,29 +159,41 @@ func _physics_process(delta: float) -> void:
 	if not puede_moverse: # si esta vedado a moverse por cualquie cosa
 		return
 	
-	#----------------  sigue al jugador
-	#look_at(jugador.global_position, Vector3.UP)
-	 # Moverse hacia adelante (eje -Z)
-	#var direccion = (jugador.global_position - global_position)
-	#direccion.y = 0
-	#direccion = direccion.normalized()
-	#
-	#velocity.x = direccion.x * velocidad
-	#velocity.z = direccion.z * velocidad
+# ---------------  Estados del enemigo
 	
-	if velocity.length() > 0.1:
-		direccion_actual = Vector3(velocity.x, 0, velocity.z).normalized()
+	match estado_actual:
+		estado.INACTIVO:
+			direccion_actual= Vector3.ZERO
+		
+		estado.WANDER: # Mago
+			if velocity.length() > 0.1:
+				direccion_actual = Vector3(velocity.x, 0, velocity.z).normalized()
+			velocidad = velocidad_base /2
+			# Calcular la velocidad deseada con Wander
+			velocidad_actual = wander.calcular_velocidad(
+			global_position,
+			direccion_actual,
+			delta
+		)
+		
+		estado.PERSIGUE:
+			velocidad = velocidad_base * 2
+			#----------------  sigue al jugador
+			look_at(jugador.global_position, Vector3.UP)
+			 # Moverse hacia adelante (eje -Z)
+			var direccion = (jugador.global_position - global_position)
+			direccion.y = 0
+			direccion = direccion.normalized()
+			velocidad_actual.x = direccion.x * velocidad
+			velocidad_actual.z = direccion.z * velocidad
 	
-	# Calcular la velocidad deseada con Wander
-	var velocidad_wander := wander.calcular_velocidad(
-		global_position,
-		direccion_actual,
-		delta
-	)
+	
+	
+	
 	
 	# Aplicar velocidad al CharacterBody3D
-	velocity.x = velocidad_wander.x
-	velocity.z = velocidad_wander.z
+	velocity.x = velocidad_actual.x
+	velocity.z = velocidad_actual.z
 	
 	# Gravedad
 	if not is_on_floor():
@@ -167,13 +201,10 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.y = 0
 	
-	if not is_on_floor():
-		velocity.y += get_gravity().y * delta
-	
-
 	move_and_slide()
 	
-	
+
+		
 
 
 func mostrar_cruz(): # titila la cruz 
@@ -201,6 +232,16 @@ func mostrar_cruz(): # titila la cruz
 			puede_moverse = true # permino que se empiece a movere
 			set_collision_mask_value(4, true))  # Agrego las pareces de colision
 
+# player entra al area de vision
+func _on_vision_body_entered(body: Node3D) -> void: 
+	if tipo==1 and estado_actual==estado.WANDER:
+		estado_actual=estado.PERSIGUE
+		
+		
 
-func _on_vision_body_entered(body: Node3D) -> void:
-	pass # Replace with function body.
+
+func _on_vision_body_exited(body: Node3D) -> void:
+	if tipo==1 and estado_actual==estado.PERSIGUE:
+		estado_actual=estado.WANDER
+		
+		

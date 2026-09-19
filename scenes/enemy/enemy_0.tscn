@@ -33,14 +33,11 @@ properties/4/spawn = true
 properties/4/replication_mode = 2
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_sugfe"]
-radius = 7.007324
+radius = 5.5029297
 
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 collision_layer = 2
 script = ExtResource("1_qypkf")
-health = null
-tipo = null
-velocidad = null
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]
 transform = Transform3D(2.964562, 0, 0, 0, 0.029198525, 2.0934258, 0, -2.201264, 0.027768113, -0.0014315248, 0.17043361, 0.00023493171)
@@ -64,9 +61,15 @@ visible = false
 [node name="movimiento" type="Node3D" parent="." unique_id=2038556398]
 
 [node name="vision" type="Area3D" parent="." unique_id=1579723558]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.067131, 0)
+collision_layer = 2
+collision_mask = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="vision" unique_id=296586098]
 shape = SubResource("CylinderShape3D_sugfe")
 
 [node name="Wander" type="Node" parent="." unique_id=410622742]
 script = ExtResource("2_20j7o")
+
+[connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]
+[connection signal="body_exited" from="vision" to="." method="_on_vision_body_exited"]
