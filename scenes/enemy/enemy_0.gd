@@ -27,7 +27,10 @@ var is_hurt := false
 var is_dying := false
 var jugador: Node3D = null
 
+# datos de movimiento
 @export var velocidad: float = 0.5
+var direccion_actual: Vector3 = Vector3.FORWARD
+@onready var wander: Wander = $Wander
 
 func _ready():
 	#animation_player.playback_default_blend_time = 0.2
@@ -134,16 +137,35 @@ func _physics_process(delta: float) -> void:
 	if not puede_moverse: # si esta vedado a moverse por cualquie cosa
 		return
 	
-	look_at(jugador.global_position, Vector3.UP)
-	
-	
+	#----------------  sigue al jugador
+	#look_at(jugador.global_position, Vector3.UP)
 	 # Moverse hacia adelante (eje -Z)
-	var direccion = (jugador.global_position - global_position)
-	direccion.y = 0
-	direccion = direccion.normalized()
+	#var direccion = (jugador.global_position - global_position)
+	#direccion.y = 0
+	#direccion = direccion.normalized()
+	#
+	#velocity.x = direccion.x * velocidad
+	#velocity.z = direccion.z * velocidad
 	
-	velocity.x = direccion.x * velocidad
-	velocity.z = direccion.z * velocidad
+	if velocity.length() > 0.1:
+		direccion_actual = Vector3(velocity.x, 0, velocity.z).normalized()
+	
+	# Calcular la velocidad deseada con Wander
+	var velocidad_wander := wander.calcular_velocidad(
+		global_position,
+		direccion_actual,
+		delta
+	)
+	
+	# Aplicar velocidad al CharacterBody3D
+	velocity.x = velocidad_wander.x
+	velocity.z = velocidad_wander.z
+	
+	# Gravedad
+	if not is_on_floor():
+		velocity.y += get_gravity().y * delta
+	else:
+		velocity.y = 0
 	
 	if not is_on_floor():
 		velocity.y += get_gravity().y * delta
@@ -178,3 +200,7 @@ func mostrar_cruz(): # titila la cruz
 	tween.tween_callback(func():
 			puede_moverse = true # permino que se empiece a movere
 			set_collision_mask_value(4, true))  # Agrego las pareces de colision
+
+
+func _on_vision_body_entered(body: Node3D) -> void:
+	pass # Replace with function body.

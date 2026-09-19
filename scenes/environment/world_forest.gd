@@ -84,7 +84,7 @@ func spawn_enemy():
 func instanciar_enemigo():
 	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 20:
 		for player in get_tree().get_node_count_in_group("Jugadores"):
-			var new_target = fabrica_enemigos(4)
+			var new_target = fabrica_enemigos(1)
 			
 			var rand_x = randf_range(GlobalJuego.mapa_x_min, GlobalJuego.mapa_x_max)
 			var rand_z = randf_range(GlobalJuego.mapa_z_min, GlobalJuego.mapa_z_max)
