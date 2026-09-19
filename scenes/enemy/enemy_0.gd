@@ -53,9 +53,7 @@ enum estado {
 
 func _ready():
 	
-	#animation_player.playback_default_blend_time = 0.2
 	cargar_modelo()
-	#modelo.rotation.z = PI # el modelo esta al reves
 	cargar_movimiento()
 	add_to_group('enemy')
 	tipo_enemigo()
@@ -213,10 +211,10 @@ func _physics_process(delta: float) -> void:
 			
 	if velocity.length() > 0.1:
 		# Dirección hacia donde se mueve
-		var direccion = velocity.normalized()
+		direccion_actual = velocity.normalized()
 		
 		# Ángulo Y (en radianes) mirando hacia esa dirección
-		var angulo_objetivo = atan2(direccion.x, direccion.z)
+		var angulo_objetivo = atan2(direccion_actual.x, direccion_actual.z)
 		
 		# Rotación actual del modelo
 		var rotacion_actual = modelo.rotation.y
