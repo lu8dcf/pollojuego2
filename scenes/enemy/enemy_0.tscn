@@ -78,5 +78,7 @@ script = ExtResource("2_20j7o")
 [node name="Flee" type="Node" parent="." unique_id=1132736876]
 script = ExtResource("3_l1is7")
 
+[node name="Evasion" type="Node" parent="." unique_id=1194008103]
+
 [connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]
 [connection signal="body_exited" from="vision" to="." method="_on_vision_body_exited"]

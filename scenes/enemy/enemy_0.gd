@@ -29,10 +29,13 @@ var jugador: Node3D = null
 
 # datos de movimiento
 @export var velocidad_base: float = 1
+@export var velocidad_giro: float = 8.0
 var velocidad: float = velocidad_base # velocidad actual
 var direccion_actual: Vector3 = Vector3.FORWARD
 @onready var wander: Wander = $Wander
 @onready var flee: Flee = $Flee
+#@onready var avoidance: ObstacleAvoidance = $Evasion
+
 var velocidad_actual: Vector3 = Vector3.ZERO
 var direccion: Vector3  = Vector3.ZERO
 
@@ -49,8 +52,10 @@ enum estado {
 }
 
 func _ready():
+	
 	#animation_player.playback_default_blend_time = 0.2
 	cargar_modelo()
+	#modelo.rotation.z = PI # el modelo esta al reves
 	cargar_movimiento()
 	add_to_group('enemy')
 	tipo_enemigo()
@@ -94,6 +99,7 @@ func cargar_movimiento():
 	movimiento.owner = self  #  Establece el owner manualmente
 
 func tipo_enemigo():
+	animation_player.play("caminar_bicho")
 	match tipo:
 		1:
 			#Chaser (ninja) debe hacer Seek para perseguir al jugador cuando éste se acerca, o cuando Chaser se acerca al jugador mientras hace Wander. Si el jugador se aleja una cierta distancia, Chaser debe volver a hacer Wander. Además Chaser debe hacer Arrive cuando llega a la posición del jugador.
@@ -196,7 +202,7 @@ func _physics_process(delta: float) -> void:
 			# Si se aleja lo suficiente, volver a WANDER
 			if flee.esta_a_salvo(global_position, jugador.global_position):
 				estado_actual = estado.WANDER
-				print("🎭 El payaso se calmó y vuelve a deambular")
+				
 				velocidad_actual = wander.calcular_velocidad(
 					global_position, direccion_actual, delta
 				)
@@ -205,7 +211,18 @@ func _physics_process(delta: float) -> void:
 					global_position, jugador.global_position, direccion_actual, delta
 				)
 			
-	
+	if velocity.length() > 0.1:
+		# Dirección hacia donde se mueve
+		var direccion = velocity.normalized()
+		
+		# Ángulo Y (en radianes) mirando hacia esa dirección
+		var angulo_objetivo = atan2(direccion.x, direccion.z)
+		
+		# Rotación actual del modelo
+		var rotacion_actual = modelo.rotation.y
+		
+		# Interpolación angular suave (evita giros bruscos)
+		modelo.rotation.y = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
 	
 	
 	# Aplicar velocidad al CharacterBody3D

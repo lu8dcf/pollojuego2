@@ -4,7 +4,7 @@ class_name Wander
 
 # ==================== CONFIGURACIÓN ====================
 @export var radio_circulo: float = 2.0       # Radio del círculo imaginario
-@export var distancia_circulo: float = 4.0   # Distancia del círculo al frente
+@export var distancia_circulo: float = 6.0   # Distancia del círculo al frente
 @export var velocidad_cambio: float = 1.0    # Qué tan rápido cambia el ángulo
 @export var velocidad_maxima: float = 1.0    # Velocidad máxima del enemigo
 @export var suavizado: float = 5.0           # Suavizado del movimiento
