@@ -150,7 +150,7 @@ func _process(_delta: float) -> void:
 	#if Input.is_key_pressed(KEY_SHIFT):# ESTO DEBE SER ACCION PARA EL JOYSTICK VIRTUAL
 		#if habilidad:
 			#habilidad.usar()
-	print (position)
+	
 
 func open_menu(current_visibility: bool):
 	player_ui.menu.visible = !current_visibility

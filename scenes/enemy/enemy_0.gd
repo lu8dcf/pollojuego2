@@ -39,20 +39,28 @@ var direccion_actual: Vector3 = Vector3.FORWARD
 var velocidad_actual: Vector3 = Vector3.ZERO
 var direccion: Vector3  = Vector3.ZERO
 
-
-
 #  una variable para almacenar el estado actual
 var estado_actual: estado = estado.INACTIVO
+var estado_anterior: estado = estado.INACTIVO
 # posibles estados
 enum estado {
 	INACTIVO,
 	WANDER,
 	PERSIGUE,
-	FLEE
+	FLEE,
+	DERECHA,
+	IZQUIERDA
 }
 
+# colisiiones
+@onready var bigote_der: Area3D = $bigote_der
+@onready var bigote_izq: Area3D = $bigote_izq
+var posicionado = false  # cuando se encuentre correctamente en el piso sin tocar la pared
+
 func _ready():
-	
+	# Areas de colision
+	bigote_der.position = Vector3(-0.3, 0.5, 0)
+	bigote_izq.position = Vector3(+0.3, 0.5, 0)
 	cargar_modelo()
 	cargar_movimiento()
 	add_to_group('enemy')
@@ -154,16 +162,17 @@ func _physics_process(delta: float) -> void:
 
 	# Add the gravity.
 	
-	if not is_on_floor(): # detecta la llegada al piso
-		velocity += get_gravity() * delta 
-		#print (position)
-		if position.y < -2:
-			#print ("cayo")
-			queue_free()
-		move_and_slide()	
-		return
-	elif is_on_floor() and ver_cruz: #Mostrar cruz
-		mostrar_cruz()
+	if !posicionado:
+		if not is_on_floor(): # detecta la llegada al piso
+			velocity += get_gravity() * delta 
+			if position.y < -2:
+				queue_free()
+			move_and_slide() # caer
+			return
+		elif is_on_floor() and ver_cruz: #Mostrar cruz
+			mostrar_cruz()
+			posicionado=true
+		
 		
 	if not puede_moverse: # si esta vedado a moverse por cualquie cosa
 		return
@@ -209,9 +218,15 @@ func _physics_process(delta: float) -> void:
 					global_position, jugador.global_position, direccion_actual, delta
 				)
 			
-	if velocity.length() > 0.1:
+		estado.DERECHA:
+			rotation.y -= 10 * velocidad_giro * delta	
+			
+		estado.IZQUIERDA:
+			rotation.y += 10 *  velocidad_giro * delta
+			
+	if velocidad_actual.length() > 0.1:
 		# Dirección hacia donde se mueve
-		direccion_actual = velocity.normalized()
+		direccion_actual = velocidad_actual.normalized()
 		
 		# Ángulo Y (en radianes) mirando hacia esa dirección
 		var angulo_objetivo = atan2(direccion_actual.x, direccion_actual.z)
@@ -221,7 +236,8 @@ func _physics_process(delta: float) -> void:
 		
 		# Interpolación angular suave (evita giros bruscos)
 		modelo.rotation.y = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
-	
+		#bigote_der.rotation.y   = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
+		#bigote_izq.rotation.y   = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
 	
 	# Aplicar velocidad al CharacterBody3D
 	velocity.x = velocidad_actual.x
@@ -283,3 +299,27 @@ func _on_vision_body_exited(body: Node3D) -> void:
 		estado_actual=estado.WANDER
 		
 		
+
+
+func _on_bigote_izq_area_entered(area: Area3D) -> void:
+	if !posicionado:
+		queue_free()
+	if estado_actual!=estado.DERECHA or estado_actual!=estado.IZQUIERDA:
+		estado_anterior=estado_actual
+	estado_actual=estado.DERECHA
+
+
+func _on_bigote_izq_area_exited(area: Area3D) -> void:
+	estado_actual=estado_anterior
+	
+
+func _on_bigote_der_area_entered(area: Area3D) -> void:
+	if !posicionado:
+		queue_free()
+	if estado_actual!=estado.DERECHA or estado_actual!=estado.IZQUIERDA:
+		estado_anterior=estado_actual
+	
+	estado_actual=estado.IZQUIERDA
+
+func _on_bigote_der_area_exited(area: Area3D) -> void:
+	estado_actual=estado_anterior

@@ -36,12 +36,13 @@ properties/4/replication_mode = 2
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_sugfe"]
 radius = 5.5029297
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_sugfe"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_glak1"]
+
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 collision_layer = 2
 script = ExtResource("1_qypkf")
-health = null
-tipo = null
-velocidad_base = null
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]
 transform = Transform3D(2.964562, 0, 0, 0, 0.029198525, 2.0934258, 0, -2.201264, 0.027768113, -0.0014315248, 0.17043361, 0.00023493171)
@@ -80,5 +81,26 @@ script = ExtResource("3_l1is7")
 
 [node name="Evasion" type="Node" parent="." unique_id=1194008103]
 
+[node name="bigote_izq" type="Area3D" parent="." unique_id=475008933]
+transform = Transform3D(0.55702627, 0, 0, 0, 0.32834178, 0, 0, 0, 1.6382052, -0.0010958314, 0.37332153, 0)
+collision_layer = 2
+collision_mask = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="bigote_izq" unique_id=280685471]
+shape = SubResource("BoxShape3D_sugfe")
+
+[node name="bigote_der" type="Area3D" parent="." unique_id=233791691]
+transform = Transform3D(0.55702627, 0, 0, 0, 0.32834178, 0, 0, 0, 1.6382052, 0.0030115843, 0.37332153, 0)
+collision_layer = 2
+collision_mask = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="bigote_der" unique_id=641594374]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -0.22224867, 0, 0)
+shape = SubResource("BoxShape3D_glak1")
+
 [connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]
 [connection signal="body_exited" from="vision" to="." method="_on_vision_body_exited"]
+[connection signal="area_entered" from="bigote_izq" to="." method="_on_bigote_izq_area_entered"]
+[connection signal="area_exited" from="bigote_izq" to="." method="_on_bigote_izq_area_exited"]
+[connection signal="area_entered" from="bigote_der" to="." method="_on_bigote_der_area_entered"]
+[connection signal="area_exited" from="bigote_der" to="." method="_on_bigote_der_area_exited"]

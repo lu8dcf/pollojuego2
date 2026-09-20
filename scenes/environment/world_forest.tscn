@@ -51,7 +51,7 @@ spawn_path = NodePath("../SpawnContainer")
 
 [node name="TimerEnemy" type="Timer" parent="." unique_id=32496409]
 unique_name_in_owner = true
-wait_time = 1.3769999999999998
+wait_time = 0.5
 autostart = true
 
 [node name="Sketchfab_Scene" parent="." unique_id=1802840441 instance=ExtResource("4_1o1l2")]

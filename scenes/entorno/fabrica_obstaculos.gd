@@ -8,7 +8,7 @@ var z_min = GlobalJuego.mapa_z_min
 var z_max = GlobalJuego.mapa_z_max
 
 # --- Configuración ---
-@export var cantidad_obstaculos: int = 10
+@export var cantidad_obstaculos: int = 20
 @export var altura_y: float = 0.5          # altura del centro del cubo (si el piso está en y=0)
 @export var tamaño_cubo: Vector3 = Vector3(1, 1, 1)
 @export var separacion_minima: float = 4 # evita que se superpongan
