@@ -37,6 +37,7 @@ properties/4/replication_mode = 2
 radius = 5.5029297
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_sugfe"]
+size = Vector3(1.0137329, 1, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_glak1"]
 
@@ -87,6 +88,7 @@ collision_layer = 2
 collision_mask = 8
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="bigote_izq" unique_id=280685471]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.9999949, 0.008880615, 0, 0)
 shape = SubResource("BoxShape3D_sugfe")
 
 [node name="bigote_der" type="Area3D" parent="." unique_id=233791691]
@@ -95,7 +97,7 @@ collision_layer = 2
 collision_mask = 8
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="bigote_der" unique_id=641594374]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -0.22224867, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.9999998, -0.0065012677, 0, 0)
 shape = SubResource("BoxShape3D_glak1")
 
 [connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]

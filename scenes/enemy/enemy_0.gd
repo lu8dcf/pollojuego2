@@ -184,7 +184,7 @@ func _physics_process(delta: float) -> void:
 			direccion_actual= Vector3.ZERO
 		
 		estado.WANDER: # Mago
-			if velocity.length() > 0.1:
+			if velocidad_actual.length() > 0.1:
 				direccion_actual = Vector3(velocity.x, 0, velocity.z).normalized()
 			velocidad = velocidad_base /2
 			# Calcular la velocidad deseada con Wander
