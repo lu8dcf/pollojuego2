@@ -30,10 +30,10 @@ var un_jugador:bool = true # si es true es singleplayer
 var cant_jugadres:int = 0
 
 #Tamaño del Mapa
-var mapa_x_min = -20
-var mapa_x_max = 20
-var mapa_z_min = -20
-var mapa_z_max = 20
+var mapa_x_min = 8
+var mapa_x_max = 72
+var mapa_z_min = 8
+var mapa_z_max = 72
 
 
 #enemigos
@@ -179,4 +179,4 @@ func configurar_singleplayer():
 	
 	# Emitir señal global
 	GlobalSignal.sesion_actualizada.emit(session_info)
-	print("Singleplayer configurado: ", session_info)
+	#print("Singleplayer configurado: ", session_info)

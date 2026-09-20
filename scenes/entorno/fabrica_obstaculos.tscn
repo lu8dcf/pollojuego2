@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dqebmh81nqj81"]
+
+[ext_resource type="Script" uid="uid://nicgwb3so0qd" path="res://scenes/entorno/fabrica_obstaculos.gd" id="1_mttr5"]
+
+[node name="fabrica_obstaculos" type="Node3D" unique_id=495963731]
+script = ExtResource("1_mttr5")

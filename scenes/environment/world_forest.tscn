@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://c7p2vuotjcwys" path="res://scenes/environment/camera_3d.gd" id="3_1o1l2"]
 [ext_resource type="PackedScene" uid="uid://cypdi1lb7klts" path="res://assets/models/crystal/scene.gltf" id="4_1o1l2"]
 [ext_resource type="Script" uid="uid://d4goam1r77jor" path="res://scenes/environment/fabrica_enemigo.gd" id="5_j6fc8"]
+[ext_resource type="PackedScene" uid="uid://dqebmh81nqj81" path="res://scenes/entorno/fabrica_obstaculos.tscn" id="6_0wskc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_b5dff"]
 
@@ -59,3 +60,5 @@ visible = false
 
 [node name="Fabrica_enemigo" type="Node3D" parent="." unique_id=1187503114]
 script = ExtResource("5_j6fc8")
+
+[node name="fabrica_obstaculos" parent="." unique_id=495963731 instance=ExtResource("6_0wskc")]
