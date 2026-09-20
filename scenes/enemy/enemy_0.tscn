@@ -32,6 +32,7 @@ properties/4/spawn = true
 properties/4/replication_mode = 2
 
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
+process_mode = 1
 collision_layer = 2
 script = ExtResource("1_qypkf")
 health = null

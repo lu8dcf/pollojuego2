@@ -2,7 +2,7 @@ extends Panel
 
 @onready var nombre_usuario: Label = $NombreUsuario
 @onready var estoy_listo_boton: TextureButtonAnimado = $ContenedorBoton/EstoyListoBoton
-@onready var indicador_listo: Label = $IndicadorListo  # Necesitas crear este Label en la escena
+@onready var indicador_listo: Label = $IndicadorListo  
 
 #botones adelante y atras
 @onready var cambiar_atras_personaje: TextureButton = %CambiarAtrasPersonaje
@@ -11,14 +11,18 @@ extends Panel
 # personaje
 @onready var sprite_personaje: AnimatedSprite2D = %SpritePersonaje
 var id_personaje:int=1
-var cant_personajes:int = 2
+var cant_personajes:int = 5
 var indice_personaje :int = 1
 var peer_id: int = 0
 
 # cada perosnjae tiene vida, ataque y defensa, 0 = nada, y 3 al maximo
 var personajes : Dictionary ={
 	1: [1,1,1],
-	2: [2,3,0]
+	2: [2,3,0],
+	3: [2,0,2],
+	4: [0,3,1],
+	5: [2,0,1],
+	
 }
 @onready var vida: TextureRect = $HabilidadesPersonaje/HBoxContainer/Vida
 @onready var ataque: TextureRect = $HabilidadesPersonaje/HBoxContainer/Ataque
@@ -32,7 +36,7 @@ var es_mi_panel: bool = false
 
 func _ready() -> void:
 
-	sprite_personaje.play("sapo1")
+	sprite_personaje.play("idle1")
 	_actualizar_habilidades(1)
 	if estoy_listo_boton:
 		estoy_listo_boton.disabled = true
@@ -78,7 +82,7 @@ func cambiar_personaje(direccion:int):
 
 func _reproducir_personaje(id_personaje):
 	if sprite_personaje:
-		sprite_personaje.play("sapo" + str(id_personaje))
+		sprite_personaje.play("idle" + str(id_personaje))
 	_actualizar_habilidades(id_personaje)
 	
 func _actualizar_habilidades(id_personaje: int) -> void:
@@ -171,7 +175,6 @@ func marcar_no_listo():
 func _on_estoy_listo_boton_pressed() -> void:
 	# Solo permitir si es mi panel
 	if not es_mi_panel:
-		print("No puedes modificar el panel de otro jugador")
 		return
 	
 	if esta_listo:

@@ -57,11 +57,10 @@ func _configurar_sesion():
 		"score": 0,
 		"username": nombre_temp,
 		"salud": SALUD_DEFAULT,
-		"personaje":0
+		"personaje":1
 	}
 	
 	_replicar_session_info.rpc(session_info)
-	print("Sesión configurada: ", session_info)
 
 func _agregar_jugador(peer_id: int):
 	"""Agrega un nuevo jugador a la sesión"""
@@ -73,7 +72,7 @@ func _agregar_jugador(peer_id: int):
 			"score": 0,
 			"username": jugador.nameplate.text if jugador.nameplate else "Jugador " + str(peer_id),
 			"salud": SALUD_DEFAULT,
-			"personaje":0
+			"personaje":1
 		}
 		_replicar_session_info.rpc(session_info)
 		
@@ -130,9 +129,7 @@ func curar_jugador(peer_id: int, cantidad: int):
 	# Emitir señal de salud actualizada
 	GlobalSignal.salud_jugador_cambiada.emit(nueva_salud)
 
-func _jugador_murio(peer_id: int):
-	"""Maneja la muerte de un jugador"""
-	print("Jugador ", peer_id, " ha muerto")
+func _jugador_murio(peer_id: int):# maneja la muerte de un jugador
 	
 	# Emitir señal global de muerte
 	GlobalSignal.jugador_muerto.emit(peer_id)
@@ -164,7 +161,6 @@ func _replicar_session_info(info: Dictionary):
 
 # ===== FUNCIONES PARA SINGLEPLAYER =====
 func configurar_singleplayer():
-	"""Configura el juego para un solo jugador"""
 	var nombre_temp = "Jugador Solo"
 	if Global.username != "":
 		nombre_temp = Global.username
@@ -174,9 +170,8 @@ func configurar_singleplayer():
 		"score": 0,
 		"username": nombre_temp,
 		"salud": SALUD_DEFAULT,
-		"personaje":0
+		"personaje":1
 	}
 	
 	# Emitir señal global
 	GlobalSignal.sesion_actualizada.emit(session_info)
-	print("Singleplayer configurado: ", session_info)

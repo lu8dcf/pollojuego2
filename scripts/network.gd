@@ -12,6 +12,17 @@ var ip_local: String = '127.0.0.1'
 var otro_ip :bool = false
 var en_lobby: bool = false
 
+# para la pantalla de carga
+var cargando: bool = false
+var jugadores_listos: Dictionary = {}  # peer_id -> bool
+var total_jugadores: int = 0
+var pantalla_carga_actual: CanvasLayer = null
+const PANTALLA_CARGA = preload("uid://bym6i52jnwycp")
+
+# PAUSA MULTIJUGADOR
+var pausa_activa: bool = false
+var peer_que_pauso: int = 0
+
 # temporizador de time out de espera
 var _timeout_conexion : SceneTreeTimer  = null
 
@@ -49,8 +60,8 @@ func _actualizar_ip_local() -> void:
 		if ip_local == "127.0.0.1" and ips.size() >0:
 			ip_local = ips[0]
 			print("ip detectada: ", ip_local)
-	else:
-		print("la ip elegida por el usuario es: ", ip_local)
+	#else:
+		#print("la ip elegida por el usuario es: ", ip_local)
 
 func empezar_servidor_lan(puerto: int = 9999):
 	en_lobby = true
@@ -102,7 +113,6 @@ func unirse_servidor_lan(direccion_ip:String, puerto:int)-> bool:
 # ------------------------------------------------------------
 
 func _on_peer_connected_lobby(peer_id: int):
-	print("Peer conectado en lobby: ", peer_id)
 	if GlobalJuego and not GlobalJuego.session_info.has(peer_id):
 		GlobalJuego.session_info[peer_id] = {
 			"score": 0,
@@ -111,7 +121,6 @@ func _on_peer_connected_lobby(peer_id: int):
 		}
 
 func _on_peer_disconnected_lobby(peer_id: int):
-	print("Peer desconectado en lobby: ", peer_id)
 	if GlobalJuego and GlobalJuego.session_info.has(peer_id):
 		GlobalJuego.session_info.erase(peer_id)
 
@@ -136,8 +145,7 @@ func _on_connected_to_server_lobby():
 # PARTIDA - CREACIÓN DE JUGADORES
 # ------------------------------------------------------------
 
-func iniciar_partida_desde_lobby():
-	"""Cambia del lobby al modo partida"""
+func iniciar_partida_desde_lobby(): #Cambia del lobby al modo partida
 	en_lobby = false
 	
 	# Desconectar señales de lobby
@@ -150,26 +158,21 @@ func iniciar_partida_desde_lobby():
 	multiplayer.peer_connected.connect(_on_peer_connected_partida)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected_partida)
 
-func crear_todos_los_jugadores():
-	"""SOLO EL HOST llama a esta función"""
+func crear_todos_los_jugadores(): #SOLO EL HOST llama a esta función
 	if not multiplayer.is_server():
 		return
-	
-	print("HOST creando jugadores...")
 	
 	# Esperar a que el mundo exista
 	await get_tree().create_timer(0.5).timeout
 	
 	var mundo = obtener_mundo_actual()
 	if not mundo:
-		print("ERROR: No hay mundo")
 		return
 	
 	# Crear jugadores localmente Y notificar a los clientes
 	for peer_id in GlobalJuego.session_info.keys():
 		var username = GlobalJuego.session_info[peer_id].get("username", "Jugador " + str(peer_id))
 		var posicion = Vector3(randf_range(15.0, 20.0), 1.0, randf_range(15.0, 20.0))
-		
 		# Crear localmente
 		crear_jugador_en_mundo(mundo, peer_id, username, posicion)
 		
@@ -177,27 +180,24 @@ func crear_todos_los_jugadores():
 		spawnear_jugador_rpc.rpc(peer_id, username, posicion)
 
 func crear_jugador_en_mundo(mundo: Node, peer_id: int, username: String, posicion: Vector3):
-	"""Crea un jugador en el mundo"""
-	# Verificar si ya existe
-	for child in mundo.get_children():
-		if child.name == str(peer_id):
-			print("Jugador ", peer_id, " ya existe")
-			return
 	
+	for child in mundo.get_children():
+		if child.name == str(peer_id): #si el jugador ya existe n el mundo, no se debe crear
+			return
 	var jugador = PLAYER.instantiate()
 	jugador.name = str(peer_id)
 	jugador.position = posicion
+	jugador.set_multiplayer_authority(peer_id)
+	
 	mundo.add_child(jugador, true)
 	
-	# Configurar nombre
-	var nameplate = jugador.get_node_or_null("Nameplate")
+	
+	var nameplate = jugador.get_node_or_null("Nameplate") # aca se configura el nombre
 	if nameplate:
 		nameplate.text = username
 	
-	print("Jugador creado localmente: ", peer_id, " - ", username)
 	
 func obtener_mundo_actual() -> Node:
-	"""Obtiene el nodo del mundo actual"""
 	var mundo = get_tree().current_scene.get_node_or_null("Mundo")
 	if mundo:
 		return mundo
@@ -225,13 +225,16 @@ func _on_peer_connected_partida(peer_id: int):
 		}
 
 func _on_peer_disconnected_partida(peer_id: int):
-	print("Peer desconectado en partida: ", peer_id)
 	if peer_id == 1:
 		if not multiplayer.is_server():
-			print("El HOST se desconectó. Cerrando partida...")
 			_volver_al_menu_por_desconexion_host()
 		return
 	remove_player(peer_id)
+	
+	if pausa_activa and peer_id == peer_que_pauso:
+		pausa_activa = false
+		peer_que_pauso = 0
+		_aplicar_pausa.rpc(false, 0)
 
 func _on_server_disconnected():
 	"""Se llama cuando se pierde la conexión con el servidor (host)"""
@@ -328,37 +331,157 @@ func _on_conexion_fallida():
 	
 	GlobalSignal.error_conexion.emit(mensaje)
 
+# ------------------------------------------------------------
+# MANEJO DE PANTALLA DE CARGA
+# ------------------------------------------------------------
+func iniciar_carga_sincronizada(lista_peer_ids: Array) -> void:
+	"""Se llama en todos los clientes cuando empieza la carga"""
+	cargando = true
+	total_jugadores = lista_peer_ids.size()
+	jugadores_listos.clear()
+	for id in lista_peer_ids:
+		jugadores_listos[id] = false
+	
+	# Mostrar pantalla de carga
+	_mostrar_pantalla_carga(lista_peer_ids)
+	
+	# Cada cliente comienza a cargar el mundo
+	_cargar_mundo_local()
 
+func _mostrar_pantalla_carga(lista_peer_ids: Array) -> void:
+	if pantalla_carga_actual and is_instance_valid(pantalla_carga_actual):
+		pantalla_carga_actual.queue_free()
+	
+	pantalla_carga_actual = PANTALLA_CARGA.instantiate()
+	get_tree().current_scene.add_child(pantalla_carga_actual)
+	pantalla_carga_actual.configurar_jugadores(lista_peer_ids)
+
+func _cargar_mundo_local() -> void: # cada usuario carga su mundo
+	var main_menu = get_tree().current_scene
+	var MUNDO = load("uid://yubh30707eb7")
+	
+	# Instanciar mundo si no existe
+	var mundo_existente = obtener_mundo_actual()
+	if not mundo_existente:
+		# liberar el mundo temporal del menu:
+		var temp = main_menu.get_node_or_null("MundoTemporal")
+		if temp and is_instance_valid(temp):
+			# Desactivar la cámara del menú primero
+			var cam = temp.get_node_or_null("Camera3D")
+			if cam:
+				cam.current = false
+			temp.queue_free()
+			await get_tree().process_frame
+	
+		var nuevo_mundo = MUNDO.instantiate()
+		nuevo_mundo.name = "Mundo"
+		nuevo_mundo.add_to_group("mundo")
+		get_tree().current_scene.add_child(nuevo_mundo)
+		
+		# Esperar un frame para que el mundo esté listo
+		await get_tree().process_frame
+		await get_tree().process_frame
+	# una vez que el mundo está cargado, avisar al host que estamos listos
+	notificar_listo()
+
+func notificar_listo() -> void:
+	"""Cada cliente avisa al host que terminó de cargar"""
+	var mi_id = multiplayer.get_unique_id()
+	if mi_id == 0:
+		mi_id = 1
+	
+	if multiplayer.is_server():
+		# Si soy host, me marco listo localmente
+		_marcar_jugador_listo(mi_id)
+		# Y también aviso (por consistencia)
+		_jugador_listo_rpc.rpc_id(1, mi_id)
+	else:
+		# Cliente avisa al host
+		_jugador_listo_rpc.rpc_id(1, mi_id)
+
+func _marcar_jugador_listo(peer_id: int) -> void:
+	jugadores_listos[peer_id] = true
+	
+	# Actualizar la pantalla de carga local (host)
+	if pantalla_carga_actual and is_instance_valid(pantalla_carga_actual):
+		pantalla_carga_actual.marcar_jugador_listo(peer_id)
+	
+	# Notificar a TODOS los clientes del nuevo estado
+	_actualizar_estado_carga_rpc.rpc(peer_id)
+	
+	# Comprobar si todos están listos
+	_comprobar_todos_listos()
+
+func _comprobar_todos_listos() -> void:
+	if not multiplayer.is_server():
+		return
+	
+	var todos_listos = true
+	for peer_id in jugadores_listos.keys():
+		if not jugadores_listos[peer_id]:
+			todos_listos = false
+			break
+	
+	if todos_listos:
+		print("¡TODOS LISTOS! Arrancando partida...")
+		# Dar la orden de arrancar a todos
+		_arrancar_partida_rpc.rpc()
+		
 # ------------------------------------------------------------
 # RPC PARA SINCRONIZAR JUGADORES
 # ------------------------------------------------------------
 @rpc("authority", "call_local", "reliable")
-func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
-	"""El host ordena spawnear un jugador en todos los clientes"""
-	print("RPC: Spawneando jugador: ", peer_id, " - ", nombre)
-	
+func _actualizar_estado_carga_rpc(peer_id: int) -> void:
+	"""Todos los clientes actualizan su pantalla de carga"""
+	if pantalla_carga_actual and is_instance_valid(pantalla_carga_actual):
+		pantalla_carga_actual.marcar_jugador_listo(peer_id)
 
-	var mundo = obtener_mundo_actual()
-	if not mundo:
-		print("ERROR: No hay mundo para spawnear en cliente")
+@rpc("authority", "call_local", "reliable")
+func _arrancar_partida_rpc() -> void:
+	"""Todos arrancan la partida al mismo tiempo"""
+	cargando = false
+	
+	# Ocultar pantalla de carga
+	if pantalla_carga_actual and is_instance_valid(pantalla_carga_actual):
+		pantalla_carga_actual.queue_free()
+	pantalla_carga_actual = null
+	
+	# El host crea los jugadores en el mundo
+	if multiplayer.is_server():
+		crear_todos_los_jugadores()
+	
+		
+@rpc("any_peer", "reliable")
+func _jugador_listo_rpc(peer_id: int) -> void:
+	"""El host recibe el aviso de que un cliente terminó de cargar"""
+	if not multiplayer.is_server():
 		return
 	
-	# Verificar si ya existe
+	print("Host recibió: jugador ", peer_id, " está listo")
+	_marcar_jugador_listo(peer_id)
+
+@rpc("authority", "call_local", "reliable")
+func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
+	
+	var mundo = obtener_mundo_actual()
+	if not mundo:
+		return
+	
 	for child in mundo.get_children():
-		if child.name == str(peer_id):
-			print("Jugador ", peer_id, " ya existe en cliente")
+		if child.name == str(peer_id): # verificar si ya exisste el jugador en el mundo
 			return
 	
 	var jugador = PLAYER.instantiate()
 	jugador.name = str(peer_id)
 	jugador.position = posicion
+	jugador.set_multiplayer_authority(peer_id)
+
 	mundo.add_child(jugador, true)
 	
-	var nameplate = jugador.get_node_or_null("Nameplate")
-	if nameplate:
-		nameplate.text = nombre
+	#var nameplate = jugador.get_node_or_null("Nameplate")
+	#if nameplate:
+		#nameplate.text = nombre
 	
-	print("Jugador spawneado en cliente: ", peer_id, " - ", nombre)
 #
 #func clean_up_signals():
 	#multiplayer.peer_connected.disconnect(add_player) 
@@ -393,3 +516,50 @@ func pedir_salvar_rpc(objetivo_id: int) -> void:
 	# Cambiar el estado del objetivo
 	objetivo.cambiar_estado(Jugador.Estado.OLEADA)
 	print("¡Salvado!")
+
+
+# ------------------------------------------------------------
+# PAUSA MULTIJUGADOR
+# ------------------------------------------------------------
+@rpc("any_peer", "call_local", "reliable")
+func solicitar_pausa(activar: bool) -> void: # CUALQUIERO PERSONA PUEDE PAUSAR PERO SOLO ESA MISMA PERSONA PUEDE DESPAUSAR
+	var peer_solicitante = multiplayer.get_remote_sender_id()
+	if peer_solicitante == 0:
+		peer_solicitante = multiplayer.get_unique_id()  # si es local
+	
+	print("Solicitud de pausa: activar=", activar, " de peer=", peer_solicitante)
+	
+	# Solo el host valida y distribuye
+	if not multiplayer.is_server():
+		return
+	
+	if activar:
+		# Si ya está pausado, no hacer nada (evitar doble pausa)
+		if pausa_activa:
+			return
+		
+		pausa_activa = true
+		peer_que_pauso = peer_solicitante
+		_aplicar_pausa.rpc(true, peer_solicitante)
+	else:
+		# Solo quien pausó puede despausar
+		if not pausa_activa:
+			return
+		if peer_solicitante != peer_que_pauso:
+			print("Peer ", peer_solicitante, " intentó despausar pero no es quien pausó (", peer_que_pauso, ")")
+			return
+		
+		pausa_activa = false
+		peer_que_pauso = 0
+		_aplicar_pausa.rpc(false, 0)
+
+@rpc("authority", "call_local", "reliable")
+func _aplicar_pausa(activar: bool, quien_pauso: int) -> void: # el host autoriza la pausa o despausa y actualiza a todos
+	print("Aplicando pausa: ", activar, " por peer ", quien_pauso)
+	
+	pausa_activa = activar
+	peer_que_pauso = quien_pauso
+	
+	# Notificar a la UI
+	GlobalSignal.pausa_cambiada.emit(activar, quien_pauso)
+	get_tree().paused = activar

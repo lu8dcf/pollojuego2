@@ -42,18 +42,20 @@ const PLAYER = preload("uid://bc1ek0bvbgna2")
 const LOBBY = preload("uid://oegdxwge86nk")
 const PANTALLA_CARGA = preload("uid://bym6i52jnwycp")
 
+# pantalla de carga
 var pantalla_carga_actual: CanvasLayer = null
+var _timeout_carga: SceneTreeTimer = null
+@onready var temp_mundo: Node3D = %MundoTemporal
 
-@onready var mundo: Node3D = %Mundo
-@onready var menu_camera: MenuCameraController = %Mundo.get_node("Camera3D")
+@onready var menu_camera: MenuCameraController = %MundoTemporal.get_node("Camera3D")
 
-@onready var temp_mundo: Node3D = %Mundo
 
 var lobby_actual: CanvasLayer = null
 var mundo_creado: bool = false
 var offset_original_layer: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	offset_original_layer = offset
 	ocultar_todo() # ocultar todos los menus 
 	
@@ -92,11 +94,18 @@ func _ready() -> void:
 func _mostrar_pantalla_carga(mensaje:String = "Conectando...") -> void:
 	_ocultar_pantalla_carga()
 	pantalla_carga_actual = PANTALLA_CARGA.instantiate()
-	pantalla_carga_actual.set_mensaje(mensaje)
+	pantalla_carga_actual.mensaje(mensaje)
 	add_child(pantalla_carga_actual)
 	pantalla_carga_actual.cancelado.connect(_on_pantalla_carga_cancelada)
+	
+	_timeout_carga = get_tree().create_timer(15.0)
+	_timeout_carga.timeout.connect(_on_timeout_carga)
 
-
+func _on_timeout_carga() -> void:
+	if pantalla_carga_actual and is_instance_valid(pantalla_carga_actual):
+		_ocultar_pantalla_carga()
+		_on_error_conexion("Tiempo de espera agotado.\nVerifica la IP y el puerto, o que el host esté activo.")
+		
 func _ocultar_pantalla_carga() -> void:
 	if pantalla_carga_actual and is_instance_valid(pantalla_carga_actual):
 		pantalla_carga_actual.queue_free()
@@ -104,14 +113,12 @@ func _ocultar_pantalla_carga() -> void:
 
 func _on_pantalla_carga_cancelada() -> void:
 	_ocultar_pantalla_carga()
-	
-	# Limpiar la conexión
 	if multiplayer.multiplayer_peer:
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = null
 	
-	# Restaurar la escena si fue liberada
-	if not is_instance_valid(temp_mundo):
+	
+	if not is_instance_valid(temp_mundo): 
 		get_tree().reload_current_scene() # se recarga el menu
 	
 	show()  # Mostrar el menú de nuevo
@@ -168,15 +175,18 @@ func aplicar_impacto(intensidad_shake: float = 12.0, intensidad_aberracion: floa
 
 func _activate_menu_camera() -> void:
 	"""Configurar la cámara para el modo menú"""
-	if mundo and mundo.has_method("enable_menu_mode"):
-		mundo.enable_menu_mode()
+	if temp_mundo and temp_mundo.has_method("enable_menu_mode"):
+		temp_mundo.enable_menu_mode()
 	if menu_camera:
+		menu_camera.current = true  # Añade esto
 		menu_camera.activate_menu_camera()
 
 func _deactivate_menu_camera() -> void:
 	"""Restaurar la cámara cuando se sale del menú"""
-	if mundo and mundo.has_method("disable_menu_mode"):
-		mundo.disable_menu_mode()
+	if temp_mundo and temp_mundo.has_method("disable_menu_mode"):
+		temp_mundo.disable_menu_mode()
+	if menu_camera:
+		menu_camera.current = false
 
 func on_join_enet():
 	var ip = edit_ip.text.strip_edges()
@@ -196,18 +206,23 @@ func on_join_enet():
 	
 	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = false
-	
-	
-	
-	# Conectar
+	# aca se muestra la pantalla de carga
+	_mostrar_pantalla_carga("Conectando a " + ip + ":" + str(puerto) + "...")
+		
+	# intenta conectar
 	var ok = Network.unirse_servidor_lan(ip, puerto)
+	if not multiplayer.connected_to_server.is_connected(_on_conectado_para_lobby):
+		multiplayer.connected_to_server.connect(_on_conectado_para_lobby)
+	
 	if not ok:
+		#si no  sale bien, se oculta la pantalla de carga
+		_ocultar_pantalla_carga()
 		return
 	
-	if temp_mundo:
-		temp_mundo.queue_free()
-	
-	_mostrar_lobby()
+	#if temp_mundo:
+		#temp_mundo.queue_free()
+	#
+	#_mostrar_lobby()
 
 func on_crear_partida_enet():
 	var puerto_str = edit_puerto.text.strip_edges()
@@ -229,7 +244,9 @@ func on_crear_partida_enet():
 	
 	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = false
-	
+	# se muestra a pantalla de carga	
+	_mostrar_pantalla_carga("Creando servidor en puerto " + str(puerto) + "...")
+
 	if temp_mundo:
 		temp_mundo.queue_free()
 	
@@ -237,10 +254,22 @@ func on_crear_partida_enet():
 	
 	var ok = Network.empezar_servidor_lan(puerto)
 	if not ok:
+		_ocultar_pantalla_carga()
 		return
+		
+	# una vez que el servidor este listo, ocultamos la pantalla decarga y mostramos el lobby
+	await get_tree().create_timer(0.3).timeout
+	_ocultar_pantalla_carga()
+	_ir_al_lobby()
+
+func _ir_al_lobby() -> void:
+	# liberar el mundo temporal solamente cuando vamos a ir al lobby
+	if temp_mundo and is_instance_valid(temp_mundo):
+		temp_mundo.queue_free()
+		await get_tree().process_frame
 	
 	_mostrar_lobby()
-
+	
 func add_world():
 	_limpiar_lobby() 
 	var nuevo_mundo = MUNDO.instantiate()
@@ -265,57 +294,50 @@ func _limpiar_lobby():
 	lobby_actual = null
 	
 func _on_partida_iniciada_desde_lobby():
-	if mundo_creado:
-		print("El mundo ya fue creado, ignorando...")
-		return
-	
-	mundo_creado = true
-	print("Partida iniciada desde el lobby")
+
 	_deactivate_menu_camera()
 	
-	if temp_mundo:
-		temp_mundo.queue_free()
-		await get_tree().process_frame
-	
-	var nuevo_mundo = MUNDO.instantiate()
-	nuevo_mundo.name = "Mundo"
-	nuevo_mundo.add_to_group("mundo")
-	get_tree().current_scene.add_child(nuevo_mundo)
-	
-	await get_tree().create_timer(0.5).timeout
-	
-	if multiplayer.is_server():
-		print("HOST: Creando jugadores...")
-		Network.crear_todos_los_jugadores()
-	else:
-		print("CLIENTE: Esperando jugadores del host...")
-	
 	hide()
+	await get_tree().process_frame
+
 	
 func on_unirse_tube():
+	var session_id = edit_sesion.text.strip_edges()
+	if session_id == "":
+		_on_error_conexion("Debes escribir un ID de sesión")
+		return
 	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = false
 	
-	Network.tube_join(edit_sesion.text)
-	multiplayer.connected_to_server.connect(_on_conectado_para_lobby)
-	temp_mundo.queue_free()
+	_mostrar_pantalla_carga("Buscando sesión " + session_id + "...")
+
+	if not multiplayer.connected_to_server.is_connected(_on_conectado_para_lobby):
+		multiplayer.connected_to_server.connect(_on_conectado_para_lobby)
+	
+	Network.tube_join(session_id)
+	
 
 func _on_conectado_para_lobby():
 	if multiplayer.connected_to_server.is_connected(_on_conectado_para_lobby):
 		multiplayer.connected_to_server.disconnect(_on_conectado_para_lobby)
-	_mostrar_lobby()
+	# si la conexion fue exitosa entonces oculta la pantalla de carga y va al lobby
+	_ocultar_pantalla_carga()
+	_ir_al_lobby()
 	
 func on_crear_partida_tube():
-	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = false
-	temp_mundo.queue_free()
 	if edit_nombre_usuario.text != "":
 		GlobalJuego.nombre_jugador = edit_nombre_usuario.text
 	elif nombre_usuario.text != "":
 		GlobalJuego.nombre_jugador = nombre_usuario.text 
-	print("Creando partida con nombre: ", GlobalJuego.nombre_jugador)
+		
+	_mostrar_pantalla_carga("Creando partida...")
+
 	Network.tube_create()
-	_mostrar_lobby()
+	# espera un poco y pasa al lobby
+	await get_tree().create_timer(0.5).timeout
+	_ocultar_pantalla_carga()
+	_ir_al_lobby()
 
 func update_ip(nuevo_texto:String):
 	boton_unirse_enet.disabled = nuevo_texto == ""
@@ -328,7 +350,6 @@ func update_session(nuevo_texto: String):
 
 func update_username(nuevo_texto: String):
 	GlobalJuego.nombre_jugador = nuevo_texto
-	print("Nombre actualizado: ", GlobalJuego.nombre_jugador)
 	
 func ocultar_todo():
 	boton_local.visible = false
@@ -390,7 +411,8 @@ func _on_empezar_solo_pressed() -> void:
 func _crear_jugador_local(mundo_instancia: Node3D):
 	var jugador = PLAYER.instantiate()
 	jugador.name = "1"
-	var spawn_container = mundo_instancia.get_node_or_null("SpawnContainer")
+	#var spawn_container = mundo_instancia.get_node_or_null("SpawnContainer")
+	#if spawn_container == null
 	jugador.global_position = Vector3(22, 2, 22)
 	GlobalJuego.un_jugador = true
 	mundo_instancia.add_child(jugador)
@@ -398,10 +420,10 @@ func _crear_jugador_local(mundo_instancia: Node3D):
 
 #manejo de errores:
 func _on_error_conexion(mensaje:String)->void:
+	_ocultar_pantalla_carga()
+	
 	show()
 	ocultar_todo()
-	
-	# Limpiar el lobby si existe
 	_limpiar_lobby()
 	
 	# Crear el popup

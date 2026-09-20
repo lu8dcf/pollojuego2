@@ -21,6 +21,7 @@ fog_density = 0.4
 fog_sky_affect = 0.3
 
 [node name="WorldForest" type="Node3D" unique_id=451922858]
+process_mode = 1
 script = ExtResource("1_3pli8")
 
 [node name="mapa_1" parent="." unique_id=1924362278 instance=ExtResource("2_1o1l2")]

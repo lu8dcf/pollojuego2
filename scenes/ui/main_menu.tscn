@@ -555,7 +555,7 @@ scale = Vector2(1.9211432, 1.031997)
 mouse_filter = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="Mundo" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
+[node name="MundoTemporal" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
 unique_name_in_owner = true
 
 [node name="MensajeError" type="AcceptDialog" parent="." unique_id=72186245]
