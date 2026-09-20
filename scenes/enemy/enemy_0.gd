@@ -191,8 +191,8 @@ func _physics_process(delta: float) -> void:
 			velocidad_actual = wander.calcular_velocidad(
 			global_position,
 			direccion_actual,
-			delta
-		)
+			delta)
+			look_at(global_position, Vector3.UP)
 		
 		estado.PERSIGUE:
 			velocidad = velocidad_base * 2
@@ -219,10 +219,10 @@ func _physics_process(delta: float) -> void:
 				)
 			
 		estado.DERECHA:
-			rotation.y -= 10 * velocidad_giro * delta	
+			rotation.y += 1 * velocidad_giro * delta	
 			
 		estado.IZQUIERDA:
-			rotation.y += 10 *  velocidad_giro * delta
+			rotation.y += 3 *  velocidad_giro * delta
 			
 	if velocidad_actual.length() > 0.1:
 		# Dirección hacia donde se mueve
@@ -236,9 +236,7 @@ func _physics_process(delta: float) -> void:
 		
 		# Interpolación angular suave (evita giros bruscos)
 		modelo.rotation.y = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
-		#bigote_der.rotation.y   = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
-		#bigote_izq.rotation.y   = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
-	
+		
 	# Aplicar velocidad al CharacterBody3D
 	velocity.x = velocidad_actual.x
 	velocity.z = velocidad_actual.z
@@ -304,7 +302,7 @@ func _on_vision_body_exited(body: Node3D) -> void:
 func _on_bigote_izq_area_entered(area: Area3D) -> void:
 	if !posicionado:
 		queue_free()
-	if estado_actual!=estado.DERECHA or estado_actual!=estado.IZQUIERDA:
+	if estado_actual!=estado.DERECHA and estado_actual!=estado.IZQUIERDA:
 		estado_anterior=estado_actual
 	estado_actual=estado.DERECHA
 
@@ -316,7 +314,7 @@ func _on_bigote_izq_area_exited(area: Area3D) -> void:
 func _on_bigote_der_area_entered(area: Area3D) -> void:
 	if !posicionado:
 		queue_free()
-	if estado_actual!=estado.DERECHA or estado_actual!=estado.IZQUIERDA:
+	if estado_actual!=estado.DERECHA and estado_actual!=estado.IZQUIERDA:
 		estado_anterior=estado_actual
 	
 	estado_actual=estado.IZQUIERDA
