@@ -172,25 +172,25 @@ _data = {
 }
 
 [node name="enemigo_1" unique_id=891392913 instance=ExtResource("1_64bgc")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, 0, 0, 0)
 
 [node name="Babosa" parent="." index="0" unique_id=107105072]
 transform = Transform3D(100, -1.3234889e-21, -5.7851535e-29, 0, -4.3711384e-06, 99.99999, -1.323489e-21, -99.99999, -4.3711384e-06, 0, 0, 0)
 
 [node name="Skeleton3D" parent="Babosa" index="0" unique_id=1952039297]
-bones/0/rotation = Quaternion(0.00781746, -0.00089601066, -0.11388262, 0.99346304)
+bones/0/rotation = Quaternion(0.0077546868, -0.0013342983, -0.16958135, 0.9854848)
 bones/1/position = Vector3(-1.2382593e-17, 0.002150768, -6.2759064e-12)
-bones/1/rotation = Quaternion(0.15933773, -0.011348243, -0.06377985, 0.9850964)
+bones/1/rotation = Quaternion(0.15355654, 0.047974605, 0.26963058, 0.94943047)
 bones/2/position = Vector3(2.3814222e-17, 0.0014079714, -3.4081418e-11)
 bones/2/rotation = Quaternion(0.3717887, -2.2533884e-09, 8.646703e-08, 0.9283174)
 bones/4/position = Vector3(2.3814222e-17, 0.0014079714, -3.4081418e-11)
 bones/4/rotation = Quaternion(0.6765206, 3.5450332e-10, 1.5562954e-07, 0.73642373)
 bones/4/scale = Vector3(1, 1.0000001, 1.0000001)
 bones/5/position = Vector3(-1.5696649e-17, 0.001312285, 8.629585e-11)
-bones/5/rotation = Quaternion(0.07739297, -0.00865251, -0.086947724, 0.9931644)
+bones/5/rotation = Quaternion(0.068519115, -0.013859639, -0.13757811, 0.9880209)
 bones/5/scale = Vector3(1, 1.0000001, 1)
 bones/6/position = Vector3(-3.5506652e-17, 0.0008023333, -2.3759664e-11)
-bones/6/rotation = Quaternion(-0.16372398, 0.018949833, -0.036839984, 0.98563594)
+bones/6/rotation = Quaternion(-0.16606395, 0.018319787, -0.05426642, 0.9844502)
 bones/6/scale = Vector3(1, 1, 0.99999994)
 bones/7/position = Vector3(4.2671377e-18, 0.00054856046, 1.4873751e-10)
 bones/7/rotation = Quaternion(-0.21954733, -0.0043954444, -0.032243945, 0.97505903)
