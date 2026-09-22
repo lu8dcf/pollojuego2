@@ -30,15 +30,15 @@ var un_jugador:bool = true # si es true es singleplayer
 var cant_jugadres:int = 0
 
 #Tamaño del Mapa
-var mapa_x_min = -20
-var mapa_x_max = 20
-var mapa_z_min = -20
-var mapa_z_max = 20
+var mapa_x_min = 8
+var mapa_x_max = 72
+var mapa_z_min = 8
+var mapa_z_max = 72
 
 
 #enemigos
 var cant_tipo_enemigos = 4 # maxima cantidad de tipos de eenmigos
-var cant_enemigos = 50 # Cantidad de enemigos en la oleada siempr activos
+var cant_enemigos = 20 # Cantidad de enemigos en la oleada siempr activos
 
 func _ready():
 	# estas son señales de red 

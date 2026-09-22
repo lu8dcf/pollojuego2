@@ -21,25 +21,61 @@ var ver_modelo = false
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 var animation_player : AnimationPlayer
 
-@export var tipo: int = 4 # tipo d enemigo
+@export var tipo: int = 1 # tipo d enemigo
 
 var is_hurt := false
 var is_dying := false
 var jugador: Node3D = null
 
-@export var velocidad: float = 0.5
+# datos de movimiento
+@export var velocidad_base: float = 1
+@export var velocidad_giro: float = 8.0
+var velocidad: float = velocidad_base # velocidad actual
+var direccion_actual: Vector3 = Vector3.FORWARD
+@onready var wander: Wander = $Wander
+@onready var flee: Flee = $Flee
+@onready var evasion= $Evasion
+var evadir_obstaculo= false
+var velocidad_deseada := Vector3.ZERO # velocidad de evasion
+#@onready var avoidance: ObstacleAvoidance = $Evasion
+
+var velocidad_actual: Vector3 = Vector3.ZERO
+var direccion: Vector3  = Vector3.ZERO
+
+#  una variable para almacenar el estado actual
+var estado_actual: estado = estado.INACTIVO
+var estado_anterior: estado = estado.INACTIVO
+# posibles estados
+enum estado {
+	INACTIVO,
+	WANDER,
+	PERSIGUE,
+	FLEE
+	
+}
+
+# colisiiones
+@onready var bigote: Area3D = $bigote
+
+var posicionado = false  # cuando se encuentre correctamente en el piso sin tocar la pared
+# seek persigue
+@export var distancia_frenado: float =5.0     # A qué distancia empieza a frenar
+@export var distancia_llegada: float = 1.0   # A qué distancia se detiene
+
 
 func _ready():
-	#animation_player.playback_default_blend_time = 0.2
+	# Areas de colision
+
 	cargar_modelo()
 	cargar_movimiento()
 	add_to_group('enemy')
+	tipo_enemigo()
 	
 	jugador = get_tree().get_first_node_in_group("Jugadores")
 	# Esperar un frame para que el NavigationServer se inicialice
 	await get_tree().physics_frame
 	
-	#look_at(goal_position)
+	
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
 	
@@ -73,6 +109,20 @@ func cargar_movimiento():
 	add_child(movimiento)
 	movimiento.owner = self  #  Establece el owner manualmente
 
+func tipo_enemigo():
+	animation_player.play("caminar_bicho")
+	match tipo:
+		1:
+			#Chaser (ninja) debe hacer Seek para perseguir al jugador cuando éste se acerca, o cuando Chaser se acerca al jugador mientras hace Wander. Si el jugador se aleja una cierta distancia, Chaser debe volver a hacer Wander. Además Chaser debe hacer Arrive cuando llega a la posición del jugador.
+			estado_actual=estado.WANDER
+		2:
+			#Coward (payaso) debe hacer Flee para huir del jugador cuando éste se acerca, o cuando Coward se acerca al jugador mientras hace Wander. Si el jugador (o Coward) se aleja una cierta distancia, Coward debe volver a hacer Wander
+			estado_actual=estado.WANDER
+		3:
+			#Wanderer (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
+			estado_actual=estado.WANDER
+		4:
+			pass
 
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
@@ -106,9 +156,6 @@ func death(source):
 	queue_free()
 
 
-#var SPEED := 0.5
-#var direction := Vector3.ZERO
-#var goal_position := Vector3.ZERO
 
 func _physics_process(delta: float) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
@@ -120,38 +167,118 @@ func _physics_process(delta: float) -> void:
 
 	# Add the gravity.
 	
-	if not is_on_floor(): # detecta la llegada al piso
-		velocity += get_gravity() * delta 
-		#print (position)
-		if position.y < -2:
-			#print ("cayo")
-			queue_free()
-		move_and_slide()	
-		return
-	elif is_on_floor() and ver_cruz: #Mostrar cruz
-		mostrar_cruz()
+	if !posicionado:
+		if not is_on_floor(): # detecta la llegada al piso
+			velocity += get_gravity() * delta 
+			if position.y < -2:
+				queue_free()
+			move_and_slide() # caer
+			return
+		elif is_on_floor() and ver_cruz: #Mostrar cruz
+			mostrar_cruz()
+			posicionado=true
+		
 		
 	if not puede_moverse: # si esta vedado a moverse por cualquie cosa
 		return
 	
-	look_at(jugador.global_position, Vector3.UP)
+# ---------------  Estados del enemigo
 	
+	match estado_actual:
+		estado.INACTIVO:
+			direccion_actual= Vector3.ZERO
+		
+		estado.WANDER: # Mago
+			if velocidad_actual.length() > 0.1:
+				direccion_actual = Vector3(velocity.x, 0, velocity.z).normalized()
+			velocidad = velocidad_base /2
+			# Calcular la velocidad deseada con Wander
+			velocidad_actual = wander.calcular_velocidad(
+			global_position,
+			direccion_actual,
+			delta)
+			
+		
+		estado.PERSIGUE: #seek
+			var distancia = Vector2(
+				jugador.global_position.x - global_position.x,
+				jugador.global_position.z - global_position.z
+			).length()
+			
+
+			# Si ya llegó, detenerse
+			if distancia <= distancia_llegada:
+				velocidad_actual.x = 0
+				velocidad_actual.z = 0
+				
+				animation_player.play("ataque_bicho")				
+				
+			else:
+				# Calcular dirección al jugador (solo XZ)
+				direccion = (jugador.global_position - global_position)
+				direccion.y = 0
+				direccion = direccion.normalized()
+				
+				animation_player.play("caminar_bicho")
+			
+				# Aplicar Arrive: velocidad proporcional a la distancia
+				var factor_velocidad = 1.0
+				if distancia < distancia_frenado:
+					factor_velocidad = distancia / distancia_frenado
+					factor_velocidad = clamp(factor_velocidad, 0.0, 1.0)
+				
+				var velocidad_final = velocidad_base * 2.0 * factor_velocidad
+				
+				velocidad_actual.x = direccion.x * velocidad_final
+				velocidad_actual.z = direccion.z * velocidad_final
+
+			# Rotar hacia el jugador
+			#look_at(jugador.global_position, Vector3.UP)
 	
-	 # Moverse hacia adelante (eje -Z)
-	var direccion = (jugador.global_position - global_position)
-	direccion.y = 0
-	direccion = direccion.normalized()
+		estado.FLEE:
+			# Si se aleja lo suficiente, volver a WANDER
+			if flee.esta_a_salvo(global_position, jugador.global_position):
+				estado_actual = estado.WANDER
+				
+				velocidad_actual = wander.calcular_velocidad(
+					global_position, direccion_actual, delta
+				)
+			else:
+				velocidad_actual = flee.calcular_velocidad(
+					global_position, jugador.global_position, direccion_actual, delta
+				)
+			
+		#estado.EVASION:
+	if evadir_obstaculo:
+		velocidad_actual = evasion.calcular_evasion(direccion_actual, delta)
+			
+	if velocidad_actual.length() > 0.1:
+		# Dirección hacia donde se mueve
+		direccion_actual = velocidad_actual.normalized()
+		
+		# Ángulo Y (en radianes) mirando hacia esa dirección
+		var angulo_objetivo = atan2(direccion_actual.x, direccion_actual.z)
+		
+		# Rotación actual del modelo
+		var rotacion_actual = modelo.rotation.y
+		
+		# Interpolación angular suave (evita giros bruscos)
+		modelo.rotation.y = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
+		
+	# Aplicar velocidad al CharacterBody3D
+	velocity.x = velocidad_actual.x
+	velocity.z = velocidad_actual.z
 	
-	velocity.x = direccion.x * velocidad
-	velocity.z = direccion.z * velocidad
-	
+	# Gravedad
 	if not is_on_floor():
 		velocity.y += get_gravity().y * delta
+	else:
+		velocity.y = 0
 	
-
 	move_and_slide()
 	
-	
+
+		
 
 
 func mostrar_cruz(): # titila la cruz 
@@ -178,3 +305,47 @@ func mostrar_cruz(): # titila la cruz
 	tween.tween_callback(func():
 			puede_moverse = true # permino que se empiece a movere
 			set_collision_mask_value(4, true))  # Agrego las pareces de colision
+
+
+
+
+
+# player entra al area de vision
+func _on_vision_body_entered(body: Node3D) -> void: 
+	if tipo==1 and estado_actual==estado.WANDER:
+		estado_actual=estado.PERSIGUE
+	
+	if tipo==2 and estado_actual==estado.WANDER:
+		estado_actual=estado.FLEE	
+		
+
+
+func _on_vision_body_exited(body: Node3D) -> void:
+	if tipo==1 and estado_actual==estado.PERSIGUE:
+		estado_actual=estado.WANDER
+		
+		
+
+
+func _on_bigote_area_entered(area: Area3D) -> void:
+	if !posicionado:
+		queue_free()
+	
+	evadir_obstaculo=true
+	evasion._activar_evasion()
+		
+
+func _on_bigote_area_exited(area: Area3D) -> void:
+	evadir_obstaculo=false
+	evasion._verificar_salida()
+
+func _on_bigote_body_entered(body: Node3D) -> void:
+	if !posicionado:
+		queue_free()
+	evadir_obstaculo=true
+	evasion._activar_evasion()
+	
+
+func _on_bigote_body_exited(body: Node3D) -> void:
+	evadir_obstaculo=false
+	evasion._verificar_salida()

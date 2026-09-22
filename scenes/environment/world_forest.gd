@@ -11,6 +11,7 @@ const enemigo_base = preload("uid://b8go34qeye00a") # Escena enemy0
 
 var is_menu_mode: bool = false
 var ya_hizo=false
+var variedad_enemigos=0
 
 func _ready() -> void:
 	GlobalJuego.mundo = self
@@ -84,7 +85,7 @@ func spawn_enemy():
 func instanciar_enemigo():
 	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 20:
 		for player in get_tree().get_node_count_in_group("Jugadores"):
-			var new_target = fabrica_enemigos(4)
+			var new_target = fabrica_enemigos(0)
 			
 			var rand_x = randf_range(GlobalJuego.mapa_x_min, GlobalJuego.mapa_x_max)
 			var rand_z = randf_range(GlobalJuego.mapa_z_min, GlobalJuego.mapa_z_max)
@@ -93,10 +94,19 @@ func instanciar_enemigo():
 			spawn_container.add_child(new_target, true)
 
 func fabrica_enemigos(tipo):
+
+		
 	
-	if tipo < 1 or tipo > GlobalJuego.cant_tipo_enemigos: # hasta aca solo 4 enemigos
+	if tipo < 0 or tipo > GlobalJuego.cant_tipo_enemigos: # hasta aca solo 4 enemigos
 		push_error("Valor X fuera de rango: " + str(tipo))
 		return
+		
+	if tipo==0:
+		variedad_enemigos+=1
+		tipo=variedad_enemigos
+		if variedad_enemigos==3:
+			variedad_enemigos=0
+			 
 	var nuevo_enemigo = enemigo_base.instantiate()
 	nuevo_enemigo.tipo = tipo
 	
