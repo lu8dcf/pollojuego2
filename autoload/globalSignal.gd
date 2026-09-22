@@ -16,6 +16,17 @@ signal seleccion_pollo_confirmada(pollo_id: String)
 @warning_ignore("unused_signal")
 signal sesion_actualizada(info_sesion: Dictionary)
 
+# ===== SEÑALES DE LOBBY =====
+@warning_ignore("unused_signal")
+signal error_conexion(mensaje :String)
+
+# ===== SEÑALES DE JOYSTICK =====
+@warning_ignore("unused_signal")
+signal enviar_joystick(joystick:Joystick)
+
+# ===== SEÑALES DE PAUSA EN MULTIJUGADOR =====
+signal pausa_cambiada(esta_pausado: bool, quien_pauso: int)
+signal intencion_desconexion(peer_id: int)
 
 # ===== SEÑALES DE INVENTARIO =====
 @warning_ignore("unused_signal")

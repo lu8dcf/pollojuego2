@@ -3,25 +3,31 @@
 [ext_resource type="Script" uid="uid://c06gks0biq762" path="res://scenes/environment/world_forest.gd" id="1_3pli8"]
 [ext_resource type="PackedScene" uid="uid://c1uh3pf0og1vi" path="res://scenes/environment/mapa_1.tscn" id="2_1o1l2"]
 [ext_resource type="Script" uid="uid://c7p2vuotjcwys" path="res://scenes/environment/camera_3d.gd" id="3_1o1l2"]
+[ext_resource type="Texture2D" uid="uid://crpe86v1j2sp1" path="res://assets/ui/prueba entorno.jpg" id="4_0wskc"]
 [ext_resource type="PackedScene" uid="uid://cypdi1lb7klts" path="res://assets/models/crystal/scene.gltf" id="4_1o1l2"]
 [ext_resource type="Script" uid="uid://d4goam1r77jor" path="res://scenes/environment/fabrica_enemigo.gd" id="5_j6fc8"]
 [ext_resource type="PackedScene" uid="uid://dqebmh81nqj81" path="res://scenes/entorno/fabrica_obstaculos.tscn" id="6_0wskc"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_b5dff"]
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_mklfh"]
+panorama = ExtResource("4_0wskc")
 
-[sub_resource type="Sky" id="Sky_3pli8"]
-sky_material = SubResource("ProceduralSkyMaterial_b5dff")
+[sub_resource type="Sky" id="Sky_bpyjm"]
+sky_material = SubResource("PanoramaSkyMaterial_mklfh")
 
 [sub_resource type="Environment" id="Environment_1o1l2"]
 background_mode = 2
-sky = SubResource("Sky_3pli8")
-tonemap_mode = 3
+sky = SubResource("Sky_bpyjm")
+tonemap_mode = 2
+ssr_enabled = true
+ssao_enabled = true
+ssil_enabled = true
+glow_enabled = true
 fog_enabled = true
 fog_mode = 1
-fog_density = 0.4
 fog_sky_affect = 0.3
 
 [node name="WorldForest" type="Node3D" unique_id=451922858]
+process_mode = 1
 script = ExtResource("1_3pli8")
 
 [node name="mapa_1" parent="." unique_id=1924362278 instance=ExtResource("2_1o1l2")]
@@ -38,8 +44,10 @@ smooth_follow_speed = 2.0
 environment = SubResource("Environment_1o1l2")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=98634334]
-transform = Transform3D(-0.8660254, -0.25000003, 0.43301275, 0, 0.8660254, 0.5, -0.50000006, 0.4330127, -0.75, 0, 8, 0)
+transform = Transform3D(-0.86602527, -0.25000006, 0.4330127, 0.3161283, 0.39718598, 0.8615719, -0.38737956, 0.88303065, -0.26494098, 0, 10.745858, 0)
+light_angular_distance = 21.47
 shadow_enabled = true
+shadow_opacity = 0.45
 
 [node name="SpawnContainer" type="Node3D" parent="." unique_id=284707713]
 unique_name_in_owner = true
