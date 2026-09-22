@@ -1,173 +1,129 @@
-# obstacle_avoidance.gd
+# evasion.gd
 extends Node
-class_name ObstacleAvoidance
+class_name Evasion
 
 # ==================== CONFIGURACIÓN ====================
-@export var distancia_rayos: float = 3.0          # Longitud de los rayos de detección
-@export var cantidad_rayos: int = 5               # Cantidad de rayos (más = más preciso)
-@export var angulo_abanico: float = 90.0          # Ángulo total del abanico en grados
-@export var fuerza_evasion: float = 2.0           # Qué tan fuerte evade
-@export var capa_colision: int = 1                # Capa de colisión de los obstáculos (bitmask)
-@export var distancia_pared: float = 1.5          # Distancia a la que detecta paredes
+@export var velocidad_evasion: float = 2      # Velocidad lenta al evadir
+@export var tiempo_max_evasion: float = 1     # Tiempo máximo evadiendo antes de retroceder
+@export var tiempo_retroceso: float = 1        # Duración del retroceso
+@export var angulo_giro: float = 90.0            # Ángulo máximo de giro aleatorio (grados)
+@export var suavizado: float = 2.0               # Suavizado de la rotación
+
 
 # ==================== ESTADO INTERNO ====================
+var evasion_activa: bool = false
+var retrocediendo: bool = false
+var tiempo_evasion: float = 0.0
+var tiempo_retroceso_restante: float = 0.0
 var direccion_evasion: Vector3 = Vector3.ZERO
-var rayos: Array[RayCast3D] = []
+var ultima_direccion: Vector3 = Vector3.FORWARD
+var nodo_padre: Node3D = null
+var area_deteccion: Area3D = null
 var debug_activo: bool = false
+var tipos_retroceso=0
 
-# ==================== INICIALIZACIÓN ====================
-func _ready() -> void:
-	_crear_rayos()
-
-func _crear_rayos() -> void:
-	# Limpiar rayos previos
-	for r in rayos:
-		if is_instance_valid(r):
-			r.queue_free()
-	rayos.clear()
-	
-	var padre := get_parent() as Node3D
-	if not padre:
-		push_error("ObstacleAvoidance debe ser hijo de un Node3D")
-		return
-	
-	# Calcular el ángulo entre rayos
-	var angulo_entre := 0.0
-	if cantidad_rayos > 1:
-		angulo_entre = deg_to_rad(angulo_abanico) / float(cantidad_rayos - 1)
-	
-	var angulo_inicial := -deg_to_rad(angulo_abanico) / 2.0
-	
-	for i in range(cantidad_rayos):
-		var rayo := RayCast3D.new()
-		rayo.enabled = true
-		rayo.collision_mask = capa_colision
-		rayo.target_position = Vector3(0, 0, -distancia_rayos)  # Hacia adelante (-Z)
-		
-		# Rotar el rayo según su posición en el abanico
-		var angulo := angulo_inicial + angulo_entre * i
-		rayo.rotation.y = angulo
-		
-		padre.add_child(rayo)
-		rayos.append(rayo)
 
 # ==================== LÓGICA PRINCIPAL ====================
-# Recibe la velocidad deseada y devuelve una velocidad corregida que evita obstáculos
-func calcular_evasion(velocidad_deseada: Vector3, delta: float) -> Vector3:
-	if velocidad_deseada.length() < 0.01:
-		return velocidad_deseada
+# Devuelve la velocidad de evasión (o Vector3.ZERO si no hay evasión activa)
+func calcular_evasion(direccion_actual: Vector3, delta: float) -> Vector3:
+	if not evasion_activa:
+		return Vector3.ZERO
 	
-	# Actualizar la dirección de los rayos según la velocidad deseada
-	_orientar_rayos(velocidad_deseada)
+	# Actualizar tiempo de evasión
+	tiempo_evasion += delta
 	
-	# Detectar obstáculos
-	var obstaculos := _detectar_obstaculos()
+	# Si está retrocediendo
+	if retrocediendo:
+		tiempo_retroceso_restante -= delta
+		if tiempo_retroceso_restante <= 0:
+			retrocediendo = false
+			_generar_direccion_aleatoria()
+		return direccion_evasion * velocidad_evasion
 	
-	if obstaculos.is_empty():
-		return velocidad_deseada
+	# Si pasó mucho tiempo evadiendo, retroceder
+	if tiempo_evasion >= tiempo_max_evasion:
+		_iniciar_retroceso()
+		return direccion_evasion * velocidad_evasion
 	
-	# Calcular dirección de evasión
-	var direccion_evasion := _calcular_direccion_evasion(obstaculos)
+	# Suavizar la dirección de evasión
+	direccion_evasion = ultima_direccion.lerp(direccion_evasion, suavizado * delta).normalized()
 	
-	# Combinar velocidad deseada con evasión
-	var velocidad_final := (velocidad_deseada.normalized() + direccion_evasion * fuerza_evasion).normalized()
-	velocidad_final *= velocidad_deseada.length()
-	
-	return velocidad_final
+	return direccion_evasion * velocidad_evasion
 
-func _orientar_rayos(velocidad_deseada: Vector3) -> void:
-	var padre := get_parent() as Node3D
-	if not padre:
+# ==================== ACTIVACIÓN DE EVASIÓN ====================
+func _activar_evasion() -> void:
+	if evasion_activa:
 		return
 	
-	# Orientar el abanico de rayos hacia la dirección deseada
-	var direccion_plana := Vector3(velocidad_deseada.x, 0, velocidad_deseada.z).normalized()
-	if direccion_plana.length() < 0.01:
-		return
+	evasion_activa = true
+	retrocediendo = false
+	tiempo_evasion = 0.0
+	_generar_direccion_aleatoria()
 	
-	var angulo := atan2(direccion_plana.x, direccion_plana.z)
-	padre.rotation.y = lerp_angle(padre.rotation.y, angulo, 10.0 -)
-
-func _detectar_obstaculos() -> Array:
-	var obstaculos := []
-	for rayo in rayos:
-		if not is_instance_valid(rayo):
-			continue
-		rayo.force_raycast_update()
-		if rayo.is_colliding():
-			obstaculos.append({
-				"rayo": rayo,
-				"colision": rayo.get_collider(),
-				"punto": rayo.get_collision_point(),
-				"normal": rayo.get_collision_normal(),
-				"distancia": rayo.global_position.distance_to(rayo.get_collision_point())
-			})
-	return obstaculos
-
-func _calcular_direccion_evasion(obstaculos: Array) -> Vector3:
-	var direccion := Vector3.ZERO
 	
-	for obs in obstaculos:
-		var normal: Vector3 = obs["normal"]
-		var distancia: float = obs["distancia"]
+
+func _generar_direccion_aleatoria() -> void:
+	# Tomar la dirección actual y girarla un ángulo aleatorio
+	var angulo := deg_to_rad(randf_range(-angulo_giro, angulo_giro))
+	
+	# Rotar la dirección actual en el plano XZ
+	var nueva_direccion := ultima_direccion.rotated(Vector3.UP, angulo)
+	nueva_direccion.y = 0
+	direccion_evasion = nueva_direccion.normalized()
+	#print ("evasion ",direccion_evasion)
+	
+	
+
+func _iniciar_retroceso() -> void:
+	retrocediendo = true
+	tiempo_retroceso_restante = tiempo_retroceso
+	# Retroceder en dirección opuesta a la actual
+	match tipos_retroceso:
+		1:
+			direccion_evasion = -ultima_direccion
+		2:
+			direccion_evasion = ultima_direccion.rotated(Vector3.UP, deg_to_rad(90))
+		3:
+			direccion_evasion = ultima_direccion.rotated(Vector3.UP, deg_to_rad(-90))
+		4:
+			direccion_evasion = ultima_direccion.rotated(Vector3.UP, deg_to_rad(-45))	
+	
+		5:
+			direccion_evasion = ultima_direccion.rotated(Vector3.UP, deg_to_rad(+135))
+	tipos_retroceso+=1
+	if tipos_retroceso ==6:
+		tipos_retroceso=1	
+	direccion_evasion.y = 0
+	direccion_evasion = direccion_evasion.normalized()
+	
+	
+# ==================== SEÑALES DEL ÁREA ====================
+
+
+func _verificar_salida() -> void:
+	evasion_activa = false
+	retrocediendo = false
+	tiempo_evasion = 0.0
+	direccion_evasion = Vector3.ZERO
 		
-		# Cuanto más cerca, más fuerte la evasión
-		var peso := 1.0 - (distancia / distancia_rayos)
-		peso = clamp(peso, 0.0, 1.0)
 		
-		# Sumar la normal del obstáculo (dirección de escape)
-		direccion += normal * peso
-	
-	if direccion.length() > 0.01:
-		direccion = direccion.normalized()
-	
-	return direccion
-
-# ==================== DETECCIÓN DE PAREDES ====================
-# Devuelve true si hay una pared muy cerca en la dirección actual
-func detectar_pared_cercana(posicion_actual: Vector3, direccion_actual: Vector3) -> bool:
-	var espacio := get_parent().get_world_3d().direct_space_state
-	var query := PhysicsRayQueryParameters3D.create(
-		posicion_actual,
-		posicion_actual + direccion_actual * distancia_pared
-	)
-	query.collision_mask = capa_colision
-	
-	var resultado := espacio.intersect_ray(query)
-	return not resultado.is_empty()
-
-# ==================== CONSULTAS ====================
-func hay_obstaculo_adelante() -> bool:
-	for rayo in rayos:
-		if is_instance_valid(rayo) and rayo.is_colliding():
-			return true
-	return false
 
 # ==================== UTILIDADES ====================
-func set_distancia_rayos(nueva_distancia: float) -> void:
-	distancia_rayos = max(0.5, nueva_distancia)
-	for rayo in rayos:
-		if is_instance_valid(rayo):
-			rayo.target_position = Vector3(0, 0, -distancia_rayos)
+func set_velocidad(nueva_velocidad: float) -> void:
+	velocidad_evasion = max(0.0, nueva_velocidad)
 
-func set_capa_colision(nueva_capa: int) -> void:
-	capa_colision = nueva_capa
-	for rayo in rayos:
-		if is_instance_valid(rayo):
-			rayo.collision_mask = capa_colision
+func set_tiempo_max(nuevo_tiempo: float) -> void:
+	tiempo_max_evasion = max(0.1, nuevo_tiempo)
 
-func activar_debug(activo: bool) -> void:
+func set_angulo_giro(nuevo_angulo: float) -> void:
+	angulo_giro = clamp(nuevo_angulo, 0.0, 180.0)
+
+func set_debug(activo: bool) -> void:
 	debug_activo = activo
-	for rayo in rayos:
-		if is_instance_valid(rayo):
-			rayo.visible = activo
 
-func _process(_delta: float) -> void:
-	if debug_activo:
-		for rayo in rayos:
-			if is_instance_valid(rayo) and rayo.is_colliding():
-				DebugDraw3D.draw_line(
-					rayo.global_position,
-					rayo.get_collision_point(),
-					Color.RED
-				)
+func reiniciar() -> void:
+	evasion_activa = false
+	retrocediendo = false
+	tiempo_evasion = 0.0
+	tiempo_retroceso_restante = 0.0
+	direccion_evasion = Vector3.ZERO

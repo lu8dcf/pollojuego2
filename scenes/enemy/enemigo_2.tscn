@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cgn8qa26kgyil"]
 
-[ext_resource type="PackedScene" uid="uid://3c36m7xriokg" path="res://assets/modelos/enemigos/enemigo_2.fbx" id="1_irb5k"]
+[ext_resource type="PackedScene" uid="uid://cuo7od8e877b8" path="res://assets/modelos/enemigos/enemigo_2.fbx" id="1_irb5k"]
 
 [sub_resource type="Animation" id="Animation_irb5k"]
 resource_name = "ataque_bicho"
@@ -188,10 +188,10 @@ _data = {
 [node name="enemigo_2" unique_id=165743715 instance=ExtResource("1_irb5k")]
 transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, 0, -0.06271754, 0)
 
-[node name="caracol" parent="." index="0" unique_id=1414262646]
+[node name="caracol" parent="." index="0" unique_id=1531005014]
 transform = Transform3D(100, -1.3234889e-21, -5.7851535e-29, 0, -4.3711384e-06, 99.99999, -1.323489e-21, -99.99999, -4.3711384e-06, 0, 0.13743147, 0)
 
-[node name="Skeleton3D" parent="caracol" index="0" unique_id=162167935]
+[node name="Skeleton3D" parent="caracol" index="0" unique_id=1646429756]
 transform = Transform3D(1.0000001, 0, -4.2351647e-22, 0, 1.0000001, 3.5527137e-15, -4.2351647e-22, -3.5527137e-15, 1.0000001, 0, 0, 0)
 bones/0/position = Vector3(-7.4505804e-11, -0.0007537964, 0.0016280031)
 bones/0/rotation = Quaternion(0.050683, -8.747019e-08, 8.099279e-08, 0.99871486)
@@ -200,14 +200,14 @@ bones/1/position = Vector3(4.935413e-10, -0.0017907453, -0.0020700626)
 bones/1/rotation = Quaternion(-0.04155759, 1.8181732e-14, -9.908104e-09, 0.99913615)
 bones/1/scale = Vector3(1, 0.9999999, 0.9999999)
 bones/2/position = Vector3(-2.678085e-18, 0.0021946467, 1.7675526e-10)
-bones/2/rotation = Quaternion(0.10053158, 0.00613261, 0.051244672, 0.9935944)
-bones/2/scale = Vector3(1.0261685, 1, 0.99999994)
+bones/2/rotation = Quaternion(0.100543916, -0.0059203375, -0.049469557, 0.99368435)
+bones/2/scale = Vector3(0.9141787, 1, 0.99999994)
 bones/3/position = Vector3(-3.09998e-18, 0.001941615, 1.3588633e-11)
-bones/3/rotation = Quaternion(0.47340515, 0.017132642, 0.019498836, 0.8804623)
+bones/3/rotation = Quaternion(0.44457567, -0.09509018, -0.106728934, 0.88426197)
 bones/3/scale = Vector3(0.9999999, 1, 0.9999999)
 bones/4/position = Vector3(2.6371641e-17, 0.0016106816, -3.251875e-10)
-bones/4/rotation = Quaternion(0.16414985, -9.402037e-06, 4.6579094e-05, 0.9864355)
+bones/4/rotation = Quaternion(0.04473129, -0.0032958926, 0.016323112, 0.9988603)
 bones/4/scale = Vector3(0.99999994, 0.99999994, 0.9999999)
 
-[node name="AnimationPlayer" parent="." index="1" unique_id=308159990]
+[node name="AnimationPlayer" parent="." index="1" unique_id=1584539178]
 libraries/ = SubResource("AnimationLibrary_vp1j6")

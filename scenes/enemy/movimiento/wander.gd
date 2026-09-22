@@ -3,11 +3,11 @@ extends Node
 class_name Wander
 
 # ==================== CONFIGURACIÓN ====================
-@export var radio_circulo: float = 2.0       # Radio del círculo imaginario
-@export var distancia_circulo: float = 6.0   # Distancia del círculo al frente
-@export var velocidad_cambio: float = 1.0    # Qué tan rápido cambia el ángulo
+@export var radio_circulo: float = 10.0       # Radio del círculo imaginario
+@export var distancia_circulo: float = 10.0   # Distancia del círculo al frente
+@export var velocidad_cambio: float = 0.1    # Qué tan rápido cambia el ángulo
 @export var velocidad_maxima: float = 1.0    # Velocidad máxima del enemigo
-@export var suavizado: float = 5.0           # Suavizado del movimiento
+@export var suavizado: float = 0.5           # Suavizado del movimiento
 
 # ==================== ESTADO INTERNO ====================
 var angulo_objetivo: float = 0.0    # Ángulo actual del punto en el círculo

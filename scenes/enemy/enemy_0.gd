@@ -34,6 +34,9 @@ var velocidad: float = velocidad_base # velocidad actual
 var direccion_actual: Vector3 = Vector3.FORWARD
 @onready var wander: Wander = $Wander
 @onready var flee: Flee = $Flee
+@onready var evasion= $Evasion
+var evadir_obstaculo= false
+var velocidad_deseada := Vector3.ZERO # velocidad de evasion
 #@onready var avoidance: ObstacleAvoidance = $Evasion
 
 var velocidad_actual: Vector3 = Vector3.ZERO
@@ -47,19 +50,22 @@ enum estado {
 	INACTIVO,
 	WANDER,
 	PERSIGUE,
-	FLEE,
-	DERECHA,
-	IZQUIERDA
+	FLEE
+	
 }
 
 # colisiiones
-@onready var bigote_der: Area3D = $bigote_der
-@onready var bigote_izq: Area3D = $bigote_izq
+@onready var bigote: Area3D = $bigote
+
 var posicionado = false  # cuando se encuentre correctamente en el piso sin tocar la pared
+# seek persigue
+@export var distancia_frenado: float =5.0     # A qué distancia empieza a frenar
+@export var distancia_llegada: float = 1.0   # A qué distancia se detiene
+
 
 func _ready():
 	# Areas de colision
-	
+
 	cargar_modelo()
 	cargar_movimiento()
 	add_to_group('enemy')
@@ -190,19 +196,44 @@ func _physics_process(delta: float) -> void:
 			velocidad_actual = wander.calcular_velocidad(
 			global_position,
 			direccion_actual,
-			delta
-		)
+			delta)
+			
 		
-		estado.PERSIGUE:
-			velocidad = velocidad_base * 2
-			#----------------  sigue al jugador
-			look_at(jugador.global_position, Vector3.UP)
-			 # Moverse hacia adelante (eje -Z)
-			direccion = (jugador.global_position - global_position)
-			direccion.y = 0
-			direccion = direccion.normalized()
-			velocidad_actual.x = direccion.x * velocidad
-			velocidad_actual.z = direccion.z * velocidad
+		estado.PERSIGUE: #seek
+			var distancia = Vector2(
+				jugador.global_position.x - global_position.x,
+				jugador.global_position.z - global_position.z
+			).length()
+			
+
+			# Si ya llegó, detenerse
+			if distancia <= distancia_llegada:
+				velocidad_actual.x = 0
+				velocidad_actual.z = 0
+				
+				animation_player.play("ataque_bicho")				
+				
+			else:
+				# Calcular dirección al jugador (solo XZ)
+				direccion = (jugador.global_position - global_position)
+				direccion.y = 0
+				direccion = direccion.normalized()
+				
+				animation_player.play("caminar_bicho")
+			
+				# Aplicar Arrive: velocidad proporcional a la distancia
+				var factor_velocidad = 1.0
+				if distancia < distancia_frenado:
+					factor_velocidad = distancia / distancia_frenado
+					factor_velocidad = clamp(factor_velocidad, 0.0, 1.0)
+				
+				var velocidad_final = velocidad_base * 2.0 * factor_velocidad
+				
+				velocidad_actual.x = direccion.x * velocidad_final
+				velocidad_actual.z = direccion.z * velocidad_final
+
+			# Rotar hacia el jugador
+			#look_at(jugador.global_position, Vector3.UP)
 	
 		estado.FLEE:
 			# Si se aleja lo suficiente, volver a WANDER
@@ -217,11 +248,9 @@ func _physics_process(delta: float) -> void:
 					global_position, jugador.global_position, direccion_actual, delta
 				)
 			
-		estado.DERECHA:
-			rotation.y -= 10 * velocidad_giro * delta	
-			
-		estado.IZQUIERDA:
-			rotation.y += 10 *  velocidad_giro * delta
+		#estado.EVASION:
+	if evadir_obstaculo:
+		velocidad_actual = evasion.calcular_evasion(direccion_actual, delta)
 			
 	if velocidad_actual.length() > 0.1:
 		# Dirección hacia donde se mueve
@@ -235,9 +264,7 @@ func _physics_process(delta: float) -> void:
 		
 		# Interpolación angular suave (evita giros bruscos)
 		modelo.rotation.y = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
-		#bigote_der.rotation.y   = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
-		#bigote_izq.rotation.y   = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
-	
+		
 	# Aplicar velocidad al CharacterBody3D
 	velocity.x = velocidad_actual.x
 	velocity.z = velocidad_actual.z
@@ -300,41 +327,25 @@ func _on_vision_body_exited(body: Node3D) -> void:
 		
 
 
-func _on_bigote_izq_area_entered(area: Area3D) -> void:
-	if !posicionado:
-		queue_free()
-	if estado_actual!=estado.DERECHA or estado_actual!=estado.IZQUIERDA:
-		estado_anterior=estado_actual
-	estado_actual=estado.DERECHA
-
-
-func _on_bigote_izq_area_exited(area: Area3D) -> void:
-	estado_actual=estado_anterior
-	
-
-func _on_bigote_der_area_entered(area: Area3D) -> void:
-	if !posicionado:
-		queue_free()
-	if estado_actual!=estado.DERECHA or estado_actual!=estado.IZQUIERDA:
-		estado_anterior=estado_actual
-	
-	estado_actual=estado.IZQUIERDA
-
-func _on_bigote_der_area_exited(area: Area3D) -> void:
-	estado_actual=estado_anterior
-
-
 func _on_bigote_area_entered(area: Area3D) -> void:
-	pass # Replace with function body.
-
+	if !posicionado:
+		queue_free()
+	
+	evadir_obstaculo=true
+	evasion._activar_evasion()
+		
 
 func _on_bigote_area_exited(area: Area3D) -> void:
-	pass # Replace with function body.
-
+	evadir_obstaculo=false
+	evasion._verificar_salida()
 
 func _on_bigote_body_entered(body: Node3D) -> void:
-	pass # Replace with function body.
-
+	if !posicionado:
+		queue_free()
+	evadir_obstaculo=true
+	evasion._activar_evasion()
+	
 
 func _on_bigote_body_exited(body: Node3D) -> void:
-	pass # Replace with function body.
+	evadir_obstaculo=false
+	evasion._verificar_salida()
