@@ -15,7 +15,7 @@ var z_max = GlobalJuego.mapa_z_max
 
 # --- Referencias ---
 @export var escena_cubo = preload("res://scenes/entorno/obstaculo.tscn")        # arrastra tu CuboObstaculo.tscn aquí
-@onready var contenedor: Node3D = $Obstaculos
+#@onready var contenedor: Node3D = $Obstaculos
 
 var posiciones_usadas: Array[Vector3] = []
 
