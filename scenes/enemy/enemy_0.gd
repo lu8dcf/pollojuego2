@@ -59,8 +59,7 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 
 func _ready():
 	# Areas de colision
-	bigote_der.position = Vector3(-0.3, 0.5, 0)
-	bigote_izq.position = Vector3(+0.3, 0.5, 0)
+	
 	cargar_modelo()
 	cargar_movimiento()
 	add_to_group('enemy')
@@ -323,3 +322,19 @@ func _on_bigote_der_area_entered(area: Area3D) -> void:
 
 func _on_bigote_der_area_exited(area: Area3D) -> void:
 	estado_actual=estado_anterior
+
+
+func _on_bigote_area_entered(area: Area3D) -> void:
+	pass # Replace with function body.
+
+
+func _on_bigote_area_exited(area: Area3D) -> void:
+	pass # Replace with function body.
+
+
+func _on_bigote_body_entered(body: Node3D) -> void:
+	pass # Replace with function body.
+
+
+func _on_bigote_body_exited(body: Node3D) -> void:
+	pass # Replace with function body.

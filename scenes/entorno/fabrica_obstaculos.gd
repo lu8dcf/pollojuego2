@@ -24,7 +24,7 @@ func _ready():
 	if escena_cubo == null:
 		push_error("Falta asignar escena_cubo en el inspector.")
 		return
-	generar_obstaculos()
+	#generar_obstaculos()
 
 func generar_obstaculos():
 	
