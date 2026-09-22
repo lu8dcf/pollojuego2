@@ -60,7 +60,7 @@ enum estado {
 var posicionado = false  # cuando se encuentre correctamente en el piso sin tocar la pared
 # seek persigue
 @export var distancia_frenado: float =5.0     # A qué distancia empieza a frenar
-@export var distancia_llegada: float = 1.0   # A qué distancia se detiene
+@export var distancia_llegada: float = 1.5   # A qué distancia se detiene
 
 
 func _ready():
@@ -71,7 +71,7 @@ func _ready():
 	add_to_group('enemy')
 	tipo_enemigo()
 	
-	jugador = get_tree().get_first_node_in_group("Jugadores")
+	#jugador = get_tree().get_first_node_in_group("Jugadores")
 	# Esperar un frame para que el NavigationServer se inicialice
 	await get_tree().physics_frame
 	
@@ -232,8 +232,7 @@ func _physics_process(delta: float) -> void:
 				velocidad_actual.x = direccion.x * velocidad_final
 				velocidad_actual.z = direccion.z * velocidad_final
 
-			# Rotar hacia el jugador
-			#look_at(jugador.global_position, Vector3.UP)
+			
 	
 		estado.FLEE:
 			# Si se aleja lo suficiente, volver a WANDER
@@ -312,12 +311,13 @@ func mostrar_cruz(): # titila la cruz
 
 # player entra al area de vision
 func _on_vision_body_entered(body: Node3D) -> void: 
+	jugador = body
 	if tipo==1 and estado_actual==estado.WANDER:
 		estado_actual=estado.PERSIGUE
 	
 	if tipo==2 and estado_actual==estado.WANDER:
 		estado_actual=estado.FLEE	
-		
+	
 
 
 func _on_vision_body_exited(body: Node3D) -> void:
