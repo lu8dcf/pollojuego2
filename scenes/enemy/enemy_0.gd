@@ -311,6 +311,8 @@ func mostrar_cruz(): # titila la cruz
 
 # player entra al area de vision
 func _on_vision_body_entered(body: Node3D) -> void: 
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+		return
 	jugador = body
 	if tipo==1 and estado_actual==estado.WANDER:
 		estado_actual=estado.PERSIGUE
@@ -321,6 +323,8 @@ func _on_vision_body_entered(body: Node3D) -> void:
 
 
 func _on_vision_body_exited(body: Node3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+		return
 	if tipo==1 and estado_actual==estado.PERSIGUE:
 		estado_actual=estado.WANDER
 		
@@ -328,6 +332,8 @@ func _on_vision_body_exited(body: Node3D) -> void:
 
 
 func _on_bigote_area_entered(_area: Area3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+		return
 	if !posicionado:
 		queue_free()
 	
@@ -336,10 +342,14 @@ func _on_bigote_area_entered(_area: Area3D) -> void:
 		
 
 func _on_bigote_area_exited(_area: Area3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+		return
 	evadir_obstaculo=false
 	evasion._verificar_salida()
 
 func _on_bigote_body_entered(_body: Node3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+		return
 	if !posicionado:
 		queue_free()
 	evadir_obstaculo=true
@@ -347,5 +357,7 @@ func _on_bigote_body_entered(_body: Node3D) -> void:
 	
 
 func _on_bigote_body_exited(_body: Node3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+		return
 	evadir_obstaculo=false
 	evasion._verificar_salida()
