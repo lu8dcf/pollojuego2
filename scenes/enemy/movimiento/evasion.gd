@@ -25,7 +25,7 @@ var tipos_retroceso=0
 
 # ==================== LÓGICA PRINCIPAL ====================
 # Devuelve la velocidad de evasión (o Vector3.ZERO si no hay evasión activa)
-func calcular_evasion(direccion_actual: Vector3, delta: float) -> Vector3:
+func calcular_evasion(_direccion_actual: Vector3, delta: float) -> Vector3:
 	if not evasion_activa:
 		return Vector3.ZERO
 	

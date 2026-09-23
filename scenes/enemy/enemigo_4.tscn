@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://drhx2vi2udeec"]
 
-[ext_resource type="PackedScene" uid="uid://bth480ase2pvk" path="res://assets/modelos/enemigos/enemigo_4.fbx" id="1_4pobs"]
+[ext_resource type="PackedScene"  path="res://assets/modelos/enemigos/enemigo_4.fbx" id="1_4pobs"]
 
 [sub_resource type="Animation" id="Animation_oawfq"]
 resource_name = "ataque_bicho"
