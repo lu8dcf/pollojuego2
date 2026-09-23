@@ -27,7 +27,7 @@ func _ready() -> void:
 	
 	multiplayer.peer_connected.connect(_on_jugador_conectado)
 	multiplayer.peer_disconnected.connect(_on_jugador_desconectado)
-	multiplayer.server_disconnected.connect(_on_server_disconnected_lobby)
+	multiplayer.server_disconnected.connect(_on_host_desconectado_lobby)
 
 	es_host = multiplayer.is_server()
 	
@@ -132,7 +132,7 @@ func _on_jugador_desconectado(peer_id: int):
 	
 	_actualizar_estado_lobby()
 
-func _on_server_disconnected_lobby():
+func _on_host_desconectado_lobby():
 	
 	if multiplayer.is_server():
 		return
@@ -346,9 +346,10 @@ func _aplicar_cambio_personaje(peer_id_jugador: int, id_personaje: int):
 			"score": 0,
 			"username": "Jugador " + str(peer_id_jugador),
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje": id_personaje
+			"personaje": id_personaje,
+			"ping":0
 		}
-	print("esto es lobby.gd: ", GlobalJuego.session_info)
+	#print("esto es lobby.gd: ", GlobalJuego.session_info)
 
 @rpc("authority", "call_local", "reliable")
 func _iniciar_partida():
@@ -391,7 +392,8 @@ func _enviar_info_jugador(peer_id: int, nombre: String):
 			"score": 0,
 			"username": nombre,
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje":1
+			"personaje":1,
+			"ping":0
 		}
 	
 	if es_host and peer_id != 1:

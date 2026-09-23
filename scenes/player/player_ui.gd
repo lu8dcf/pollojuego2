@@ -23,8 +23,13 @@ var peer_que_pauso: int = 0
 const PANEL_USUARIO = preload("uid://cjpe82p33f0c6")
 var paneles_usuarios:Dictionary = {}
 
+# PANEL DE INFO DE CONTROLES + ping
+@onready var label_ping: Label = %LabelPing
+
+
 # tiempo
 @onready var label_tiempo: Label = %LabelTiempo
+
 
 
 # vida barra experiencia, monedas
@@ -59,6 +64,10 @@ func _ready() -> void:
 	boton_regresar.pressed.connect(_on_boton_regresar_pressed)
 	pausa_panel.visible = false # NO MOSTRAR LA PAUSA
 	
+	multiplayer.peer_disconnected.connect(_on_jugador_desconectado)
+	multiplayer.server_disconnected.connect(_on_server_desconectado)
+	var es_host = multiplayer.is_server()
+	
 	if GlobalSignal.has_signal("pausa_cambiada"):
 		GlobalSignal.pausa_cambiada.connect(_on_pausa_cambiada)
 		
@@ -90,7 +99,8 @@ func _ready() -> void:
 	GlobalSignal.sesion_actualizada.connect(_actualizar_paneles_aliados)
 	if GlobalSignal.has_signal("jugador_recibio_daño"):
 		GlobalSignal.jugador_recibio_daño.connect(_on_jugador_recibio_daño)
-	
+	#GlobalSignal.mi_ping_actualizado.connect(_actualizar_mi_ping)
+	#_actualizar_mi_ping(0)
 	# Y para cuando la salud cambia:
 	if GlobalSignal.has_signal("salud_jugador_cambiada"):
 		GlobalSignal.salud_jugador_cambiada.connect(_on_salud_jugador_cambiada)
@@ -104,13 +114,15 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS # ESTO HARA QUE SIGA PROCESANDO EL CANVAS LAYER, NO SE QUE TAN BUENO SEA
 
 
+# ===== SI ES MOBILE =====
 func _verificar_si_es_mobile() -> void:
 	if OS.has_feature("mobile"):
 		var ui_movil = preload("uid://wsf5ahon4ims")
 		var ui_movil_actual = ui_movil.instanciate()
 		add_child(ui_movil_actual)
 
-	
+# ===== MANEJO DE ACTUALIZAR INFO EN PANTALLA =====
+
 func _actualizar_paneles_aliados(info:Dictionary)-> void:
 	if not lista_usuarios:
 		print("ERROR: contenedor_aliados no está configurado")
@@ -153,6 +165,15 @@ func _crear_panel_aliado(peer_id: int, nombre: String, salud: int, salud_max: in
 	paneles_usuarios[peer_id] = panel
 	#print("session info: ", GlobalJuego.session_info)
 
+func _eliminar_panel_aliado0(peer_id) -> void:
+	if not paneles_usuarios.has(peer_id):
+		return
+	var panel = paneles_usuarios[peer_id]
+	if is_instance_valid(panel):
+		panel.queue_free()
+	paneles_usuarios.erase(peer_id) # seelimina el aliado que se desconecto
+
+
 func _actualizar_barra_salud(nueva_salud: int):
 	barra_salud.value = nueva_salud
 	etiqueta_salud.text = str(nueva_salud) + " / " + str(barra_salud.max_value)
@@ -180,7 +201,7 @@ func _mostrar_daño(peer_id: int, cantidad: int):
 		# seria genial mostrar efecto de daño en pantalla
 		print("Recibiste ", cantidad, " de daño")
 
-# SEÑALES FUNCIONEs
+# ===== SEÑALES DE FUNCIONES =====
 func _on_jugador_recibio_daño(peer_id: int, cantidad: int):
 	# Refrescar el panel de ese jugador específico
 	if paneles_usuarios.has(peer_id):
@@ -192,7 +213,18 @@ func _on_salud_jugador_cambiada(nueva_salud: int):
 	# Este es del jugador local, pero por si acaso refrescamos todos
 	_actualizar_paneles_aliados(GlobalJuego.session_info)
 
-# PAUSA
+
+# ===== MANEJO DE ALIADO DESCONECTADO O SERVER =====
+func _on_jugador_desconectado(peer_id:int)-> void:
+	_eliminar_panel_aliado0(peer_id)
+
+func _on_server_desconectado()-> void:
+	paneles_usuarios.clear()
+
+
+
+	
+# ===== MANEJO DE LA PAUSA =====
 # para manejar la pausa se debe usar el rpc en network
 func _on_boton_pausa_pressed() -> void:
 	# Si ya está pausado y NO soy el que pausó, no permitir

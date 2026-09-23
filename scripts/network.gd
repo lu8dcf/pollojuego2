@@ -26,6 +26,12 @@ var peer_que_pauso: int = 0
 # temporizador de time out de espera
 var _timeout_conexion : SceneTreeTimer  = null
 
+# variables para el PING de conexion
+var _ping_actual: int = 0
+var _ultimo_ping_enviado:int = 0
+var _timer_ping:Timer = null
+const INTERVALO_PING :=1.0 # cada un segundo se actualiza
+
 func _ready() -> void:
 	if tube_enabled:
 		tube_client.context = TUBE_CONTEXT
@@ -33,8 +39,25 @@ func _ready() -> void:
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 	multiplayer.connection_failed.connect(_on_conexion_fallida)
 	
+	# timer para medir el ping
+	_timer_ping = Timer.new()
+	_timer_ping.wait_time = INTERVALO_PING
+	_timer_ping.autostart = true
+	_timer_ping.timeout.connect(_enviar_ping)
+	add_child(_timer_ping)
+	
+	
 	_actualizar_ip_local()
 
+func _enviar_ping()->void:
+	# cada usuario envia un ping al host para medir la conexion
+	if not multiplayer.has_multiplayer_peer():
+		return
+	if multiplayer.is_server():
+		return # el host no se mide a si mismo
+		
+	_ultimo_ping_enviado = Time.get_ticks_msec()
+	_ping_servidor.rpc_id(1, _ultimo_ping_enviado)
 
 func tube_create():
 	en_lobby = true
@@ -117,7 +140,9 @@ func _on_peer_connected_lobby(peer_id: int):
 		GlobalJuego.session_info[peer_id] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id),
-			"salud": GlobalJuego.SALUD_DEFAULT
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"personaje":0,
+			"ping":0
 		}
 
 func _on_peer_disconnected_lobby(peer_id: int):
@@ -138,7 +163,8 @@ func _on_connected_to_server_lobby():
 			"score": 0,
 			"username": GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else "Jugador " + str(peer_id),
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje":0
+			"personaje":0,
+			"ping":0
 		}
 
 # ------------------------------------------------------------
@@ -221,7 +247,8 @@ func _on_peer_connected_partida(peer_id: int):
 			"score": 0,
 			"username": "Jugador " + str(peer_id),
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje":0
+			"personaje":0,
+			"ping":0
 		}
 
 func _on_peer_disconnected_partida(peer_id: int):
@@ -229,13 +256,21 @@ func _on_peer_disconnected_partida(peer_id: int):
 		if not multiplayer.is_server():
 			_volver_al_menu_por_desconexion_host()
 		return
-	remove_player(peer_id)
-	
-	if pausa_activa and peer_id == peer_que_pauso:
+	eliminar_jugador(peer_id)
+	# si el que pauso se desconecta, despausar
+	if multiplayer.is_server() and pausa_activa and peer_id == peer_que_pauso:
+		print("El que pausó (", peer_id, ") se desconectó. Despausando...")
 		pausa_activa = false
 		peer_que_pauso = 0
 		_aplicar_pausa.rpc(false, 0)
-
+	
+	#limpiar el peer del session info
+	if GlobalJuego and GlobalJuego.session_info.has(peer_id):
+		GlobalJuego.session_info.erase(peer_id)
+		# emite señal para que la UI se actualice
+		GlobalSignal.sesion_actualizada.emit(GlobalJuego.session_info)
+	
+	eliminar_jugador(peer_id)
 func _on_server_disconnected():
 	"""Se llama cuando se pierde la conexión con el servidor (host)"""
 	print("¡Se perdió la conexión con el HOST!")
@@ -262,7 +297,7 @@ func _volver_al_menu_por_desconexion_host():
 	await get_tree().create_timer(0.5).timeout
 	get_tree().reload_current_scene()
 
-func remove_player(peer_id):
+func eliminar_jugador(peer_id):
 	var mundo = obtener_mundo_actual()
 	if mundo:
 		var jugador = mundo.get_node_or_null(str(peer_id))
@@ -485,7 +520,7 @@ func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
 #
 #func clean_up_signals():
 	#multiplayer.peer_connected.disconnect(add_player) 
-	#multiplayer.peer_disconnected.disconnect(remove_player)
+	#multiplayer.peer_disconnected.disconnect(eliminar_jugador)
 	#multiplayer.connected_to_server.disconnect(on_connected_to_server)
 
 func _exit_tree() -> void:
@@ -493,7 +528,7 @@ func _exit_tree() -> void:
 		tube_client.leave_session()
 
 
-#----------------------------------------------------- Interacciones Jugador
+#---------- Interacciones Jugador
 @rpc("any_peer", "call_local")
 func pedir_salvar_rpc(objetivo_id: int) -> void:
 
@@ -517,6 +552,38 @@ func pedir_salvar_rpc(objetivo_id: int) -> void:
 	objetivo.cambiar_estado(Jugador.Estado.OLEADA)
 	print("¡Salvado!")
 
+
+# ------------------------------------------------------------
+# PING PONG DE CONEXION
+# ------------------------------------------------------------
+@rpc("any_peer","unreliable")
+func _ping_servidor(tiempo_envio:int)-> void:
+	if not multiplayer.is_server():
+		return
+	var peer_id = multiplayer.get_remote_sender_id()
+	_pong_cliente.rpc(peer_id,tiempo_envio)
+@rpc("authority","unreliable")
+func _pong_cliente(tiempo_envio:int)-> void:
+	var rtt = Time.get_ticks_msec()-tiempo_envio
+	_ping_actual = rtt
+	GlobalSignal.mi_ping_actualizado.emit(rtt)
+	_actualizar_ping_en_host.rpc_id(1,multiplayer.get_unique_id(),rtt)
+
+@rpc("any_peer","reliable")
+func _actualizar_ping_en_host(peer_id:int,ping:int)-> void:
+	if not multiplayer.is_server():
+		return
+	if GlobalJuego.session_info.has(peer_id):
+		GlobalJuego.session_info[peer_id]["ping"] = ping
+		# Reenviar a todos
+		_replicar_ping.rpc(peer_id, ping)
+		
+@rpc("authority", "call_local", "reliable") # envia el ping a todos
+func _replicar_ping(peer_id: int, ping: int) -> void:
+	if GlobalJuego.session_info.has(peer_id):
+		GlobalJuego.session_info[peer_id]["ping"] = ping
+		# Emitir señal para que la UI se actualice
+		GlobalSignal.sesion_actualizada.emit(GlobalJuego.session_info)
 
 # ------------------------------------------------------------
 # PAUSA MULTIJUGADOR
