@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b0h5wuf4brlk1" path="res://scripts/armas/comportamiento/comportamientoExplosivo.gd" id="1_4juux"]
 [ext_resource type="Script" uid="uid://ckltpinun1cgl" path="res://scripts/armas/arma.gd" id="1_h7l8e"]
-[ext_resource type="PackedScene" uid="uid://bskyk4ur6lr8m" path="res://assets/modelos/pollos/pollo_1.fbx" id="3_wlq20"]
+[ext_resource type="PackedScene" uid="uid://b635l88o7cpj4" path="res://scenes/bala/balaExplosiva.tscn" id="1_wlq20"]
 
 [sub_resource type="Resource" id="Resource_m28bd"]
 script = ExtResource("1_4juux")
@@ -15,7 +15,6 @@ metadata/_custom_type_script = "uid://b0h5wuf4brlk1"
 script = ExtResource("1_h7l8e")
 id = 2
 danio = 5.0
-sprite = ExtResource("3_wlq20")
 tiempoDeAtaque = 4
 tipo = 2
 comportamiento = SubResource("Resource_m28bd")

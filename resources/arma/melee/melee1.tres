@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://b47t1prnayyqk" path="res://scripts/armas/comportamiento/comportamientoMelee.gd" id="1_0mjtl"]
 [ext_resource type="Script" uid="uid://ckltpinun1cgl" path="res://scripts/armas/arma.gd" id="1_cpshx"]
-[ext_resource type="PackedScene" uid="uid://bskyk4ur6lr8m" path="res://assets/modelos/pollos/pollo_1.fbx" id="3_mitao"]
+[ext_resource type="PackedScene" uid="uid://dmk64w66uhmkc" path="res://scenes/bala/balaMelee.tscn" id="1_lt6ua"]
+[ext_resource type="PackedScene" uid="uid://c23nf7t55y5ta" path="res://scenes/armas/testArrow/test_arma.tscn" id="4_lt6ua"]
 
 [sub_resource type="Resource" id="Resource_8w0r3"]
 script = ExtResource("1_0mjtl")
@@ -11,6 +12,7 @@ metadata/_custom_type_script = "uid://b47t1prnayyqk"
 [resource]
 script = ExtResource("1_cpshx")
 id = 1
-sprite = ExtResource("3_mitao")
+sprite = ExtResource("4_lt6ua")
+tiempoDeAtaque = 1.0
 comportamiento = SubResource("Resource_8w0r3")
 metadata/_custom_type_script = "uid://ckltpinun1cgl"

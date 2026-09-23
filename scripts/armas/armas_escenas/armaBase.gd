@@ -1,7 +1,6 @@
 extends Node3D
 class_name armaBase
 
-@export var bala = preload("res://scenes/bala/bala.tscn")
 
 @onready var synchronizer = $MultiplayerSynchronizer
 
@@ -11,19 +10,24 @@ class_name armaBase
 @onready var sprite = $Sprite3D
 @onready var tiempo = $tiempoEntreDisparo
 
-var objetivoMasCercano
+var objetivo: Node3D = null
+var objetivo_actual: Node3D
 
+#var objetivoMasCercano
+var balaArma 
 
-@onready var objetivo = null
 var datos: Arma
 
 func _ready() -> void:
 	top_level = true #esto es para que cuando el padre rote, este nodo no
-	#if(datos.tiempoDeAtaque > 0):
-		#tiempo.wait_time = datos.tiempoDeAtaque
-	#else:
-		#tiempo.wait_time = 1
+	if(datos.tiempoDeAtaque > 0):
+		tiempo.wait_time = datos.tiempoDeAtaque
+	else:
+		tiempo.wait_time = 1
 		
+	if(datos.comportamiento.bala != null):
+		balaArma = datos.comportamiento.bala
+	
 	#aplico la textura del arma
 	#sprite=datos.sprite
 	
@@ -31,21 +35,32 @@ func _ready() -> void:
 	if(datos.sprite != null):
 		add_child(datos.sprite.instantiate())
 
-func _physics_process(delta: float) -> void:
+func _physics_process(delta):
 	global_position = get_parent().global_position
-	mirarObjetivo(delta)
-	
-	
+
+	if objetivo != null and is_instance_valid(objetivo):
+		mirarObjetivo(delta)
+
+
+func actualizar_objetivo():
+	objetivo = buscarObjetivoMasCercano()
+
+
+
+
 func mirarObjetivo(delta):
 	# direccion desde el jugador hacia el mouse
-	objetivoMasCercano = buscarObjetivoMasCercano()
-	if(objetivoMasCercano == null):
+	#objetivoMasCercano = buscarObjetivoMasCercano()
+	if objetivo == null or not is_instance_valid(objetivo):
 		return
 	
-	var direccion = -(objetivoMasCercano - global_position) #MUCHO MUY IMPORTANTE ESE MENOOOS
+	var direccion = -(objetivo.global_position - global_position) #MUCHO MUY IMPORTANTE ESE MENOOOS
 # sin contar la altura
 	direccion.y = 0
-
+	
+	if direccion.length_squared() == 0:
+		return
+	
 	# direccion actual del puntero
 	var direccion_marker = -(puntero.global_position - global_position)
 	direccion_marker.y = 0
@@ -84,7 +99,7 @@ func buscarObjetivoMasCercano():
 			mas_cercano = obj
 	if mas_cercano == null:
 		return null
-	return mas_cercano.global_position
+	return mas_cercano
 
 
 
@@ -112,12 +127,11 @@ func _on_tiempo_disparo_timeout() -> void:
 	#contenedor.add_child(nueva_bala, true) #lo agrego al contenedor de spawn
 
 func disparo():
-	var objetivo = buscarObjetivoMasCercano()
 
-	if objetivo == null:
+	if objetivo == null or not is_instance_valid(objetivo):
 		return
 
-	var direccion = objetivo - puntero.global_position
+	var direccion = objetivo.global_position - puntero.global_position
 	direccion.y = 0
 	direccion = direccion.normalized()
 
@@ -126,12 +140,12 @@ func disparo():
 	if multiplayer.is_server():
 		## Si este ArmaBase está en el servidor,
 		## no necesitamos hacer un RPC.
-		#crear_bala(
-			#puntero.global_position,
-			#direccion,
-			##tipo_bala
-		#)
-	#else:
+		crear_bala(
+			puntero.global_position,
+			direccion,
+			#tipo_bala
+		)
+	else:
 		## Si este ArmaBase pertenece a un cliente,
 		# le pedimos al servidor que cree la bala.
 		solicitar_disparo.rpc_id(
@@ -141,8 +155,10 @@ func disparo():
 			#tipo_bala
 		)
 
+func _on_buscar_objetivo_timeout() -> void:
+	actualizar_objetivo()
 func crear_bala(posicion: Vector3, direccion: Vector3) -> void:
-	var nueva_bala = bala.instantiate()
+	var nueva_bala = balaArma.instantiate()
 	nueva_bala.set_multiplayer_authority(1)
 	contenedor.add_child(nueva_bala, true)
 	nueva_bala.iniciar(
