@@ -65,21 +65,26 @@ func _obtener_nombre_jugador() -> String:
 		return "Jugador " + str(multiplayer.get_unique_id())
 
 func mostrar_usuarios():
+	label_id.hide()
+	label_ip.hide()
+	label_puerto.hide()
 	if not lobby_inicializado:
 		if GlobalJuego.un_jugador:
-			label_id.hide()
 			if boton_empezar:
 				boton_empezar.visible = true
 				boton_empezar.disabled = false
 		else:
 			if not Network.tube_enabled or Network.tube_client.session_id == "":
 				if es_host:
+					label_ip.show()
+					label_puerto.show()
 					if label_ip: label_ip.text = "IP: "+Network.ip_local
 					if label_puerto: label_puerto.text = "Puerto: " + str(Network.puerto_actual)
 				else:
 					if label_ip: label_ip.text = ""
 					if label_puerto: label_puerto.text = ""
 			else:
+				label_id.show()
 				label_id.text = "ID: " + Network.tube_client.session_id
 				if label_ip: label_ip.text = ""
 				if label_puerto: label_puerto.text = ""
