@@ -14,7 +14,7 @@ properties/1/path = NodePath("pollo_1:visible")
 properties/1/spawn = true
 properties/1/replication_mode = 2
 
-[node name="bala" type="Node3D" unique_id=1580871014]
+[node name="bala" type="Area3D" unique_id=1937482765]
 script = ExtResource("1_ckbog")
 
 [node name="tiempoVida" type="Timer" parent="." unique_id=1022337294]
