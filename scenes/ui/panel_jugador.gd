@@ -157,7 +157,7 @@ func cambiar_personaje_arma(direccion:int):
 			id_personaje = 1
 		elif id_personaje < 1:
 			id_personaje = cant_personajes
-		_reproducir_personaje_arma(id_personaje)
+		_reproducir_personaje(id_personaje)
 		_actualizar_habilidades(id_personaje)
 		indice_personaje = id_personaje
 		# notificar al lobby para que se sincronice con todos
@@ -172,7 +172,7 @@ func cambiar_personaje_arma(direccion:int):
 			id_arma = 1
 		elif id_arma < 1:
 			id_arma = cant_armas
-		_reproducir_personaje_arma(id_arma)
+		_reproducir_arma(id_arma)
 		_actualizar_habilidades(id_arma)
 		indice_arma = id_arma
 		# notificar al lobby para que se sincronice con todos
@@ -182,11 +182,15 @@ func cambiar_personaje_arma(direccion:int):
 
 	
 
-func _reproducir_personaje_arma(id):
+func _reproducir_personaje(id):
 	if sprite_personaje.visible:
 		sprite_personaje.play("idle" + str(id))
 			
-	elif sprite_arma.visible:
+	_actualizar_habilidades(id)
+	_actualizar_nombre(id)
+
+func _reproducir_arma(id):
+	if sprite_arma.visible:
 		sprite_arma.play("arma"+str(id))
 	_actualizar_habilidades(id)
 	_actualizar_nombre(id)
@@ -241,7 +245,7 @@ func actualizar_info(id: int, nombre_jugador: String,personaje: int = 1):
 	if nombre_usuario:
 		nombre_usuario.text = nombre_jugador
 	
-	_reproducir_personaje_arma(id_personaje)
+	_reproducir_personaje(id_personaje)
 	
 	if sprite_arma_mostrar:
 		sprite_arma_mostrar.visible = not es_mi_panel # solo mostrar el arma elegida a los demas jugadores, no a  mi
@@ -272,7 +276,7 @@ func actualizar_estado_listo(estado: bool):
 # esto solo sincroniza los perosnajes de los demas
 func actualizar_personaje_remoto(id: int) -> void:
 	id_personaje = id
-	_reproducir_personaje_arma(id)
+	_reproducir_personaje(id)
 
 func actualizar_arma_remoto(id:int)->void:
 	id_arma = id

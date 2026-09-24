@@ -488,7 +488,7 @@ func _arrancar_partida_rpc() -> void:
 		crear_todos_los_jugadores()
 	
 		
-@rpc("any_peer", "reliable")
+@rpc("any_peer","call_local", "reliable")
 func _jugador_listo_rpc(peer_id: int) -> void:
 	"""El host recibe el aviso de que un cliente terminó de cargar"""
 	if not multiplayer.is_server():
@@ -563,7 +563,7 @@ func _ping_servidor(tiempo_envio:int)-> void:
 	if not multiplayer.is_server():
 		return
 	var peer_id = multiplayer.get_remote_sender_id()
-	_pong_cliente.rpc(peer_id,tiempo_envio)
+	_pong_cliente.rpc_id(peer_id,tiempo_envio)
 @rpc("authority","unreliable")
 func _pong_cliente(tiempo_envio:int)-> void:
 	var rtt = Time.get_ticks_msec()-tiempo_envio
