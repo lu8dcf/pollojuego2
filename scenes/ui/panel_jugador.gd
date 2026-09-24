@@ -80,12 +80,12 @@ func cambiar_personaje(direccion:int):
 	if lobby and lobby.has_method("notificar_cambio_personaje"):
 		lobby.notificar_cambio_personaje(peer_id, id_personaje)
 
-func _reproducir_personaje(id_personaje):
+func _reproducir_personaje(_id_personaje):
 	if sprite_personaje:
 		sprite_personaje.play("idle" + str(id_personaje))
 	_actualizar_habilidades(id_personaje)
 	
-func _actualizar_habilidades(id_personaje: int) -> void:
+func _actualizar_habilidades(_id_personaje: int) -> void:
 	if not personajes.has(id_personaje):
 		return
 	
