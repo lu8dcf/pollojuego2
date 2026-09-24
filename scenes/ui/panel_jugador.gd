@@ -299,10 +299,17 @@ func _actualizar_indicador():
 				indicador_listo.modulate = Color.GRAY
 				indicador_listo.visible = true
 
+func _habilitar_deshabilitar_botones(esta_habilitado:bool): # se deshabilita caundo el usaurio le dio a estoy listo
+	arma_eleccion.disabled = esta_habilitado
+	personaje_eleccion.disabled = esta_habilitado
+	cambiar_adelante_opcion.disabled = esta_habilitado
+	cambiar_atras_opcion.disabled = esta_habilitado
+
 func marcar_listo():
 	esta_listo = true
 	if estoy_listo_boton:
 		estoy_listo_boton.cambiar_texto("¡Listo!")
+	_habilitar_deshabilitar_botones(esta_listo)
 	_actualizar_indicador()
 	# Emitir señal para notificar al lobby
 	_notificar_estado_listo.rpc(peer_id, true)
