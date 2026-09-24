@@ -28,6 +28,7 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 	inicio = true
 	
 func _ready() -> void:
+	add_to_group("bala")
 	top_level = true
 	#textureBullet.visible=true
 	balaMelee()
@@ -53,16 +54,17 @@ func balaMelee():
 	#fin Test
 	
 	var cuerpos_en_area = areaMelee.get_overlapping_bodies()
-	#for cuerpo in cuerpos_en_area:
-		#if cuerpo.is_in_group("enemies") and cuerpo.has_method("take_damage"):
-			#cuerpo.take_damage(damage * GlobalItem.potenciando_danio_arma)
+	for cuerpo in cuerpos_en_area:
+		if(cuerpo.is_in_group("enemy")):
+			#print("golpeo enemigo") --------------------------Aca cuando choca con el enemigo
+			pass
 
 	eliminarBala()
 
 #-----------------------------------------------------------------------------comun y explosiva
 	
 func eliminarBala():
-	if !is_multiplayer_authority():
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
 	queue_free()
 

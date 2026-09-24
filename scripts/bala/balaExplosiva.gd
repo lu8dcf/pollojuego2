@@ -31,6 +31,7 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 
 	
 func _ready() -> void:
+	add_to_group("bala")
 	top_level = true
 	textureBullet.visible=true
 	#balaExplosiva()
@@ -66,12 +67,10 @@ func explosion():
 	areaExplosiva.visible = true
 	var cuerpos_en_area = areaExplosiva.get_overlapping_bodies()
 	if(cuerpos_en_area != null):
-		print("en la explosion me llevo a :")
-	else:
-		print("vacio")
-	#for cuerpo in cuerpos_en_area:
-		#if cuerpo.is_in_group("enemies") and cuerpo.has_method("take_damage"):
-			#cuerpo.take_damage(damage * GlobalItem.potenciando_danio_arma)
+		for cuerpo in cuerpos_en_area:
+			if(cuerpo.is_in_group("enemy")):
+				#print("danio enemigo ") --------------------------Aca cuando choca con el enemigo
+				pass
 	await get_tree().create_timer(0.5).timeout
 	eliminarBala()
 
@@ -80,17 +79,10 @@ func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
 	eliminarBala()
 	
 func eliminarBala():
-	if !is_multiplayer_authority():
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
 	queue_free()
 
 
-func _on_area_explosion_area_entered(area: Area3D) -> void:
-	if(area.get_collision_layer_value(4)):
-		eliminarBala()
-	pass # Replace with function body.
-
-
-func _on_impacto_previo_area_entered(area: Area3D) -> void:
+func _on_impacto_previo_body_entered(body: Node3D) -> void:
 	explosion()
-	pass # Replace with function body.
