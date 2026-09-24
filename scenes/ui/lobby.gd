@@ -444,6 +444,7 @@ func _enviar_info_jugador(peer_id: int, info_jugador: Dictionary):
 	var nombre = info_jugador.get("username","Jugador " +str(peer_id))
 	var personaje = info_jugador.get("personaje",1)
 	var listo= info_jugador.get("listo",false)
+	var armas_actuales= info_jugador.get("armas_actuales",[1,0])
 	
 	_agregar_jugador_al_lobby(peer_id,nombre)
 	
@@ -459,12 +460,14 @@ func _enviar_info_jugador(peer_id: int, info_jugador: Dictionary):
 				panel.actualizar_personaje_remoto(personaje)
 			if panel.has_method("actualizar_estado_listo"):
 				panel.actualizar_estado_listo(listo)
+			if panel.has_method("actualizar_arma_remoto"):
+				if armas_actuales.size()>0:
+					panel.actualizar_arma_remoto(armas_actuales[0])
 		
-	
 	if not GlobalJuego.session_info.has(peer_id):
 		GlobalJuego.session_info[peer_id] = info_jugador
 	else:
-		for key in info_jugador.keys():
+		for key in info_jugador.keys(): # combinacion de todos los clave valor de l dict session_info
 			GlobalJuego.session_info[peer_id][key] = info_jugador[key]
 	
 	if es_host and peer_id != 1:
