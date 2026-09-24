@@ -14,7 +14,10 @@ properties/1/path = NodePath("pollo_1:visible")
 properties/1/spawn = true
 properties/1/replication_mode = 2
 
-[node name="bala" type="Node3D" unique_id=1580871014]
+[sub_resource type="SphereShape3D" id="SphereShape3D_sugfe"]
+radius = 0.2141147
+
+[node name="bala" type="Area3D" unique_id=1937482765]
 script = ExtResource("1_ckbog")
 
 [node name="tiempoVida" type="Timer" parent="." unique_id=1022337294]
@@ -24,6 +27,7 @@ wait_time = 5.0
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, -0.25, 0)
 
 [node name="area_comun" type="Area3D" parent="." unique_id=840675643]
+visible = false
 collision_layer = 16
 collision_mask = 10
 
@@ -32,6 +36,9 @@ shape = SubResource("SphereShape3D_8w0r3")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2072508626]
 replication_config = SubResource("SceneReplicationConfig_tdw23")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=337711590]
+shape = SubResource("SphereShape3D_sugfe")
 
 [connection signal="timeout" from="tiempoVida" to="." method="_on_tiempo_vida_timeout"]
 [connection signal="body_entered" from="area_comun" to="." method="_on_area_comun_body_entered"]

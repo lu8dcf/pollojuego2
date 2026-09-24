@@ -16,7 +16,7 @@ properties/1/replication_mode = 2
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_8w0r3"]
 
-[node name="balaExplosiva" type="Node3D" unique_id=252777348]
+[node name="balaExplosiva" type="Area3D" unique_id=1972517349]
 script = ExtResource("1_8udgy")
 
 [node name="pollo_1" parent="." unique_id=1188442573 instance=ExtResource("2_osb2g")]
@@ -47,4 +47,3 @@ shape = SubResource("SphereShape3D_8w0r3")
 
 [connection signal="area_entered" from="area_explosion" to="." method="_on_area_explosion_area_entered"]
 [connection signal="area_entered" from="impactoPrevio" to="." method="_on_impacto_previo_area_entered"]
-[connection signal="body_entered" from="impactoPrevio" to="." method="_on_impacto_previo_body_entered"]

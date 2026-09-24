@@ -14,7 +14,10 @@ properties/1/path = NodePath("area_melee/Sprite3D:visible")
 properties/1/spawn = true
 properties/1/replication_mode = 2
 
-[node name="balaMelee" type="Node3D" unique_id=216072085]
+[sub_resource type="BoxShape3D" id="BoxShape3D_sugfe"]
+size = Vector3(0.9760742, 1, 1)
+
+[node name="balaMelee" type="Area3D" unique_id=1455033309]
 script = ExtResource("1_h7sch")
 
 [node name="area_melee" type="Area3D" parent="." unique_id=423919927]
@@ -36,5 +39,9 @@ replication_config = SubResource("SceneReplicationConfig_782ts")
 
 [node name="tiempoVida" type="Timer" parent="." unique_id=763218826]
 wait_time = 0.2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=131143176]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.011962891, 0, 0)
+shape = SubResource("BoxShape3D_sugfe")
 
 [connection signal="timeout" from="tiempoVida" to="." method="_on_tiempo_vida_timeout"]
