@@ -32,7 +32,7 @@ func _ready() -> void:
 	#textureBullet.visible=true
 	balaMelee()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if(inicio):
 		tiempoDeVida.start
 		balaMelee()

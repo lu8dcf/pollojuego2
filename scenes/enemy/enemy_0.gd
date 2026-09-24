@@ -22,7 +22,7 @@ var ver_modelo = false
 var animation_player : AnimationPlayer
 
 @export var tipo: int = 1 # tipo d enemigo
-
+@export var animacion_ataque=false
 var is_hurt := false
 var is_dying := false
 var jugador: Node3D = null
@@ -210,16 +210,16 @@ func _physics_process(delta: float) -> void:
 			if distancia <= distancia_llegada:
 				velocidad_actual.x = 0
 				velocidad_actual.z = 0
+				animacion_ataque= true
 				
-				animation_player.play("ataque_bicho")				
 				
 			else:
 				# Calcular dirección al jugador (solo XZ)
 				direccion = (jugador.global_position - global_position)
 				direccion.y = 0
 				direccion = direccion.normalized()
+				animacion_ataque= false
 				
-				animation_player.play("caminar_bicho")
 			
 				# Aplicar Arrive: velocidad proporcional a la distancia
 				var factor_velocidad = 1.0
@@ -267,6 +267,11 @@ func _physics_process(delta: float) -> void:
 	# Aplicar velocidad al CharacterBody3D
 	velocity.x = velocidad_actual.x
 	velocity.z = velocidad_actual.z
+	
+	if animacion_ataque:
+		animation_player.play("ataque_bicho")
+	else:
+		animation_player.play("caminar_bicho")
 	
 	# Gravedad
 	if not is_on_floor():
