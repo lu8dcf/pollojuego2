@@ -4,7 +4,7 @@ class_name EnemigoBase
 @export var health := 100
 # @export var animation_player: AnimationPlayer
 
-@onready var crystal_timer: Timer = $Timer
+#@onready var crystal_timer: Timer = $Timer
 
 # IA
 var puede_moverse = false
@@ -22,7 +22,7 @@ var ver_modelo = false
 var animation_player : AnimationPlayer
 
 @export var tipo: int = 1 # tipo d enemigo
-
+@export var animacion_ataque=false
 var is_hurt := false
 var is_dying := false
 var jugador: Node3D = null
@@ -37,7 +37,7 @@ var direccion_actual: Vector3 = Vector3.FORWARD
 @onready var evasion= $Evasion
 var evadir_obstaculo= false
 var velocidad_deseada := Vector3.ZERO # velocidad de evasion
-#@onready var avoidance: ObstacleAvoidance = $Evasion
+
 
 var velocidad_actual: Vector3 = Vector3.ZERO
 var direccion: Vector3  = Vector3.ZERO
@@ -61,7 +61,8 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 # seek persigue
 @export var distancia_frenado: float =5.0     # A qué distancia empieza a frenar
 @export var distancia_llegada: float = 1.5   # A qué distancia se detiene
-
+@export var rot_byte = 0
+@onready var marcapaso: Timer = $Marcapaso
 
 func _ready():
 	# Areas de colision
@@ -70,7 +71,7 @@ func _ready():
 	cargar_movimiento()
 	add_to_group('enemy')
 	tipo_enemigo()
-	
+	marcapaso.timeout.connect(cambios)
 	#jugador = get_tree().get_first_node_in_group("Jugadores")
 	# Esperar un frame para que el NavigationServer se inicialice
 	await get_tree().physics_frame
@@ -155,9 +156,23 @@ func death(source):
 	#await animation_player.animation_finished
 	queue_free()
 
-
+func cambios():
+	if animacion_ataque:
+		animation_player.play("ataque_bicho")
+	else:
+		animation_player.play("caminar_bicho")
+	
+	
 
 func _physics_process(delta: float) -> void:
+	
+	var rotacion_actual = modelo.rotation.y		
+	# Cuando SE RECIBE el valor  el valor:
+	var angulo_recibido = byte_a_angulo(rot_byte)
+
+		#  interpolando localmente:
+	modelo.rotation.y = lerp_angle(rotacion_actual, angulo_recibido, velocidad_giro * delta)
+	
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
 	
@@ -210,16 +225,16 @@ func _physics_process(delta: float) -> void:
 			if distancia <= distancia_llegada:
 				velocidad_actual.x = 0
 				velocidad_actual.z = 0
+				animacion_ataque= true
 				
-				animation_player.play("ataque_bicho")				
 				
 			else:
 				# Calcular dirección al jugador (solo XZ)
 				direccion = (jugador.global_position - global_position)
 				direccion.y = 0
 				direccion = direccion.normalized()
+				animacion_ataque= false
 				
-				animation_player.play("caminar_bicho")
 			
 				# Aplicar Arrive: velocidad proporcional a la distancia
 				var factor_velocidad = 1.0
@@ -250,23 +265,29 @@ func _physics_process(delta: float) -> void:
 		#estado.EVASION:
 	if evadir_obstaculo:
 		velocidad_actual = evasion.calcular_evasion(direccion_actual, delta)
-			
+	
+	
 	if velocidad_actual.length() > 0.1:
 		# Dirección hacia donde se mueve
 		direccion_actual = velocidad_actual.normalized()
 		
 		# Ángulo Y (en radianes) mirando hacia esa dirección
 		var angulo_objetivo = atan2(direccion_actual.x, direccion_actual.z)
-		
-		# Rotación actual del modelo
-		var rotacion_actual = modelo.rotation.y
-		
+				
 		# Interpolación angular suave (evita giros bruscos)
-		modelo.rotation.y = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
+		angulo_objetivo = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
+		# Ejemplo de uso antes de enviar por RPC / sincronizador:
+		rot_byte = angulo_a_byte(angulo_objetivo)
+			# envías rot_byte (un solo byte o un int pequeño)	
+		
+		
+		
 		
 	# Aplicar velocidad al CharacterBody3D
 	velocity.x = velocidad_actual.x
 	velocity.z = velocidad_actual.z
+	
+	
 	
 	# Gravedad
 	if not is_on_floor():
@@ -277,7 +298,18 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	
 
-		
+# angulo_objetivo está en radianes, entre -PI y PI (o 0..2TAU, da igual)
+func angulo_a_byte(angulo: float) -> int:
+	# Normalizamos a [0, TAU)
+	var tau = TAU
+	var norm = fposmod(angulo, tau)
+	# Mapa a [0, 255]
+	return int(norm / tau * 255.0 + 0.5)
+	
+func byte_a_angulo(rot_byte: int) -> float:
+	var tau = TAU
+	return (rot_byte / 255.0) * tau
+	
 
 
 func mostrar_cruz(): # titila la cruz 
@@ -304,10 +336,6 @@ func mostrar_cruz(): # titila la cruz
 	tween.tween_callback(func():
 			puede_moverse = true # permino que se empiece a movere
 			set_collision_mask_value(4, true))  # Agrego las pareces de colision
-
-
-
-
 
 # player entra al area de vision
 func _on_vision_body_entered(body: Node3D) -> void: 
@@ -361,3 +389,10 @@ func _on_bigote_body_exited(_body: Node3D) -> void:
 		return
 	evadir_obstaculo=false
 	evasion._verificar_salida()
+
+
+func _on_danio_body_entered(_body: Node3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+		return
+	
+	queue_free()

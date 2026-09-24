@@ -467,7 +467,7 @@ func mirar_al_mouse(delta: float) -> void:
 	#return -(raycast_start - raycast_end).normalized()
 
 @rpc("any_peer", 'call_local')
-func register_hit(is_dead = false):
+func register_hit(_is_dead = false):
 	#if is_dead:
 		#sound_hit.play()
 		#sound_ping.play()
@@ -490,7 +490,7 @@ func register_hit(is_dead = false):
 	#arm_mesh_left.set_surface_override_material(0, new_material)
 	#arm_mesh_right.set_surface_override_material(0, new_material)
 
-func attack(version: int):
+func attack(_version: int):
 	#print ("Ataque")
 	Sonidos.sonidoPollo()
 	#if weapon_animation_player.current_animation.begins_with("arm_model_animations/swing"):

@@ -36,9 +36,12 @@ properties/4/replication_mode = 2
 properties/5/path = NodePath(".:tipo")
 properties/5/spawn = true
 properties/5/replication_mode = 2
-properties/6/path = NodePath("modelo:rotation:y")
+properties/6/path = NodePath(".:animacion_ataque")
 properties/6/spawn = true
 properties/6/replication_mode = 2
+properties/7/path = NodePath(".:rot_byte")
+properties/7/spawn = true
+properties/7/replication_mode = 2
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_sugfe"]
 radius = 5.5029297
@@ -46,6 +49,10 @@ radius = 5.5029297
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_50d1r"]
 height = 1.5380859
 radius = 1.5854492
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sugfe"]
+radius = 0.7192383
+height = 3.0966797
 
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 process_mode = 1
@@ -65,7 +72,9 @@ debug_color = Color(0.52156866, 0.07058824, 0.07058824, 1)
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1439608142]
 replication_config = SubResource("SceneReplicationConfig_qypkf")
 
-[node name="Timer" type="Timer" parent="." unique_id=1893234336]
+[node name="Marcapaso" type="Timer" parent="." unique_id=1893234336]
+wait_time = 0.5
+autostart = true
 
 [node name="modelo" type="Node3D" parent="." unique_id=1013882562]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0020587444, 0)
@@ -98,9 +107,18 @@ collision_mask = 8
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23095703, 0)
 shape = SubResource("CylinderShape3D_50d1r")
 
+[node name="danio" type="Area3D" parent="." unique_id=1659760012]
+collision_layer = 2
+collision_mask = 16
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="danio" unique_id=519725807]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.54833984, 0)
+shape = SubResource("CapsuleShape3D_sugfe")
+
 [connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]
 [connection signal="body_exited" from="vision" to="." method="_on_vision_body_exited"]
 [connection signal="area_entered" from="bigote" to="." method="_on_bigote_area_entered"]
 [connection signal="area_exited" from="bigote" to="." method="_on_bigote_area_exited"]
 [connection signal="body_entered" from="bigote" to="." method="_on_bigote_body_entered"]
 [connection signal="body_exited" from="bigote" to="." method="_on_bigote_body_exited"]
+[connection signal="body_entered" from="danio" to="." method="_on_danio_body_entered"]
