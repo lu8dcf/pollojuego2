@@ -25,7 +25,9 @@ signal error_conexion(mensaje :String)
 signal enviar_joystick(joystick:Joystick)
 
 # ===== SEÑALES DE PAUSA EN MULTIJUGADOR =====
+@warning_ignore("unused_signal")
 signal pausa_cambiada(esta_pausado: bool, quien_pauso: int)
+@warning_ignore("unused_signal")
 signal intencion_desconexion(peer_id: int)
 
 # ===== SEÑALES DE INVENTARIO =====
