@@ -37,7 +37,7 @@ var direccion_actual: Vector3 = Vector3.FORWARD
 @onready var evasion= $Evasion
 var evadir_obstaculo= false
 var velocidad_deseada := Vector3.ZERO # velocidad de evasion
-#@onready var avoidance: ObstacleAvoidance = $Evasion
+
 
 var velocidad_actual: Vector3 = Vector3.ZERO
 var direccion: Vector3  = Vector3.ZERO
@@ -61,7 +61,7 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 # seek persigue
 @export var distancia_frenado: float =5.0     # A qué distancia empieza a frenar
 @export var distancia_llegada: float = 1.5   # A qué distancia se detiene
-
+@export var rot_byte = 0
 
 func _ready():
 	# Areas de colision
@@ -250,19 +250,32 @@ func _physics_process(delta: float) -> void:
 		#estado.EVASION:
 	if evadir_obstaculo:
 		velocidad_actual = evasion.calcular_evasion(direccion_actual, delta)
-			
+	
+	# Rotación actual del modelo
+	var rotacion_actual = modelo.rotation.y		
+	
 	if velocidad_actual.length() > 0.1:
 		# Dirección hacia donde se mueve
 		direccion_actual = velocidad_actual.normalized()
 		
-		# Ángulo Y (en radianes) mirando hacia esa dirección
-		var angulo_objetivo = atan2(direccion_actual.x, direccion_actual.z)
+		if multiplayer.is_server(): # solo el servidor puede girar los enemigos
 		
-		# Rotación actual del modelo
-		var rotacion_actual = modelo.rotation.y
+			# Ángulo Y (en radianes) mirando hacia esa dirección
+			var angulo_objetivo = atan2(direccion_actual.x, direccion_actual.z)
+				
+			# Interpolación angular suave (evita giros bruscos)
+			angulo_objetivo = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
+			# Ejemplo de uso antes de enviar por RPC / sincronizador:
+			rot_byte = angulo_a_byte(angulo_objetivo)
+			# envías rot_byte (un solo byte o un int pequeño)	
 		
-		# Interpolación angular suave (evita giros bruscos)
-		modelo.rotation.y = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
+		# Cuando SE RECIBE el valor  el valor:
+		print(rot_byte)
+		var angulo_recibido = byte_a_angulo(rot_byte)
+
+		#  interpolando localmente:
+		modelo.rotation.y = lerp_angle(rotacion_actual, angulo_recibido, velocidad_giro * delta)
+		
 		
 	# Aplicar velocidad al CharacterBody3D
 	velocity.x = velocidad_actual.x
@@ -282,7 +295,18 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	
 
-		
+# angulo_objetivo está en radianes, entre -PI y PI (o 0..2TAU, da igual)
+func angulo_a_byte(angulo: float) -> int:
+	# Normalizamos a [0, TAU)
+	var tau = TAU
+	var norm = fposmod(angulo, tau)
+	# Mapa a [0, 255]
+	return int(norm / tau * 255.0 + 0.5)
+	
+func byte_a_angulo(rot_byte: int) -> float:
+	var tau = TAU
+	return (rot_byte / 255.0) * tau
+	
 
 
 func mostrar_cruz(): # titila la cruz 
