@@ -34,7 +34,7 @@ func _ready() -> void:
 	top_level = true
 	textureBullet.visible=true
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if(inicio):
 		balaComun()
 

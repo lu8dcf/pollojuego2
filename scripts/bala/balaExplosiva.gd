@@ -91,6 +91,6 @@ func _on_area_explosion_area_entered(area: Area3D) -> void:
 	pass # Replace with function body.
 
 
-func _on_impacto_previo_area_entered(area: Area3D) -> void:
+func _on_impacto_previo_area_entered(_area: Area3D) -> void:
 	explosion()
 	pass # Replace with function body.
