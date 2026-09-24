@@ -68,7 +68,9 @@ debug_color = Color(0.52156866, 0.07058824, 0.07058824, 1)
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1439608142]
 replication_config = SubResource("SceneReplicationConfig_qypkf")
 
-[node name="Timer" type="Timer" parent="." unique_id=1893234336]
+[node name="Marcapaso" type="Timer" parent="." unique_id=1893234336]
+wait_time = 0.5
+autostart = true
 
 [node name="modelo" type="Node3D" parent="." unique_id=1013882562]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0020587444, 0)

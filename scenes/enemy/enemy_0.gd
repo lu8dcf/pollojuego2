@@ -4,7 +4,7 @@ class_name EnemigoBase
 @export var health := 100
 # @export var animation_player: AnimationPlayer
 
-@onready var crystal_timer: Timer = $Timer
+#@onready var crystal_timer: Timer = $Timer
 
 # IA
 var puede_moverse = false
@@ -62,6 +62,7 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 @export var distancia_frenado: float =5.0     # A qué distancia empieza a frenar
 @export var distancia_llegada: float = 1.5   # A qué distancia se detiene
 @export var rot_byte = 0
+@onready var marcapaso: Timer = $Marcapaso
 
 func _ready():
 	# Areas de colision
@@ -70,7 +71,7 @@ func _ready():
 	cargar_movimiento()
 	add_to_group('enemy')
 	tipo_enemigo()
-	
+	marcapaso.timeout.connect(cambios)
 	#jugador = get_tree().get_first_node_in_group("Jugadores")
 	# Esperar un frame para que el NavigationServer se inicialice
 	await get_tree().physics_frame
@@ -155,9 +156,23 @@ func death(source):
 	#await animation_player.animation_finished
 	queue_free()
 
-
+func cambios():
+	if animacion_ataque:
+		animation_player.play("ataque_bicho")
+	else:
+		animation_player.play("caminar_bicho")
+	
+	
 
 func _physics_process(delta: float) -> void:
+	
+	var rotacion_actual = modelo.rotation.y		
+	# Cuando SE RECIBE el valor  el valor:
+	var angulo_recibido = byte_a_angulo(rot_byte)
+
+		#  interpolando localmente:
+	modelo.rotation.y = lerp_angle(rotacion_actual, angulo_recibido, velocidad_giro * delta)
+	
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
 	
@@ -251,40 +266,28 @@ func _physics_process(delta: float) -> void:
 	if evadir_obstaculo:
 		velocidad_actual = evasion.calcular_evasion(direccion_actual, delta)
 	
-	# Rotación actual del modelo
-	var rotacion_actual = modelo.rotation.y		
 	
 	if velocidad_actual.length() > 0.1:
 		# Dirección hacia donde se mueve
 		direccion_actual = velocidad_actual.normalized()
 		
-		if multiplayer.is_server(): # solo el servidor puede girar los enemigos
-		
-			# Ángulo Y (en radianes) mirando hacia esa dirección
-			var angulo_objetivo = atan2(direccion_actual.x, direccion_actual.z)
+		# Ángulo Y (en radianes) mirando hacia esa dirección
+		var angulo_objetivo = atan2(direccion_actual.x, direccion_actual.z)
 				
-			# Interpolación angular suave (evita giros bruscos)
-			angulo_objetivo = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
-			# Ejemplo de uso antes de enviar por RPC / sincronizador:
-			rot_byte = angulo_a_byte(angulo_objetivo)
+		# Interpolación angular suave (evita giros bruscos)
+		angulo_objetivo = lerp_angle(rotacion_actual, angulo_objetivo, velocidad_giro * delta)
+		# Ejemplo de uso antes de enviar por RPC / sincronizador:
+		rot_byte = angulo_a_byte(angulo_objetivo)
 			# envías rot_byte (un solo byte o un int pequeño)	
 		
-		# Cuando SE RECIBE el valor  el valor:
-		print(rot_byte)
-		var angulo_recibido = byte_a_angulo(rot_byte)
-
-		#  interpolando localmente:
-		modelo.rotation.y = lerp_angle(rotacion_actual, angulo_recibido, velocidad_giro * delta)
+		
 		
 		
 	# Aplicar velocidad al CharacterBody3D
 	velocity.x = velocidad_actual.x
 	velocity.z = velocidad_actual.z
 	
-	if animacion_ataque:
-		animation_player.play("ataque_bicho")
-	else:
-		animation_player.play("caminar_bicho")
+	
 	
 	# Gravedad
 	if not is_on_floor():
