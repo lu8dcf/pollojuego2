@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://dadcihim0y0i"]
 
-[ext_resource type="Script" uid="uid://cp4sxbj1mijo2" path="res://scripts/habilidades/habilidad.gd" id="1_33vks"]
+[ext_resource type="Script" uid="uid://c83bb52q5c06j" path="res://scripts/jugador/pollo.gd" id="1_33vks"]
+[ext_resource type="PackedScene" uid="uid://bskyk4ur6lr8m" path="res://assets/modelos/pollos/pollo_1.fbx" id="2_b2qhq"]
 
 [node name="pollo" type="Node3D" unique_id=656483584]
+script = ExtResource("1_33vks")
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1282197475]
 
-[node name="Habilidad" type="Node" parent="." unique_id=291986676]
-script = ExtResource("1_33vks")
-metadata/_custom_type_script = "uid://cp4sxbj1mijo2"
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=258323717]
+
+[node name="pollo_1" parent="." unique_id=96098598 instance=ExtResource("2_b2qhq")]

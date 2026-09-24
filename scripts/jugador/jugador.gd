@@ -57,24 +57,9 @@ var objetivo_actual: Node = null
 #-----------------------------------------------DASH
 const DASH_SPEED := 20.0
 const DASH_DURATION := 0.25
-const DASH_COLDOWN :=3
 
 var direccion_dash := Vector3.ZERO
 var tiempo_dash := 0.0
-
-
-
-
-
-#@onready var animation_library_godot_standard: Node3D = %AnimationLibrary_Godot_Standard
-#@export var animation_player: AnimationPlayer 
-#@export var player_mesh: MeshInstance3D
-
-#@onready var arms_root: Node3D = %ArmsRoot
-#@export var weapon_animation_player: AnimationPlayer 
-#@export var hurt_box: HurtBox
-#@export var arm_mesh_right: MeshInstance3D
-#@export var arm_mesh_left: MeshInstance3D
 
 
 
@@ -197,7 +182,6 @@ func puede_interactuar() -> bool:
 func esta_vivo() -> bool:
 	return estadoActual != Estado.MUERTE
 
-
 func entrar_caido():
 	estadoActual = Estado.CAIDO
 	timer_caido.start()
@@ -216,6 +200,9 @@ func entrar_tienda():
 	estadoActual = Estado.TIENDA
 	velocity = Vector3.ZERO
 	
+func entrar_dash():
+	estadoActual = Estado.DASH
+	
 func cambiar_estado(nuevo_estado: Estado) -> void:
 	if estadoActual == nuevo_estado:
 		return
@@ -228,7 +215,8 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 			entrar_oleada()
 		Estado.TIENDA:
 			entrar_tienda()
-
+		Estado.DASH:
+			entrar_dash()
 	estadoActual = nuevo_estado
 	
 func _on_timer_caido_timeout() -> void:
@@ -237,27 +225,6 @@ func _on_timer_caido_timeout() -> void:
 #----------------------------------------------------------------HABILIDADES
 
 #-------------------------------------------------DASH
-
-#func empezar_dash(direccion: Vector3) -> void:
-	#if estadoActual != Estado.OLEADA:
-		#return
-	#if direccion.length_squared() < 0.001:
-		#return
-	#direccion_dash = direccion.normalized()
-	#tiempo_dash = DASH_DURATION
-	#cambiar_estado(Estado.DASH)
-#
-#func procesar_dash(delta: float) -> void:
-	#tiempo_dash -= delta
-	#velocity = direccion_dash * DASH_SPEED
-	#move_and_slide()
-	#if tiempo_dash <= 0.0:
-		#terminar_dash()
-#
-#func terminar_dash() -> void:
-	#velocity = Vector3.ZERO
-	#direccion_dash = Vector3.ZERO
-	#cambiar_estado(Estado.OLEADA)
 
 # --------------------------------------------------------------SISTEMA DE SALVAR
 func procesar_salvar() -> void:
@@ -319,65 +286,143 @@ func _on_timer_salvar_timeout() -> void:
 		##habilidad.usar()
 
 func _physics_process(delta: float) -> void:
-	match estadoActual:
-		#Estado.OLEADA:
-			#procesar_movimiento(delta)
-		#Estado.DASH:
-			#procesar_dash(delta)
-		Estado.CAIDO:
-			velocity = Vector3.ZERO
-		Estado.MUERTE:
-			velocity = Vector3.ZERO
-		Estado.TIENDA:
-			velocity = Vector3.ZERO
 
-	# Si llegamos aca estamos en OLEADA
-	# Add the gravity.
+	match estadoActual:
+
+		Estado.OLEADA:
+			procesar_movimiento(delta)
+
+		Estado.DASH:
+			procesar_dash(delta)
+
+		Estado.CAIDO:
+			procesar_caido()
+
+		Estado.MUERTE:
+			procesar_muerte()
+
+		Estado.TIENDA:
+			procesar_tienda()
+			
+func procesar_movimiento(delta: float) -> void:
+	# GRAVEDAD
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
-	# Handle jump.
-	#if Input.is_action_just_pressed("jump") and is_on_floor():
-		#velocity.y = JUMP_VELOCITY
-
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	
+	# INPUT DE MOVIMIENTO
 	var direction := Vector3.ZERO
-	
-	# Prioridad al Joystick táctil si es válido
-	if joystick != null and is_instance_valid(joystick) and joystick.direccion != Vector2.ZERO:
-		direction = (transform.basis * Vector3(joystick.direccion.x, 0, joystick.direccion.y)).normalized()
+	# Primero intentamos usar el joystick táctil.
+	if joystick != null and is_instance_valid(joystick)and joystick.direccion != Vector2.ZERO:
+		direction = (transform.basis* Vector3(joystick.direccion.x,0,joystick.direccion.y)).normalized()
 	else:
-		# Si no hay joystick, leemos el teclado/mando clásico
-		var input_dir := Input.get_vector("left", "right", "forward", "backward")
-		direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+		# Si no hay joystick, usamos teclado/mando.
+		var input_dir := Input.get_vector("left","right","forward","backward")
+		direction = (transform.basis* Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
-	# 3. Aplicar las velocidades calculadas
+	# APLICAR VELOCIDAD
+
 	if direction != Vector3.ZERO:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
-	
-	#var input_dir := Input.get_vector("left", "right", "forward", "backward")
-	#var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+		velocity.x = move_toward(velocity.x,0,SPEED)
+		velocity.z = move_toward(velocity.z,0,SPEED)
+	move_and_slide()
+
+func procesar_caido() -> void:
+	velocity = Vector3.ZERO
+
+
+func procesar_muerte() -> void:
+	velocity = Vector3.ZERO
+
+
+func procesar_tienda() -> void:
+	velocity = Vector3.ZERO
+
+func iniciar_dash(direccion: Vector3) -> void:
+	if estadoActual != Estado.OLEADA:
+		return
+	if direccion.length_squared() < 0.001:
+		return
+	direccion_dash = direccion.normalized()
+	tiempo_dash = DASH_DURATION
+	cambiar_estado(Estado.DASH)
+
+func procesar_dash(delta: float) -> void:
+	tiempo_dash -= delta
+	# El jugador se mueve exclusivamente
+	# en la dirección del dash.
+	velocity = direccion_dash * DASH_SPEED
+	move_and_slide()
+	if tiempo_dash <= 0.0:
+		terminar_dash()
+
+func terminar_dash() -> void:
+	velocity = Vector3.ZERO
+	direccion_dash = Vector3.ZERO
+	cambiar_estado(Estado.OLEADA)
+
+#func _physics_process(delta: float) -> void:
+	#match estadoActual:
+		##Estado.OLEADA:
+			##procesar_movimiento(delta)
+		##Estado.DASH:
+			##procesar_dash(delta)
+		#Estado.CAIDO:
+			#velocity = Vector3.ZERO
+		#Estado.MUERTE:
+			#velocity = Vector3.ZERO
+		#Estado.TIENDA:
+			#velocity = Vector3.ZERO
 #
+	## Si llegamos aca estamos en OLEADA
+	## Add the gravity.
+	#if not is_on_floor():
+		#velocity += get_gravity() * delta
 #
-	#if direction:
+	## Handle jump.
+	##if Input.is_action_just_pressed("jump") and is_on_floor():
+		##velocity.y = JUMP_VELOCITY
+#
+	## Get the input direction and handle the movement/deceleration.
+	## As good practice, you should replace UI actions with custom gameplay actions.
+	#
+	#var direction := Vector3.ZERO
+	#
+	## Prioridad al Joystick táctil si es válido
+	#if joystick != null and is_instance_valid(joystick) and joystick.direccion != Vector2.ZERO:
+		#direction = (transform.basis * Vector3(joystick.direccion.x, 0, joystick.direccion.y)).normalized()
+	#else:
+		## Si no hay joystick, leemos el teclado/mando clásico
+		#var input_dir := Input.get_vector("left", "right", "forward", "backward")
+		#direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+#
+	## 3. Aplicar las velocidades calculadas
+	#if direction != Vector3.ZERO:
 		#velocity.x = direction.x * SPEED
 		#velocity.z = direction.z * SPEED
 	#else:
 		#velocity.x = move_toward(velocity.x, 0, SPEED)
 		#velocity.z = move_toward(velocity.z, 0, SPEED)
-
-
-	#sigo con la mirada al mouse
-	mirar_al_mouse(delta)
-	
-	move_and_slide()
-	#handle_animations(direction)
+	#
+	##var input_dir := Input.get_vector("left", "right", "forward", "backward")
+	##var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+##
+##
+	##if direction:
+		##velocity.x = direction.x * SPEED
+		##velocity.z = direction.z * SPEED
+	##else:
+		##velocity.x = move_toward(velocity.x, 0, SPEED)
+		##velocity.z = move_toward(velocity.z, 0, SPEED)
+#
+#
+	##sigo con la mirada al mouse
+	#mirar_al_mouse(delta)
+	#
+	#move_and_slide()
+	##handle_animations(direction)
 
 #var one_shots: Array[String] = ["Sword_Attack"]
 

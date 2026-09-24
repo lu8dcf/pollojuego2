@@ -2,7 +2,7 @@ extends Node3D
 
 #Pruebo la fabrica de armas
 @onready
-var crear_armas_derecho = $derecho
+var crear_armas = $fabricaArmas
 
 @onready var mano_izquierda: Marker3D = $izquierdo/mark_izq
 @onready var mano_derecha: Marker3D =$derecho/mark_der
@@ -52,10 +52,10 @@ func equipar_arma(id_arma: int) -> void:
 		# si se intenta la misma arma que retorne
 		if arma_actual.get("id_arma") == id_arma:
 			return
-		# si es otra, que la saque
-		arma_actual.queue_free()
+		arma_actual.free()
 	# creo una nueva arma
-	var nueva_arma = crear_armas_derecho.crear_arma(id_arma)
+	var nueva_arma = crear_armas.crear_arma(id_arma)
+	nueva_arma.name = "ArmaBase"
 	mano.add_child(nueva_arma)
 	nueva_arma.transform = Transform3D.IDENTITY
 	# cambia de mano para la siguiente arma

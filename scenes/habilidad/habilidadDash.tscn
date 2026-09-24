@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dwjwf8pvn58i2"]
+
+[ext_resource type="Script" uid="uid://caf41h2qmg34c" path="res://scripts/habilidades/habilidadDash.gd" id="1_fkd1q"]
+
+[node name="HabilidadDash" type="Node3D" unique_id=1831260479]
+script = ExtResource("1_fkd1q")

@@ -12,6 +12,7 @@ metadata/_custom_type_script = "uid://b47t1prnayyqk"
 [resource]
 script = ExtResource("1_cpshx")
 id = 1
+nombre = "mm"
 sprite = ExtResource("4_lt6ua")
 tiempoDeAtaque = 1.0
 comportamiento = SubResource("Resource_8w0r3")

@@ -1,6 +1,7 @@
 extends Node3D
 
 @onready var spawn_container: Node3D = %SpawnContainer
+@onready var spawn_proyectiles: Node3D = %ContenedorProyectiles
 @onready var timer_enemy: Timer = %TimerEnemy
 @onready var menu_camera: MenuCameraController = $Camera3D
 #@onready var contenedor_mapa: Node3D = $Conteendor_mapa

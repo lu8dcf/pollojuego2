@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://mn3ancqbnvq1"]
+
+[ext_resource type="Script" uid="uid://bfve28q4fvv73" path="res://scripts/habilidades/habilidadEscudo.gd" id="1_t8eba"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_8w0r3"]
+radius = 1.1512372
+
+[node name="HabilidadEscudo" type="Node3D" unique_id=1375354752]
+script = ExtResource("1_t8eba")
+duracion = null
+
+[node name="escudo" type="Area3D" parent="." unique_id=1112783184]
+collision_layer = 8
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="escudo" unique_id=1507750467]
+shape = SubResource("SphereShape3D_8w0r3")
+
+[node name="tiempoRecarga" type="Timer" parent="." unique_id=2147375495]
+wait_time = 4.0
+
+[connection signal="timeout" from="tiempoRecarga" to="." method="_on_tiempo_recarga_timeout"]

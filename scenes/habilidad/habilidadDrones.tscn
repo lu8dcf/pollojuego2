@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://1h3lki5cd1ng"]
+
+[ext_resource type="Script" uid="uid://cel1vrrevhd8" path="res://scripts/habilidades/habilidadDrones.gd" id="1_cqhsr"]
+
+[node name="HabilidadDrones" type="Node3D" unique_id=637565460]
+script = ExtResource("1_cqhsr")
+
+[node name="tiempoRecarga" type="Timer" parent="." unique_id=760405088]
+wait_time = 4.0
+
+[node name="Marker3D" type="Marker3D" parent="." unique_id=976988339]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4488971, 0)
+
+[connection signal="timeout" from="tiempoRecarga" to="." method="_on_tiempo_recarga_timeout"]
