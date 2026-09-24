@@ -36,6 +36,9 @@ properties/4/replication_mode = 2
 properties/5/path = NodePath(".:tipo")
 properties/5/spawn = true
 properties/5/replication_mode = 2
+properties/6/path = NodePath("modelo:rotation:y")
+properties/6/spawn = true
+properties/6/replication_mode = 2
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_sugfe"]
 radius = 5.5029297
