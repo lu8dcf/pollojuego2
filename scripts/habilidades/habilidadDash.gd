@@ -11,4 +11,4 @@ func usar() -> void:
 
 	var direccion := -jugador.global_transform.basis.z
 
-	jugador.iniciar_dash(direccion, velocidad_dash, duracion)
+	#jugador.iniciar_dash(direccion, velocidad_dash, duracion)
