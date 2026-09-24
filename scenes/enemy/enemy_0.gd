@@ -148,7 +148,7 @@ func take_damage(damage: int, source: int):
 		is_hurt = false
 
 func death(source):
-	Global.update_score_for(source)
+	#Global.update_score_for(source)
 	set_collision_layer_value(1, false)
 	is_dying = true
 	#animation_player.play("Death01")

@@ -142,7 +142,8 @@ func _on_peer_connected_lobby(peer_id: int):
 			"username": "Jugador " + str(peer_id),
 			"salud": GlobalJuego.SALUD_DEFAULT,
 			"personaje":0,
-			"ping":0
+			"ping":0,
+			"inventario":[]
 		}
 
 func _on_peer_disconnected_lobby(peer_id: int):
@@ -164,7 +165,8 @@ func _on_connected_to_server_lobby():
 			"username": GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else "Jugador " + str(peer_id),
 			"salud": GlobalJuego.SALUD_DEFAULT,
 			"personaje":0,
-			"ping":0
+			"ping":0,
+			"inventario":[]
 		}
 
 # ------------------------------------------------------------
@@ -241,14 +243,14 @@ func obtener_mundo_actual() -> Node:
 	return null
 
 func _on_peer_connected_partida(peer_id: int):
-	print("Peer conectado en partida: ", peer_id)
 	if GlobalJuego and not GlobalJuego.session_info.has(peer_id):
 		GlobalJuego.session_info[peer_id] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id),
 			"salud": GlobalJuego.SALUD_DEFAULT,
 			"personaje":0,
-			"ping":0
+			"ping":0,
+			"inventario":[]
 		}
 
 func _on_peer_disconnected_partida(peer_id: int):

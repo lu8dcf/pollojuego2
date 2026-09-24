@@ -99,8 +99,9 @@ func _ready() -> void:
 	GlobalSignal.sesion_actualizada.connect(_actualizar_paneles_aliados)
 	if GlobalSignal.has_signal("jugador_recibio_daño"):
 		GlobalSignal.jugador_recibio_daño.connect(_on_jugador_recibio_daño)
-	#GlobalSignal.mi_ping_actualizado.connect(_actualizar_mi_ping)
-	#_actualizar_mi_ping(0)
+	GlobalSignal.mi_ping_actualizado.connect(_actualizar_mi_ping)
+	_actualizar_mi_ping(0)
+	
 	# Y para cuando la salud cambia:
 	if GlobalSignal.has_signal("salud_jugador_cambiada"):
 		GlobalSignal.salud_jugador_cambiada.connect(_on_salud_jugador_cambiada)
@@ -122,6 +123,27 @@ func _verificar_si_es_mobile() -> void:
 		add_child(ui_movil_actual)
 
 # ===== MANEJO DE ACTUALIZAR INFO EN PANTALLA =====
+
+#manejo de ping
+func _actualizar_mi_ping(ping:int)-> void:
+	if GlobalJuego.un_jugador:
+		label_ping.hide()
+		return
+	else:
+			
+		if not label_ping:
+			return # si no hay label no calcular
+		if ping <= 0:
+			label_ping.text = "ping: --"
+			label_ping.modulate = Color.GRAY
+		else:
+			label_ping.text = "Ping: "+ str(ping) + " ms"
+			if ping <80:
+				label_ping.modulate = Color.GREEN
+			elif ping < 150:
+				label_ping.modulate = Color.YELLOW
+			else:
+				label_ping.modulate = Color.RED
 
 func _actualizar_paneles_aliados(info:Dictionary)-> void:
 	if not lista_usuarios:

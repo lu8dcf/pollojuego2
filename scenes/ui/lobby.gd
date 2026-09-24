@@ -47,7 +47,9 @@ func _ready() -> void:
 				"score": 0,
 				"username": _obtener_nombre_jugador(),
 				"salud": GlobalJuego.SALUD_DEFAULT,
-				"personaje": 1
+				"personaje": 1,
+				"ping":0,
+				"inventario":[]
 			}
 	else:
 		_agregar_jugador_al_lobby(multiplayer.get_unique_id(), _obtener_nombre_jugador())
@@ -106,7 +108,9 @@ func _on_session_created():
 			"score": 0,
 			"username": _obtener_nombre_jugador(),
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje":1
+			"personaje":1,
+			"ping":0,
+			"inventario":[]
 		}
 	
 	lobby_inicializado = true
@@ -120,7 +124,27 @@ func _on_jugador_conectado(peer_id: int): #245698
 	
 	if es_host:
 		_solicitar_info_jugador.rpc_id(peer_id)
+		_enviar_estado_actual_a_cliente(peer_id)
 
+func _enviar_estado_actual_a_cliente(nuevo_cliente_id: int):
+	for peer_id in jugadores_en_lobby.keys():
+		if peer_id == nuevo_cliente_id:
+			continue  # su propia info ya la enviara él mismo
+		
+		var info_lobby = jugadores_en_lobby[peer_id]
+		var info_completa = {
+			"username": info_lobby.get("nombre", "Jugador " + str(peer_id)),
+			"personaje": info_lobby.get("personaje", 1),
+			"listo": info_lobby.get("listo", false),
+			"score": GlobalJuego.session_info.get(peer_id, {}).get("score", 0),
+			"salud": GlobalJuego.session_info.get(peer_id, {}).get("salud", GlobalJuego.SALUD_DEFAULT),
+			"ping": GlobalJuego.session_info.get(peer_id, {}).get("ping",0),
+			"inventario":GlobalJuego.session_info.get(peer_id, {}).get("inventario",[])
+		}
+		
+		# enviar SOLO al nuevo cliente (no a todos)
+		_enviar_info_jugador.rpc_id(nuevo_cliente_id, peer_id, info_completa)
+		
 func _on_jugador_desconectado(peer_id: int):
 	
 	if jugadores_en_lobby.has(peer_id):
@@ -317,39 +341,56 @@ func _iniciar_carga():
 		Network.iniciar_carga_sincronizada(GlobalJuego.session_info.keys())
 
 # avisar del cambio de personaje, cuando un usuario cambia su eprsonaje, avisa al host para que todos actualicen
-func notificar_cambio_personaje(peer_id_jugador: int, id_personaje: int):
-	_aplicar_cambio_personaje(peer_id_jugador, id_personaje)
+func notificar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
+	_sincronizar_cambio_personaje_arma(peer_id_jugador, id_personaje,id_arma)
 	# enviar RPC a todos
-	_sincronizar_cambio_personaje.rpc(peer_id_jugador, id_personaje)
+	_sincronizar_cambio_personaje_arma.rpc(peer_id_jugador, id_personaje,id_arma)
+
 
 @rpc("any_peer", "call_local", "reliable")
-func _sincronizar_cambio_personaje(peer_id_jugador: int, id_personaje: int):
+func _sincronizar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
 	"""Sincroniza el cambio de personaje a todos los clientes"""
-	_aplicar_cambio_personaje(peer_id_jugador, id_personaje)
+	_aplicar_cambio_personaje_arma(peer_id_jugador, id_personaje,id_arma)
 
-func _aplicar_cambio_personaje(peer_id_jugador: int, id_personaje: int): 
+func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int): 
 	if jugadores_en_lobby.has(peer_id_jugador):
 		var info = jugadores_en_lobby[peer_id_jugador]
 		info["personaje"] = id_personaje
+		info["arma"]= id_arma
 		jugadores_en_lobby[peer_id_jugador] = info
 		
 		var panel = info.get("panel")
 		if panel and is_instance_valid(panel):
 			if panel.has_method("actualizar_personaje_remoto"):
 				panel.actualizar_personaje_remoto(id_personaje)
+			if panel.has_method("actualizar_arma_remoto"):
+				panel.actualizar_arma_remoto(id_arma)
 	
-	# Actualizar session_info para que se use al iniciar partida
-	if GlobalJuego.session_info.has(peer_id_jugador):
-		GlobalJuego.session_info[peer_id_jugador]["personaje"] = id_personaje
-	else:
+	if not GlobalJuego.session_info.has(peer_id_jugador):
 		GlobalJuego.session_info[peer_id_jugador] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id_jugador),
 			"salud": GlobalJuego.SALUD_DEFAULT,
 			"personaje": id_personaje,
-			"ping":0
+			"ping": 0,
+			"inventario": [id_arma]  # primera arma
 		}
-	#print("esto es lobby.gd: ", GlobalJuego.session_info)
+	else:
+		GlobalJuego.session_info[peer_id_jugador]["personaje"] = id_personaje
+		
+		# agregar arma al inventario si no está ya
+		var inventario: Array = GlobalJuego.session_info[peer_id_jugador].get("inventario", [])
+		if not id_arma in inventario:
+			if inventario.size() < 6:
+				inventario.append(id_arma)
+				
+		GlobalJuego.session_info[peer_id_jugador]["inventario"] = inventario
+	
+	# a futuro
+	## guardar armas que se estan usando, suelen ser 2, lista de dos armas
+	#if GlobalJuego.session_info.has(peer_id_jugador):
+		#GlobalJuego.session_info[peer_id_jugador]["arma_actual"] = id_arma
+	
 
 @rpc("authority", "call_local", "reliable")
 func _iniciar_partida():
@@ -372,29 +413,49 @@ func _comenzar_partida():
 func _solicitar_info_jugador():
 	var solicitante_id = multiplayer.get_remote_sender_id()
 	var mi_id = multiplayer.get_unique_id()
-	var nombre = _obtener_nombre_jugador()
-		
-	_enviar_info_jugador.rpc_id(solicitante_id, mi_id, nombre)
-
-@rpc("any_peer", "call_local", "reliable")
-func _enviar_info_jugador(peer_id: int, nombre: String):	
-	if peer_id == 1 and es_host:
-		return
 	
-	if peer_id == 1 and not es_host:
-		_agregar_jugador_al_lobby(peer_id, nombre)
-		return
-	
-	_agregar_jugador_al_lobby(peer_id, nombre)
-	
-	if not GlobalJuego.session_info.has(peer_id):
-		GlobalJuego.session_info[peer_id] = {
+	var mi_info = GlobalJuego.session_info.get(mi_id, {})
+	if mi_info.is_empty():
+		mi_info = {
+			"username": _obtener_nombre_jugador(),
+			"personaje": 1,
+			"listo": false,
 			"score": 0,
-			"username": nombre,
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje":1,
 			"ping":0
 		}
+	
+	_enviar_info_jugador.rpc_id(solicitante_id, mi_id, mi_info)
+
+@rpc("any_peer", "call_local", "reliable")
+func _enviar_info_jugador(peer_id: int, info_jugador: Dictionary):	
+	if peer_id == 1 and es_host:
+		return
+	var nombre = info_jugador.get("username","Jugador " +str(peer_id))
+	var personaje = info_jugador.get("personaje",1)
+	var listo= info_jugador.get("listo",false)
+	
+	_agregar_jugador_al_lobby(peer_id,nombre)
+	
+	if jugadores_en_lobby.has(peer_id):
+		var info = jugadores_en_lobby[peer_id] # se obtiene la info de cada jugadro
+		info["personaje"] = personaje
+		info["listo"] = listo
+		jugadores_en_lobby[peer_id] = info
+		
+		var panel = info.get("panel")
+		if panel and is_instance_valid(panel):
+			if panel.has_method("actualizar_personaje_remoto"):
+				panel.actualizar_personaje_remoto(personaje)
+			if panel.has_method("actualizar_estado_listo"):
+				panel.actualizar_estado_listo(listo)
+		
+	
+	if not GlobalJuego.session_info.has(peer_id):
+		GlobalJuego.session_info[peer_id] = info_jugador
+	else:
+		for key in info_jugador.keys():
+			GlobalJuego.session_info[peer_id][key] = info_jugador[key]
 	
 	if es_host and peer_id != 1:
 		for jugador_id in jugadores_en_lobby.keys():
@@ -403,19 +464,28 @@ func _enviar_info_jugador(peer_id: int, nombre: String):
 
 @rpc("any_peer", "call_local", "reliable")
 func _solicitar_info_jugadores():
-	if es_host:
-		var solicitante_id = multiplayer.get_remote_sender_id()
+	if not es_host:
+		return
+	
+	var solicitante_id = multiplayer.get_remote_sender_id()
+	
+	# eenviar info completa de CADA jugador en el lobby
+	for peer_id in jugadores_en_lobby.keys():
+		var info_lobby = jugadores_en_lobby[peer_id]
 		
-		if jugadores_en_lobby.has(1):
-			var info_host = jugadores_en_lobby[1]
-			var nombre_host = info_host.get("nombre", "Host")
-			_enviar_info_jugador.rpc_id(solicitante_id, 1, nombre_host)
+		# construir info completa y despues pasarla
+		var info_completa = {
+			"username": info_lobby.get("nombre", "Jugador " + str(peer_id)),
+			"personaje": info_lobby.get("personaje", 1),
+			"listo": info_lobby.get("listo", false),
+			"score": GlobalJuego.session_info.get(peer_id, {}).get("score", 0),
+			"salud": GlobalJuego.session_info.get(peer_id, {}).get("salud", GlobalJuego.SALUD_DEFAULT),
+			"ping": GlobalJuego.session_info.get(peer_id, {}).get("ping", 0),
+			"inventario":GlobalJuego.session_info.get(peer_id, {}).get("inventario", [])
+		}
 		
-		for peer_id in jugadores_en_lobby.keys():
-			if peer_id != 1 and peer_id != solicitante_id:
-				var info = jugadores_en_lobby[peer_id]
-				var nombre = info.get("nombre", "Jugador " + str(peer_id))
-				_enviar_info_jugador.rpc_id(solicitante_id, peer_id, nombre)
+		print("Enviando info de ", peer_id, " al solicitante: ", info_completa)
+		_enviar_info_jugador.rpc_id(solicitante_id, peer_id, info_completa)
 		
 func _on_regresar_boton_pressed() -> void:
 	if Network:
