@@ -14,7 +14,7 @@ properties/1/path = NodePath("area_melee/Sprite3D:visible")
 properties/1/spawn = true
 properties/1/replication_mode = 2
 
-[node name="balaMelee" type="Node3D" unique_id=216072085]
+[node name="balaMelee" type="Area3D" unique_id=1455033309]
 script = ExtResource("1_h7sch")
 
 [node name="area_melee" type="Area3D" parent="." unique_id=423919927]

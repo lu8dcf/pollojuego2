@@ -121,4 +121,4 @@ shape = SubResource("CapsuleShape3D_sugfe")
 [connection signal="area_exited" from="bigote" to="." method="_on_bigote_area_exited"]
 [connection signal="body_entered" from="bigote" to="." method="_on_bigote_body_entered"]
 [connection signal="body_exited" from="bigote" to="." method="_on_bigote_body_exited"]
-[connection signal="body_entered" from="danio" to="." method="_on_danio_body_entered"]
+[connection signal="area_entered" from="danio" to="." method="_on_danio_area_entered"]
