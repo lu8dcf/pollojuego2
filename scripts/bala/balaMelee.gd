@@ -13,7 +13,7 @@ var inicio = false
 @onready var areaMelee = $area_melee
 
 #TEST
-@onready var textureBullet = $pollo_1
+#@onready var textureBullet = $pollo_1
 
 
 func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3) -> void:
@@ -34,6 +34,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if(inicio):
+		tiempoDeVida.start
 		balaMelee()
 
 
@@ -46,7 +47,7 @@ func balaMelee():
 	inicio = false
 	areaMelee.visible = true
 	await get_tree().create_timer(0.2).timeout
-	eliminarBala()
+	#eliminarBala()
 	#TEST------------------------------------
 	#textureBullet.visible = true
 	#fin Test
@@ -55,7 +56,7 @@ func balaMelee():
 	#for cuerpo in cuerpos_en_area:
 		#if cuerpo.is_in_group("enemies") and cuerpo.has_method("take_damage"):
 			#cuerpo.take_damage(damage * GlobalItem.potenciando_danio_arma)
-	await get_tree().create_timer(0.5).timeout
+
 	eliminarBala()
 
 #-----------------------------------------------------------------------------comun y explosiva
@@ -64,3 +65,8 @@ func eliminarBala():
 	if !is_multiplayer_authority():
 		return
 	queue_free()
+
+
+func _on_tiempo_vida_timeout() -> void:
+	eliminarBala()
+	pass # Replace with function body.
