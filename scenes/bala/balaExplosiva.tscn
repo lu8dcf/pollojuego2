@@ -17,6 +17,8 @@ properties/1/replication_mode = 2
 [sub_resource type="SphereShape3D" id="SphereShape3D_8w0r3"]
 
 [node name="balaExplosiva" type="Area3D" unique_id=1972517349]
+collision_layer = 16
+collision_mask = 72
 script = ExtResource("1_8udgy")
 
 [node name="pollo_1" parent="." unique_id=1188442573 instance=ExtResource("2_osb2g")]
@@ -25,7 +27,7 @@ transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, -0.25, 0)
 [node name="area_explosion" type="Area3D" parent="." unique_id=1832871902]
 visible = false
 collision_layer = 16
-collision_mask = 10
+collision_mask = 72
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="area_explosion" unique_id=1600623139]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.09454346, 0)

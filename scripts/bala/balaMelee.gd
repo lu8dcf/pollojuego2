@@ -71,4 +71,12 @@ func eliminarBala():
 
 func _on_tiempo_vida_timeout() -> void:
 	eliminarBala()
-	pass # Replace with function body.
+	
+
+
+func _on_area_melee_body_entered(body: Node3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+		return
+	print("elimina melle")		#--------------------------Aca cuando choca con el enemigo
+	eliminarBala()
+	

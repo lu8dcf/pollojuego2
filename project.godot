@@ -22,6 +22,7 @@ boot_splash/minimum_display_time=120
 
 Network="*uid://bhyh5d2so8tve"
 TileRunInstancesGlobal="*uid://b6fg6pu2bfi14"
+Global="*uid://d1r3eqtrbojy0"
 Sonidos="*uid://vh6qthglqxy4"
 GlobalJuego="*uid://gyfy8r8vlaty"
 GlobalSignal="*uid://by2t47y7bj0tv"
@@ -116,6 +117,7 @@ pointing/emulate_touch_from_mouse=true
 3d_physics/layer_4="paredes"
 3d_physics/layer_5="balas"
 3d_physics/layer_6="PowerUp"
+3d_physics/layer_7="dañoenemigo"
 
 [physics]
 

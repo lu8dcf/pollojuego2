@@ -23,7 +23,7 @@ script = ExtResource("1_h7sch")
 [node name="area_melee" type="Area3D" parent="." unique_id=423919927]
 visible = false
 collision_layer = 16
-collision_mask = 10
+collision_mask = 72
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="area_melee" unique_id=1016552277]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.01184082, 0)
@@ -44,4 +44,5 @@ wait_time = 0.2
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.011962891, 0, 0)
 shape = SubResource("BoxShape3D_sugfe")
 
+[connection signal="body_entered" from="area_melee" to="." method="_on_area_melee_body_entered"]
 [connection signal="timeout" from="tiempoVida" to="." method="_on_tiempo_vida_timeout"]

@@ -18,6 +18,8 @@ properties/1/replication_mode = 2
 radius = 0.2141147
 
 [node name="bala" type="Area3D" unique_id=1937482765]
+collision_layer = 16
+collision_mask = 72
 script = ExtResource("1_ckbog")
 
 [node name="tiempoVida" type="Timer" parent="." unique_id=1022337294]
@@ -29,7 +31,7 @@ transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, -0.25, 0)
 [node name="area_comun" type="Area3D" parent="." unique_id=840675643]
 visible = false
 collision_layer = 16
-collision_mask = 10
+collision_mask = 72
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="area_comun" unique_id=432064733]
 shape = SubResource("SphereShape3D_8w0r3")
@@ -41,4 +43,5 @@ replication_config = SubResource("SceneReplicationConfig_tdw23")
 shape = SubResource("SphereShape3D_sugfe")
 
 [connection signal="timeout" from="tiempoVida" to="." method="_on_tiempo_vida_timeout"]
+[connection signal="area_entered" from="area_comun" to="." method="_on_area_comun_area_entered"]
 [connection signal="body_entered" from="area_comun" to="." method="_on_area_comun_body_entered"]
