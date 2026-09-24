@@ -33,3 +33,8 @@ texture = ExtResource("2_fpisl")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=766762669]
 replication_config = SubResource("SceneReplicationConfig_782ts")
+
+[node name="tiempoVida" type="Timer" parent="." unique_id=763218826]
+wait_time = 0.2
+
+[connection signal="timeout" from="tiempoVida" to="." method="_on_tiempo_vida_timeout"]
