@@ -72,6 +72,6 @@ func eliminarBala():
 func _on_area_comun_body_entered(body: Node3D) -> void:
 	if(body.is_in_group("enemy")):
 				#--------------------------Aca cuando choca con el enemigo
-		pass
+		eliminarBala()
 	else:
 		eliminarBala()
