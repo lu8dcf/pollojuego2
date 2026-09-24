@@ -50,6 +50,10 @@ radius = 5.5029297
 height = 1.5380859
 radius = 1.5854492
 
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sugfe"]
+radius = 0.7192383
+height = 3.0966797
+
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 process_mode = 1
 collision_layer = 2
@@ -103,9 +107,18 @@ collision_mask = 8
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23095703, 0)
 shape = SubResource("CylinderShape3D_50d1r")
 
+[node name="danio" type="Area3D" parent="." unique_id=1659760012]
+collision_layer = 2
+collision_mask = 16
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="danio" unique_id=519725807]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.54833984, 0)
+shape = SubResource("CapsuleShape3D_sugfe")
+
 [connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]
 [connection signal="body_exited" from="vision" to="." method="_on_vision_body_exited"]
 [connection signal="area_entered" from="bigote" to="." method="_on_bigote_area_entered"]
 [connection signal="area_exited" from="bigote" to="." method="_on_bigote_area_exited"]
 [connection signal="body_entered" from="bigote" to="." method="_on_bigote_body_entered"]
 [connection signal="body_exited" from="bigote" to="." method="_on_bigote_body_exited"]
+[connection signal="body_entered" from="danio" to="." method="_on_danio_body_entered"]
