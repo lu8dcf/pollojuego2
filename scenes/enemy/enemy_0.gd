@@ -394,5 +394,5 @@ func _on_bigote_body_exited(_body: Node3D) -> void:
 func _on_danio_body_entered(_body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
-	
+	print("pego")
 	queue_free()
