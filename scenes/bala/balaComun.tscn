@@ -35,3 +35,4 @@ shape = SubResource("SphereShape3D_8w0r3")
 replication_config = SubResource("SceneReplicationConfig_tdw23")
 
 [connection signal="timeout" from="tiempoVida" to="." method="_on_tiempo_vida_timeout"]
+[connection signal="body_entered" from="area_comun" to="." method="_on_area_comun_body_entered"]
