@@ -337,10 +337,6 @@ func mostrar_cruz(): # titila la cruz
 			puede_moverse = true # permino que se empiece a movere
 			set_collision_mask_value(4, true))  # Agrego las pareces de colision
 
-
-
-
-
 # player entra al area de vision
 func _on_vision_body_entered(body: Node3D) -> void: 
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
@@ -393,3 +389,10 @@ func _on_bigote_body_exited(_body: Node3D) -> void:
 		return
 	evadir_obstaculo=false
 	evasion._verificar_salida()
+
+
+func _on_danio_body_entered(body: Node3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+		return
+	
+	queue_free()
