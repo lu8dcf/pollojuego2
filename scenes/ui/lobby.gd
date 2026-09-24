@@ -32,7 +32,7 @@ func _ready() -> void:
 	es_host = multiplayer.is_server()
 	
 	if boton_empezar:
-		boton_empezar.visible = es_host  # Solo el host ve el botón
+		boton_empezar.visible = es_host  # solo el host ve el botón
 		if not boton_empezar.pressed.is_connected(_on_iniciar_partida_pressed):
 			boton_empezar.pressed.connect(_on_iniciar_partida_pressed)
 		boton_empezar.disabled = true
@@ -49,7 +49,8 @@ func _ready() -> void:
 				"salud": GlobalJuego.SALUD_DEFAULT,
 				"personaje": 1,
 				"ping":0,
-				"inventario":[]
+				"inventario":[],
+				"armas_actuales":[]
 			}
 	else:
 		_agregar_jugador_al_lobby(multiplayer.get_unique_id(), _obtener_nombre_jugador())
@@ -353,6 +354,7 @@ func _sincronizar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,
 	_aplicar_cambio_personaje_arma(peer_id_jugador, id_personaje,id_arma)
 
 func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int): 
+	# esto es solo un panel visual
 	if jugadores_en_lobby.has(peer_id_jugador):
 		var info = jugadores_en_lobby[peer_id_jugador]
 		info["personaje"] = id_personaje
@@ -373,23 +375,31 @@ func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_a
 			"salud": GlobalJuego.SALUD_DEFAULT,
 			"personaje": id_personaje,
 			"ping": 0,
-			"inventario": [id_arma]  # primera arma
+			"inventario": [id_arma],  # primera arma
+			"armas_actuales":[id_arma,0], # si es cero es que no hay arma en esa mano
+			"listo" :false
 		}
 	else:
-		GlobalJuego.session_info[peer_id_jugador]["personaje"] = id_personaje
+		var info_peer = GlobalJuego.session_info[peer_id_jugador] # obtener la data del usuario
+		info_peer["personaje"] = id_personaje
 		
 		# agregar arma al inventario si no está ya
-		var inventario: Array = GlobalJuego.session_info[peer_id_jugador].get("inventario", [])
-		if not id_arma in inventario:
-			if inventario.size() < 6:
-				inventario.append(id_arma)
+		var armas_actuales :Array = info_peer.get("armas_actuales",[1,0])
+		if armas_actuales.is_empty():
+			armas_actuales = [id_arma,0]
+		else:
+			armas_actuales[0] = id_arma
+		info_peer["armas_actuales"] = armas_actuales
+		
+		var inventario: Array = info_peer.get("inventario", [])
+		if not id_arma in inventario and inventario.size()<6:
+			inventario.append(id_arma)
+		info_peer["inventario"] = inventario
 				
-		GlobalJuego.session_info[peer_id_jugador]["inventario"] = inventario
+		GlobalJuego.session_info[peer_id_jugador]= info_peer
 	
 	# a futuro
 	## guardar armas que se estan usando, suelen ser 2, lista de dos armas
-	#if GlobalJuego.session_info.has(peer_id_jugador):
-		#GlobalJuego.session_info[peer_id_jugador]["arma_actual"] = id_arma
 	
 
 @rpc("authority", "call_local", "reliable")
@@ -472,19 +482,20 @@ func _solicitar_info_jugadores():
 	# eenviar info completa de CADA jugador en el lobby
 	for peer_id in jugadores_en_lobby.keys():
 		var info_lobby = jugadores_en_lobby[peer_id]
+		var session_panel = GlobalJuego.session_info.get(peer_id,{})
 		
 		# construir info completa y despues pasarla
 		var info_completa = {
 			"username": info_lobby.get("nombre", "Jugador " + str(peer_id)),
 			"personaje": info_lobby.get("personaje", 1),
 			"listo": info_lobby.get("listo", false),
-			"score": GlobalJuego.session_info.get(peer_id, {}).get("score", 0),
-			"salud": GlobalJuego.session_info.get(peer_id, {}).get("salud", GlobalJuego.SALUD_DEFAULT),
-			"ping": GlobalJuego.session_info.get(peer_id, {}).get("ping", 0),
-			"inventario":GlobalJuego.session_info.get(peer_id, {}).get("inventario", [])
+			"score": session_panel.get(peer_id, {}).get("score", 0),
+			"salud": session_panel.get(peer_id, {}).get("salud", GlobalJuego.SALUD_DEFAULT),
+			"ping": session_panel.get(peer_id, {}).get("ping", 0),
+			"inventario":session_panel.get(peer_id, {}).get("inventario", []),
+			"armas_actuales": session_panel.get("armas_actuales", [1, 0])
 		}
 		
-		print("Enviando info de ", peer_id, " al solicitante: ", info_completa)
 		_enviar_info_jugador.rpc_id(solicitante_id, peer_id, info_completa)
 		
 func _on_regresar_boton_pressed() -> void:

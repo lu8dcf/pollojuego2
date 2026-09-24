@@ -160,10 +160,11 @@ func cambiar_personaje_arma(direccion:int):
 		_reproducir_personaje_arma(id_personaje)
 		_actualizar_habilidades(id_personaje)
 		indice_personaje = id_personaje
-		# Notificar al lobby para que se sincronice con todos
+		# notificar al lobby para que se sincronice con todos
 		var lobby = get_tree().get_first_node_in_group("lobby")
 		if lobby and lobby.has_method("notificar_cambio_personaje_arma"):
-			lobby
+			lobby.notificar_cambio_personaje_arma(peer_id, id_personaje,id_arma)
+
 		
 	elif sprite_arma.visible:
 		id_arma += direccion
@@ -174,7 +175,7 @@ func cambiar_personaje_arma(direccion:int):
 		_reproducir_personaje_arma(id_arma)
 		_actualizar_habilidades(id_arma)
 		indice_arma = id_arma
-		# Notificar al lobby para que se sincronice con todos
+		# notificar al lobby para que se sincronice con todos
 		var lobby = get_tree().get_first_node_in_group("lobby")
 		if lobby and lobby.has_method("notificar_cambio_personaje_arma"):
 			lobby.notificar_cambio_personaje_arma(peer_id, id_personaje,id_arma)
@@ -234,7 +235,7 @@ func actualizar_info(id: int, nombre_jugador: String,personaje: int = 1):
 	peer_id = id
 	nombre = nombre_jugador
 	id_personaje = personaje
-	# Determinar si es el panel del jugador local
+	# verificar si es el panel del jugador local
 	es_mi_panel = (peer_id == multiplayer.get_unique_id() or (peer_id == 1 and multiplayer.is_server()))
 		
 	if nombre_usuario:
@@ -243,9 +244,13 @@ func actualizar_info(id: int, nombre_jugador: String,personaje: int = 1):
 	_reproducir_personaje_arma(id_personaje)
 	
 	if sprite_arma_mostrar:
-		sprite_arma_mostrar.visible = not es_mi_panel
-		var inventario = GlobalJuego.session_info.get(peer_id,{}).get("inventario",[])
-		var arma = inventario[0] # a la primera ubicaciond el arma que esta en el inventario
+		sprite_arma_mostrar.visible = not es_mi_panel # solo mostrar el arma elegida a los demas jugadores, no a  mi
+		var info = GlobalJuego.session_info.get(peer_id,{})
+		var armas_actuales:Array = info.get("armas_actuales",[])
+		var arma = 1 # fallback, en caso de que no se hayan guardado armas
+		if armas_actuales.size()>0:
+			arma= armas_actuales[0] # toma la primer arma que encuentra
+		
 		actualizar_arma_remoto(arma)
 			
 	if estoy_listo_boton:
