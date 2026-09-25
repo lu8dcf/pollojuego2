@@ -111,7 +111,8 @@ func _on_session_created():
 			"salud": GlobalJuego.SALUD_DEFAULT,
 			"personaje":1,
 			"ping":0,
-			"inventario":[]
+			"inventario":[],
+			"armas_actuales":[]
 		}
 	
 	lobby_inicializado = true
@@ -140,7 +141,8 @@ func _enviar_estado_actual_a_cliente(nuevo_cliente_id: int):
 			"score": GlobalJuego.session_info.get(peer_id, {}).get("score", 0),
 			"salud": GlobalJuego.session_info.get(peer_id, {}).get("salud", GlobalJuego.SALUD_DEFAULT),
 			"ping": GlobalJuego.session_info.get(peer_id, {}).get("ping",0),
-			"inventario":GlobalJuego.session_info.get(peer_id, {}).get("inventario",[])
+			"inventario":GlobalJuego.session_info.get(peer_id, {}).get("inventario",[]),
+			"armas_actuales":GlobalJuego.session_info.get(peer_id,{}).get("armas_actuales",[])
 		}
 		
 		# enviar SOLO al nuevo cliente (no a todos)
@@ -369,6 +371,8 @@ func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_a
 				panel.actualizar_arma_remoto(id_arma)
 	
 	if not GlobalJuego.session_info.has(peer_id_jugador):
+		if id_personaje==0:
+			id_personaje=1
 		GlobalJuego.session_info[peer_id_jugador] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id_jugador),
