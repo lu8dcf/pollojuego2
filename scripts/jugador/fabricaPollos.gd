@@ -1,5 +1,5 @@
 class_name PolloFactory
-extends RefCounted
+extends Node
 
 
 enum TipoPollo {

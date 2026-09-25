@@ -3,11 +3,12 @@ extends Node3D
 
 var jugador: Jugador
 
-@onready var habilidad: Habilidad = $Habilidad
+var habilidad: Habilidad
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var modelo : Node3D
 
 func inicializar(p_jugador: Jugador,p_modelo: Node3D,p_habilidad: Habilidad) -> void:
+
 	jugador = p_jugador
 	modelo = p_modelo
 	habilidad = p_habilidad
@@ -17,10 +18,12 @@ func inicializar(p_jugador: Jugador,p_modelo: Node3D,p_habilidad: Habilidad) -> 
 
 	habilidad.iniciar(jugador)
 
-
 func usar_habilidad() -> void:
-	if habilidad:
+
+	#if is_instance_valid(habilidad):
+	if(habilidad != null):
 		habilidad.usar()
+
 
 func reproducir_animacion(nombre: StringName) -> void:
 	animation_player.play(nombre)

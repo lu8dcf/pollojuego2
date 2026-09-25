@@ -2,5 +2,10 @@
 
 [ext_resource type="Script" uid="uid://caf41h2qmg34c" path="res://scripts/habilidades/habilidadDash.gd" id="1_fkd1q"]
 
-[node name="HabilidadDash" type="Node3D" unique_id=1831260479]
+[node name="HabilidadDash" type="Node3D" unique_id=635516163]
 script = ExtResource("1_fkd1q")
+
+[node name="tiempoRecarga" type="Timer" parent="." unique_id=1666486697]
+wait_time = 4.0
+
+[connection signal="timeout" from="tiempoRecarga" to="." method="_on_tiempo_recarga_timeout"]

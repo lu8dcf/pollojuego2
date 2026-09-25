@@ -55,12 +55,13 @@ var objetivo_actual: Node = null
 #habilidad especial
 #@onready var habilidad: Habilidad = $habilidad
 #-----------------------------------------------DASH
-const DASH_SPEED := 20.0
+const DASH_SPEED := 80.0
 const DASH_DURATION := 0.25
 
 var direccion_dash := Vector3.ZERO
 var tiempo_dash := 0.0
-
+#-----------------------------------------------------------------ASIGNACION POLLO
+var pollo
 
 
 func _enter_tree() -> void:
@@ -70,6 +71,8 @@ func _enter_tree() -> void:
 	set_multiplayer_authority(id)
 
 func _ready():
+	pollo = ($FabricaPollos.crear($FabricaPollos.TipoPollo.COMUN, self))
+	add_child(pollo)
 	#add_child(personajePollo.instantiate())
 	add_to_group("Jugadores")
 	nameplate.text = name
@@ -131,6 +134,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		#camera_3d.rotation.x = clamp(camera_3d.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
 func _process(_delta: float) -> void:
+	
+	if Input.is_action_just_pressed("habilidad"):
+		if puede_usar_habilidad():
+			pollo.usar_habilidad()
+			
 	if Input.is_action_just_pressed('menu'):
 		estadoActual = Estado.TIENDA
 		open_menu(player_ui.menu.visible)
@@ -225,7 +233,29 @@ func _on_timer_caido_timeout() -> void:
 #----------------------------------------------------------------HABILIDADES
 
 #-------------------------------------------------DASH
+func iniciar_dash() -> void:
 
+	#if direccion.length_squared() < 0.001:
+		#return
+	direccion_dash = -pollo.global_transform.basis.z
+	direccion_dash = direccion_dash.normalized()
+	tiempo_dash = DASH_DURATION
+	cambiar_estado(Estado.DASH)
+
+func procesar_dash(delta: float) -> void:
+	tiempo_dash -= delta
+	# El jugador se mueve exclusivamente
+	# en la dirección del dash.
+	#print("velocidad: ", velocity)
+	velocity = direccion_dash * DASH_SPEED
+	move_and_slide()
+	if tiempo_dash <= 0.0:
+		terminar_dash()
+
+func terminar_dash() -> void:
+	velocity = Vector3.ZERO
+	direccion_dash = Vector3.ZERO
+	cambiar_estado(Estado.OLEADA)
 # --------------------------------------------------------------SISTEMA DE SALVAR
 func procesar_salvar() -> void:
 	# Si no estamos intentando salvar,
@@ -311,7 +341,7 @@ func procesar_movimiento(delta: float) -> void:
 
 	# INPUT DE MOVIMIENTO
 	var direction := Vector3.ZERO
-	# Primero intentamos usar el joystick táctil.
+	# Primero intentamos usar el joystick tactil.
 	if joystick != null and is_instance_valid(joystick)and joystick.direccion != Vector2.ZERO:
 		direction = (transform.basis* Vector3(joystick.direccion.x,0,joystick.direccion.y)).normalized()
 	else:
@@ -324,10 +354,22 @@ func procesar_movimiento(delta: float) -> void:
 	if direction != Vector3.ZERO:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
+		mirar_hacia_direccion(direction,delta)
 	else:
 		velocity.x = move_toward(velocity.x,0,SPEED)
 		velocity.z = move_toward(velocity.z,0,SPEED)
 	move_and_slide()
+
+func mirar_hacia_direccion(direction: Vector3, delta: float) -> void:
+
+	if direction.length_squared() < 0.001:
+		return
+
+	var angulo := atan2(direction.x,direction.z) + PI #este pi es para invertir la vuelta
+
+	pollo.rotation.y = lerp_angle(pollo.rotation.y,angulo,delta * 10.0)
+	
+	#ACA DEBO AGREGAR AL MULTIPLAYERsYNCRONIZER LA ROTACION DEL POLLO
 
 func procesar_caido() -> void:
 	velocity = Vector3.ZERO
@@ -340,28 +382,7 @@ func procesar_muerte() -> void:
 func procesar_tienda() -> void:
 	velocity = Vector3.ZERO
 
-func iniciar_dash(direccion: Vector3) -> void:
-	if estadoActual != Estado.OLEADA:
-		return
-	if direccion.length_squared() < 0.001:
-		return
-	direccion_dash = direccion.normalized()
-	tiempo_dash = DASH_DURATION
-	cambiar_estado(Estado.DASH)
 
-func procesar_dash(delta: float) -> void:
-	tiempo_dash -= delta
-	# El jugador se mueve exclusivamente
-	# en la dirección del dash.
-	velocity = direccion_dash * DASH_SPEED
-	move_and_slide()
-	if tiempo_dash <= 0.0:
-		terminar_dash()
-
-func terminar_dash() -> void:
-	velocity = Vector3.ZERO
-	direccion_dash = Vector3.ZERO
-	cambiar_estado(Estado.OLEADA)
 
 #func _physics_process(delta: float) -> void:
 	#match estadoActual:

@@ -1,14 +1,25 @@
 class_name HabilidadDash
 extends Habilidad
 
-@export var velocidad_dash: float = 20.0
-@export var duracion: float = 0.15
+@onready var tiempoRecarga = $tiempoRecarga
+
+var disponible := true
+
 
 
 func usar() -> void:
-	if jugador == null:
+	if not jugador.puede_usar_habilidad():
 		return
+	if not disponible:
+		return
+	disponible = false
+	jugador.iniciar_dash()
+	tiempoRecarga.start()
+	
 
-	var direccion := -jugador.global_transform.basis.z
 
-	#jugador.iniciar_dash(direccion, velocidad_dash, duracion)
+
+func _on_tiempo_recarga_timeout() -> void:
+	#print("habilidadDisponible")
+	disponible = true
+	pass # Replace with function body.
