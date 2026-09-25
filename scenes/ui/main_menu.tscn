@@ -51,7 +51,6 @@ texto = "Local"
 
 [node name="PanelMultijugador" type="PanelContainer" parent="Control" unique_id=882952804]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.71500003
@@ -216,6 +215,7 @@ text = "CREAR PARTIDA"
 
 [node name="PanelUnJugador" type="PanelContainer" parent="Control" unique_id=605970837]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -562,7 +562,6 @@ unique_name_in_owner = true
 oversampling_override = 1.0
 title = "Error!"
 initial_position = 4
-visible = true
 
 [connection signal="pressed" from="Control/BotonOnline" to="." method="_on_boton_online_pressed"]
 [connection signal="pressed" from="Control/BotonLocal" to="." method="_on_boton_local_pressed"]
