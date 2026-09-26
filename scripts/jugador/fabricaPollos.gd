@@ -19,8 +19,8 @@ const POLLOS := {
 	},
 
 	TipoPollo.NEGRO: {
-		#"modelo": preload("res://pollo/modelos/PolloNegro.tscn"),
-		#"habilidad": preload("res://habilidades/HabilidadDrone.tscn"),
+		"modelo": preload("res://assets/modelos/pollos/pollo_1.fbx"),
+		"habilidad": preload("res://scenes/habilidad/habilidadDrones.tscn"),
 	},
 
 	TipoPollo.AZUL: {
@@ -32,6 +32,7 @@ const POLLOS := {
 
 
 static func crear(tipo: TipoPollo, jugador: Jugador) -> Pollo:
+	
 	if not POLLOS.has(tipo):
 		push_error("Tipo de pollo inválido: %s" % tipo)
 		return null

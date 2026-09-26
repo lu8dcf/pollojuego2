@@ -494,10 +494,11 @@ func _exit_tree() -> void:
 
 
 #----------------------------------------------------- Interacciones Jugador
-@rpc("any_peer", "call_local")
+@rpc("any_peer", "call_local", "reliable")
 func pedir_salvar_rpc(objetivo_id: int) -> void:
 
 	if not multiplayer.is_server():
+		print("no lo podes salvar vos")
 		return
 
 	var salvador_id := multiplayer.get_remote_sender_id()
@@ -510,11 +511,11 @@ func pedir_salvar_rpc(objetivo_id: int) -> void:
 
 	# comprobar que el objetivo esta caido
 	if objetivo.estadoActual != Jugador.Estado.CAIDO:
-		print("El jugador no está caido")
+		print("El jugador: ", objetivo,"no está caido")
 		return
 
 	# Cambiar el estado del objetivo
-	objetivo.cambiar_estado(Jugador.Estado.OLEADA)
+	objetivo.polloSalvado()
 	print("¡Salvado!")
 
 

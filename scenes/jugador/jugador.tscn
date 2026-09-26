@@ -11,13 +11,13 @@
 height = 1.0024414
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_6bcbl"]
-properties/0/path = NodePath(".:position")
+properties/0/path = NodePath("Nameplate:text")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath(".:estadoActual")
+properties/1/path = NodePath(".:position")
 properties/1/spawn = true
 properties/1/replication_mode = 2
-properties/2/path = NodePath("Nameplate:text")
+properties/2/path = NodePath(".:estadoActual")
 properties/2/spawn = true
 properties/2/replication_mode = 2
 
@@ -79,6 +79,7 @@ transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0.47852877, 0)
 shape = SubResource("CylinderShape3D_8w0r3")
 
 [node name="timer_caido" type="Timer" parent="." unique_id=523117100]
+wait_time = 10.0
 
 [node name="timer_salvar" type="Timer" parent="." unique_id=2130058164]
 wait_time = 3.0

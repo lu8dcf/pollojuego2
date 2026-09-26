@@ -1,7 +1,11 @@
 [gd_scene format=3 uid="uid://dadcihim0y0i"]
 
 [ext_resource type="Script" uid="uid://c83bb52q5c06j" path="res://scripts/jugador/pollo.gd" id="1_33vks"]
-[ext_resource type="PackedScene" uid="uid://bskyk4ur6lr8m" path="res://assets/modelos/pollos/pollo_1.fbx" id="2_b2qhq"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_33vks"]
+properties/0/path = NodePath(".:rotation:y")
+properties/0/spawn = true
+properties/0/replication_mode = 2
 
 [node name="pollo" type="Node3D" unique_id=656483584]
 script = ExtResource("1_33vks")
@@ -10,4 +14,5 @@ script = ExtResource("1_33vks")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=258323717]
 
-[node name="pollo_1" parent="." unique_id=96098598 instance=ExtResource("2_b2qhq")]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1293359634]
+replication_config = SubResource("SceneReplicationConfig_33vks")
