@@ -15,7 +15,7 @@ var z_max = GlobalJuego.mapa_z_max
 
 # --- Referencias ---
 @export var escena_cubo = preload("res://scenes/entorno/obstaculo.tscn")        # arrastra tu CuboObstaculo.tscn aquí
-@onready var contenedor: Node3D = $Obstaculos
+#@onready var contenedor: Node3D = $Obstaculos
 
 var posiciones_usadas: Array[Vector3] = []
 
@@ -24,7 +24,7 @@ func _ready():
 	if escena_cubo == null:
 		push_error("Falta asignar escena_cubo en el inspector.")
 		return
-	generar_obstaculos()
+	#generar_obstaculos()
 
 func generar_obstaculos():
 	

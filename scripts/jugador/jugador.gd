@@ -7,6 +7,8 @@ class_name Jugador
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 
+var joystick : Joystick = null
+
 @onready var camera_3d: Camera3D = $camaraRig/OffsetRig/Camera3D
 #@onready var head: Node3D = %Head
 @onready var nameplate: Label3D = %Nameplate
@@ -77,12 +79,11 @@ var tiempo_dash := 0.0
 
 
 func _enter_tree() -> void:
-	set_multiplayer_authority(int(name)) #lo mete en el arbol
-	print("Jugador ", name, " - Autoridad: ", get_multiplayer_authority())
+	var id = int(name)
+	if id <= 0:
+		id = 1
+	set_multiplayer_authority(id)
 
-	if not is_multiplayer_authority():
-		set_process(false)
-		set_physics_process(false)
 func _ready():
 	#add_child(personajePollo.instantiate())
 	add_to_group("Jugadores")
@@ -91,12 +92,22 @@ func _ready():
 #	arms_root.hide()
 	#replicate_color_changed(player_ui.COLORS[0])
 	player_ui.hide()
-
+	GlobalSignal.enviar_joystick.connect(recibir_joystick) # para obtener el joystick
 	if not is_multiplayer_authority(): #
+		if camera_3d:
+			camera_3d.current = false
 		player_ui.hide()
+		set_process(false)
+		set_physics_process(false)
 		return
-	
+	await get_tree().process_frame
+	if camera_3d:
+		camera_3d.current = true
+		
 	ready_client_visuals() 
+
+func recibir_joystick(j:Joystick):
+	joystick = j
 
 func ready_client_visuals():
 	player_ui.show()
@@ -113,6 +124,8 @@ func ready_client_visuals():
 	#------------------------------------------------------------------------------INPUTS
 
 func _unhandled_input(event: InputEvent) -> void:
+
+	
 	if not is_multiplayer_authority():
 		return
 	
@@ -159,8 +172,8 @@ func open_menu(current_visibility: bool):
 
 	if player_ui.menu.visible:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	#else:
-		#Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	else:
+		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 		
 		
 		
@@ -329,16 +342,35 @@ func _physics_process(delta: float) -> void:
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
-	var input_dir := Input.get_vector("left", "right", "forward", "backward")
-	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	
+	var direction := Vector3.ZERO
+	
+	# Prioridad al Joystick táctil si es válido
+	if joystick != null and is_instance_valid(joystick) and joystick.direccion != Vector2.ZERO:
+		direction = (transform.basis * Vector3(joystick.direccion.x, 0, joystick.direccion.y)).normalized()
+	else:
+		# Si no hay joystick, leemos el teclado/mando clásico
+		var input_dir := Input.get_vector("left", "right", "forward", "backward")
+		direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
-
-	if direction:
+	# 3. Aplicar las velocidades calculadas
+	if direction != Vector3.ZERO:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 		velocity.z = move_toward(velocity.z, 0, SPEED)
+	
+	#var input_dir := Input.get_vector("left", "right", "forward", "backward")
+	#var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+#
+#
+	#if direction:
+		#velocity.x = direction.x * SPEED
+		#velocity.z = direction.z * SPEED
+	#else:
+		#velocity.x = move_toward(velocity.x, 0, SPEED)
+		#velocity.z = move_toward(velocity.z, 0, SPEED)
 
 
 	#sigo con la mirada al mouse

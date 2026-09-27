@@ -65,19 +65,26 @@ func _ready() -> void:
 	animar_entrada_cascada()
 
 func _on_pressed_impacto() -> void:
-	"""Busca el ColorRect en el CanvasLayer/Escena y modifica su shader directamente"""
-	var color_rect = _buscar_color_rect(get_tree().current_scene)
+	if not is_inside_tree():
+		return
 	
-	if color_rect and color_rect.material is ShaderMaterial:
-		var mat = color_rect.material as ShaderMaterial
-		
-		# Forzar el parámetro 'intensidad' en el shader (0.08 para que sea bien visible)
-		mat.set_shader_parameter("intensidad", 0.08)
-		
-		# Reducir la intensidad a 0.0 progresivamente en 0.25 segundos
-		var tween = create_tween()
-		tween.tween_property(mat, "shader_parameter/intensidad", 0.0, 0.25)
-
+	var tree = get_tree()
+	if not tree:
+		return
+	
+	var color_rect = _buscar_color_rect(tree.current_scene)
+	if color_rect == null:
+		return
+	
+	if not (color_rect.material is ShaderMaterial):
+		return
+	
+	var mat = color_rect.material as ShaderMaterial
+	mat.set_shader_parameter("intensidad", 0.08)
+	
+	var tween = create_tween()
+	tween.tween_property(mat, "shader_parameter/intensidad", 0.0, 0.25)
+	
 func _buscar_color_rect(nodo: Node) -> ColorRect:
 	"""Recorre la escena buscando el ColorRect que tiene el ShaderMaterial"""
 	if nodo is ColorRect and nodo.material is ShaderMaterial:

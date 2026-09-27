@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://df4owisch7ucy" path="res://icon.svg" id="3_uxt7q"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_k1rfm"]
-radius = 64.0
+radius = 82.0
 
 [node name="Joystick" type="Area2D" unique_id=254397830]
 script = ExtResource("1_4a20h")
@@ -16,6 +16,8 @@ shape = SubResource("CircleShape2D_k1rfm")
 
 [node name="SpriteRango" type="Sprite2D" parent="." unique_id=801723901]
 unique_name_in_owner = true
+position = Vector2(1.9073486e-06, 1.9073486e-06)
+scale = Vector2(1.2578125, 1.2578125)
 texture = ExtResource("2_evor0")
 
 [node name="SpritePalanca" type="Sprite2D" parent="." unique_id=1308324412]
