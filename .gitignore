@@ -4,7 +4,8 @@
 /dist/
 .DS_Store
 **/.DS_Store
-assets/models/crystal/scene.gltf.import
+webrtc/lib/~libwebrtc_native.windows.template_debug.x86_64.dll~RF9cb407.TMP
 .import/
 *.import
-/assets/models/castle_town
+*.import
+webrtc/lib/~libwebrtc_native.windows.template_debug.x86_64.dll

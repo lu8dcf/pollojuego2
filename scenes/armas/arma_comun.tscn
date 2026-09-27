@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://ccpfxpxwl0rn2"]
+
+[sub_resource type="GDScript" id="GDScript_q813k"]
+script/source = "extends Node3D
+
+var datos: Arma
+
+
+
+func atacar():
+	print(\"pew pew!\")
+"
+
+[node name="armaComun" type="Node3D" unique_id=692652577]
+script = SubResource("GDScript_q813k")
+
+[node name="Marker3D" type="Marker3D" parent="." unique_id=746436328]

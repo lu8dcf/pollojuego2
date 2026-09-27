@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://wsf5ahon4ims"]
+
+[ext_resource type="Script" uid="uid://bvgqf8vjq4mb1" path="res://scenes/ui/ui_movil.gd" id="1_ahvyb"]
+[ext_resource type="PackedScene" uid="uid://c6ohglddwi5dl" path="res://scenes/ui/joystick/joystick.tscn" id="2_7nd03"]
+[ext_resource type="Texture2D" uid="uid://df4owisch7ucy" path="res://icon.svg" id="3_4olny"]
+
+[node name="UIMovil" type="CanvasLayer" unique_id=2004051786]
+script = ExtResource("1_ahvyb")
+
+[node name="Joystick" parent="." unique_id=254397830 instance=ExtResource("2_7nd03")]
+unique_name_in_owner = true
+position = Vector2(165, 505)
+
+[node name="TextureButton" type="TextureButton" parent="." unique_id=1468485331]
+offset_left = 692.0
+offset_top = 444.0
+offset_right = 820.0
+offset_bottom = 572.0
+texture_normal = ExtResource("3_4olny")

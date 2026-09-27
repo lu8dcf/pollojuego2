@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dadcihim0y0i"]
+
+[ext_resource type="Script" uid="uid://cp4sxbj1mijo2" path="res://scripts/habilidades/habilidad.gd" id="1_33vks"]
+
+[node name="pollo" type="Node3D" unique_id=656483584]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1282197475]
+
+[node name="Habilidad" type="Node" parent="." unique_id=291986676]
+script = ExtResource("1_33vks")
+metadata/_custom_type_script = "uid://cp4sxbj1mijo2"

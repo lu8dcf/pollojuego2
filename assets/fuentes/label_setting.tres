@@ -1,0 +1,7 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://bv3bgri0yuhlq"]
+
+[ext_resource type="FontFile" uid="uid://d02ux4lnojyuo" path="res://assets/fuentes/Boring Time.otf" id="1_1blux"]
+
+[resource]
+font = ExtResource("1_1blux")
+font_size = 40
