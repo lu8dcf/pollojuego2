@@ -53,9 +53,9 @@ func sonar_sfx(archivo):
 
 ####SONIDO POLLO
 func sonidoPollo():
-	var sonidoPollo = crear_audio_player_2d("SFX")
-	sonidoPollo.stream = preload("res://assets/sonidos/sonidoPolloTemporal.mp3")
-	add_child(sonidoPollo)
-	sonidoPollo.play()
-	await sonidoPollo.finished
-	sonidoPollo.queue_free()
+	var pollo = crear_audio_player_2d("SFX")
+	pollo.stream = preload("res://assets/sonidos/sonidoPolloTemporal.mp3")
+	add_child(pollo)
+	pollo.play()
+	await pollo.finished
+	pollo.queue_free()

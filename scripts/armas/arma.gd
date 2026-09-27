@@ -19,5 +19,6 @@ enum TipoArma {
 @export var tipo : TipoArma
 @export var comportamiento: comportamientoArma
 
+
 #Mas adelante, si quisiera agregar modificadores:
 #@export var comportamientos: Array[ComportamientoArma] = []

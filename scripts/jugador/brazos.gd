@@ -28,6 +28,7 @@ func _input(event: InputEvent) -> void:
 		#var arma = crear_armas_derecho.crear_arma(1)
 		#equipar_arma(1)
 		solicitar_equipar_arma(3)
+		solicitar_equipar_arma(1)
 
 func obtener_arma(mano: Manos) -> Node:
 	if mano == Manos.IZQUIERDA:

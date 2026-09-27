@@ -25,7 +25,7 @@ modulate = Color(0.24705882, 1, 1, 1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.94608486, 0, 0)
 
 [node name="tiempoEntreDisparo" type="Timer" parent="." unique_id=1059315536]
-wait_time = 7.0
+wait_time = 2.0
 autostart = true
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2103318625]
@@ -35,9 +35,14 @@ replication_config = SubResource("SceneReplicationConfig_xu1fw")
 unique_name_in_owner = true
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1437828170]
-_spawnable_scenes = PackedStringArray("uid://beawwqs832562")
+_spawnable_scenes = PackedStringArray("uid://beawwqs832562", "uid://b635l88o7cpj4", "uid://dmk64w66uhmkc")
 spawn_path = NodePath("../SpawnContainerBalas")
 
 [node name="testArma" parent="." unique_id=111605971 instance=ExtResource("2_q77go")]
 
+[node name="buscarObjetivo" type="Timer" parent="." unique_id=424682024]
+wait_time = 0.1
+autostart = true
+
 [connection signal="timeout" from="tiempoEntreDisparo" to="." method="_on_tiempo_disparo_timeout"]
+[connection signal="timeout" from="buscarObjetivo" to="." method="_on_buscar_objetivo_timeout"]

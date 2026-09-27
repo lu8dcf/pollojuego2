@@ -44,7 +44,12 @@ var COLORS: Array[Color] =[ # colores de la barra de vida
 ]
 
 func _ready() -> void:
-	menu.hide() # los botones de salir y pausa
+	if OS.has_feature("mobile"):
+		await get_tree().process_frame 
+		menu.show()
+	else:
+		menu.hide() # los botones de salir y pausa
+		
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	# BOTON SALIR
 	boton_salir.pressed.connect(func(): Network.leave_server())
