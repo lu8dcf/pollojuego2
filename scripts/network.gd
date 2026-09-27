@@ -494,30 +494,42 @@ func _exit_tree() -> void:
 
 
 #----------------------------------------------------- Interacciones Jugador
-@rpc("any_peer", "call_local", "reliable")
+
+@rpc("any_peer", "reliable")
 func pedir_salvar_rpc(objetivo_id: int) -> void:
-
 	if not multiplayer.is_server():
-		print("no lo podes salvar vos")
 		return
-
 	var salvador_id := multiplayer.get_remote_sender_id()
+	procesar_salvar(salvador_id, objetivo_id)
 
+
+func procesar_salvar(salvador_id: int, objetivo_id: int) -> void:
 	var salvador := GlobalJuego._obtener_jugador(salvador_id)
 	var objetivo := GlobalJuego._obtener_jugador(objetivo_id)
 
-	if salvador == null or objetivo == null:
+	if salvador == null:
+		print("salvador no encontrado: ", salvador_id)
 		return
 
-	# comprobar que el objetivo esta caido
+	if objetivo == null:
+		print("objetivo no encontrado: ", objetivo_id)
+		return
+
 	if objetivo.estadoActual != Jugador.Estado.CAIDO:
 		print("El jugador: ", objetivo,"no está caido")
 		return
 
-	# Cambiar el estado del objetivo
-	objetivo.polloSalvado()
-	print("¡Salvado!")
+	print("Salvado!")
 
+	salvado_rpc.rpc(objetivo_id)
+
+
+@rpc("authority", "call_local", "reliable")
+func salvado_rpc(objetivo_id: int) -> void: 
+	var objetivo := GlobalJuego._obtener_jugador(objetivo_id)
+	if objetivo == null:
+		return
+	objetivo.polloSalvado()
 
 # ------------------------------------------------------------
 # PAUSA MULTIJUGADOR

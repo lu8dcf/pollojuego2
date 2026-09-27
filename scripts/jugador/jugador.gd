@@ -145,7 +145,7 @@ func esta_vivo() -> bool:
 #---------------------------------------------------------------ENTRAR ESTADOS
 
 func entrar_caido() -> void:
-	timer_caido.start()
+	estado_caido_rpc.rpc() #al servidor!
 
 
 func entrar_muerte() -> void:
@@ -163,6 +163,9 @@ func entrar_tienda() -> void:
 
 func entrar_dash() -> void:
 	pass
+func entrar_ayudando():
+	pass
+
 
 #------------------------------------------------------------------------CAMBIAR ESTADO
 func cambiar_estado(nuevo_estado: Estado) -> void:
@@ -183,11 +186,10 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 			entrar_tienda()
 		Estado.DASH:
 			entrar_dash()
+		Estado.AYUDANDO:
+			entrar_ayudando()
 
-#------------------------------------------------------------------------TIMER CAIDO
 
-func _on_timer_caido_timeout() -> void:
-	cambiar_estado(Estado.MUERTE)
 
 #-----------------------------------------------------------------------------DASH
 
@@ -247,6 +249,7 @@ func _physics_process(delta: float) -> void:
 			
 		Estado.AYUDANDO:
 			procesar_ayudando()
+			procesar_salvar()
 
 #----------------------------------------------------------------------MOVIMIENTO NORMAL
 
@@ -302,7 +305,7 @@ func procesar_salvar() -> void:
 	if objetivo_actual == null: #
 		cancelar_salvar()
 		return
-	if estadoActual != Estado.AYUDANDO:#solo te salva alguien en oleada
+	if estadoActual != Estado.AYUDANDO:#
 		cancelar_salvar()
 
 
@@ -322,17 +325,18 @@ func cancelar_salvar() -> void:
 	if timer_salvar.is_stopped():
 		return
 	timer_salvar.stop()
-	cambiar_estado(Estado.AYUDANDO)
+	cambiar_estado(Estado.OLEADA)
 
 func _on_timer_salvar_timeout() -> void:
 	if objetivo_actual == null:
 		return
-	if estadoActual != Estado.OLEADA:
+	if estadoActual != Estado.AYUDANDO:
 		return
 	if not Input.is_action_pressed("attack2"):
 		return
 	var objetivo_id := int(objetivo_actual.name)
 	pedir_salvar(objetivo_id)
+	cambiar_estado(Estado.OLEADA)
 	
 #------------------------------------------------------------------------SERVIDOR
 @rpc("any_peer")
@@ -341,8 +345,12 @@ func pedir_ayuda() -> void:
 
 
 func pedir_salvar(objetivo_id: int) -> void:
-	Network.pedir_salvar_rpc.rpc_id(1,objetivo_id)
+	if multiplayer.is_server():
+		Network.procesar_salvar(multiplayer.get_unique_id(), objetivo_id) #si es el server esto
+	else:
+		Network.pedir_salvar_rpc.rpc_id(1, objetivo_id) #si es cliente, esto
 	objetivo_actual = null
+
 #------------------------------------------------------------DETECCION DE AYUDA
 
 func _on_deteccion_ayuda_area_entered(area: Area3D) -> void:
@@ -354,6 +362,29 @@ func _on_deteccion_ayuda_area_exited(area: Area3D) -> void:
 	if objetivo_actual == area.get_parent():
 		objetivo_actual = null
 		
+		
+#------------------------------------------------------------------------TIMER CAIDO y morir
+func _on_timer_caido_timeout() -> void:
+	if not multiplayer.is_server():
+		return
+	if estadoActual != Estado.CAIDO:
+		return
+	morir_rpc.rpc(int(name))
+
+@rpc("any_peer", "call_local", "reliable")
+func morir_rpc(jugador_id: int) -> void:
+	var jugador := GlobalJuego._obtener_jugador(jugador_id)
+	if jugador == null:
+		return
+	cambiar_estado(Estado.MUERTE)
+	jugador.morir()
+
+@rpc("any_peer", "call_local", "reliable")
+func estado_caido_rpc() -> void:
+	timer_caido.start()
+
+func morir():
+	print("jugador ha muerto!")
 #-------------------------------------------------------------------SALVADOO
 func polloSalvado():
 	timer_caido.stop()
