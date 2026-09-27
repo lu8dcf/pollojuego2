@@ -149,7 +149,7 @@ func take_damage(damage: int, source: int):
 		is_hurt = false
 
 func death(source):
-	Global.update_score_for(source)
+	#Global.update_score_for(source)
 	set_collision_layer_value(1, false)
 	is_dying = true
 	#animation_player.play("Death01")
@@ -395,5 +395,5 @@ func _on_bigote_body_exited(_body: Node3D) -> void:
 func _on_danio_area_entered(area: Area3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
-	print("pego")
+	
 	queue_free()

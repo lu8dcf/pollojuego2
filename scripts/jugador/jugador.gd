@@ -79,10 +79,14 @@ var tiempo_dash := 0.0
 
 
 func _enter_tree() -> void:
-	var id = int(name)
-	if id <= 0:
-		id = 1
-	set_multiplayer_authority(id)
+	if GlobalJuego.un_jugador:
+		set_multiplayer_authority(1)
+		return
+	else:
+		var id = int(name)
+		if id <= 0:
+			id = 1
+		set_multiplayer_authority(id)
 
 func _ready():
 	#add_child(personajePollo.instantiate())
@@ -93,18 +97,27 @@ func _ready():
 	#replicate_color_changed(player_ui.COLORS[0])
 	player_ui.hide()
 	GlobalSignal.enviar_joystick.connect(recibir_joystick) # para obtener el joystick
-	if not is_multiplayer_authority(): #
+	if GlobalJuego.un_jugador:
+		# MODO UN JUGADOR
+		await get_tree().process_frame
 		if camera_3d:
-			camera_3d.current = false
-		player_ui.hide()
-		set_process(false)
-		set_physics_process(false)
+			camera_3d.current = true
+		ready_client_visuals()
 		return
-	await get_tree().process_frame
-	if camera_3d:
-		camera_3d.current = true
-		
-	ready_client_visuals() 
+	
+	# MODO MULTIJUGADOR
+	if !GlobalJuego.un_jugador:
+		if not is_multiplayer_authority():
+			if camera_3d:
+				camera_3d.current = false
+			player_ui.hide()
+			set_process(false)
+			set_physics_process(false)
+			return
+		await get_tree().process_frame
+		if camera_3d:
+			camera_3d.current = true
+		ready_client_visuals()
 
 func recibir_joystick(j:Joystick):
 	joystick = j

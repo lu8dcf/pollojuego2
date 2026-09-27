@@ -4,11 +4,120 @@
 [ext_resource type="Script" uid="uid://dg6hg5ln4lacb" path="res://scenes/ui/panel_jugador.gd" id="1_w18h1"]
 [ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_wo01u"]
 [ext_resource type="Texture2D" uid="uid://bhhw8ihihl4ib" path="res://assets/ui/lobby/personajes/idle1.png" id="3_x6hcr"]
+[ext_resource type="Texture2D" uid="uid://dxvba16ob4txj" path="res://assets/ui/lobby/selccion_sheet.png" id="4_atqr2"]
 [ext_resource type="Texture2D" uid="uid://bhsw7bb8gny5f" path="res://assets/ui/lobby/personajes/idle2.png" id="4_jpjro"]
 [ext_resource type="Texture2D" uid="uid://c31q5hfwsb75k" path="res://assets/ui/lobby/personajes/idle3.png" id="5_7rgl2"]
 [ext_resource type="Texture2D" uid="uid://crbrs4ib5uc28" path="res://assets/ui/lobby/personajes/idle4.png" id="6_bmp6k"]
 [ext_resource type="Texture2D" uid="uid://cd85mjdrm67ti" path="res://assets/ui/lobby/personajes/idle5.png" id="7_atqr2"]
 [ext_resource type="Texture2D" uid="uid://b1t8eqspo4bb6" path="res://assets/keyboard-&-mouse_sheet_default.png" id="8_bmp6k"]
+[ext_resource type="Texture2D" uid="uid://cpq2nnp1n1dou" path="res://assets/ui/lobby/armas/armas1.png" id="10_e002p"]
+[ext_resource type="Texture2D" uid="uid://b6bp2had3p2es" path="res://assets/ui/lobby/armas/armas2.png" id="11_5glau"]
+[ext_resource type="Texture2D" uid="uid://berrepcqp5ej4" path="res://assets/ui/lobby/armas/armas3.png" id="12_cxe5k"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8fbuy"]
+atlas = ExtResource("8_bmp6k")
+region = Rect2(328, 904, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t14ga"]
+atlas = ExtResource("8_bmp6k")
+region = Rect2(392, 904, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iedqo"]
+atlas = ExtResource("10_e002p")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lljtg"]
+atlas = ExtResource("11_5glau")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2bsgv"]
+atlas = ExtResource("12_cxe5k")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_62p37"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iedqo")
+}],
+"loop": 1,
+"name": &"arma1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lljtg")
+}],
+"loop": 1,
+"name": &"arma2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2bsgv")
+}],
+"loop": 1,
+"name": &"arma3",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ui5wk"]
+atlas = ExtResource("8_bmp6k")
+region = Rect2(200, 328, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b5x2r"]
+atlas = ExtResource("8_bmp6k")
+region = Rect2(264, 328, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gyjd6"]
+atlas = ExtResource("4_atqr2")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h5sui"]
+atlas = ExtResource("4_atqr2")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a5r5q"]
+atlas = ExtResource("4_atqr2")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lc556"]
+atlas = ExtResource("4_atqr2")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6xdmq"]
+atlas = ExtResource("4_atqr2")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a5ern"]
+atlas = ExtResource("4_atqr2")
+region = Rect2(640, 0, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_c2doj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gyjd6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h5sui")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a5r5q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lc556")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6xdmq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a5ern")
+}],
+"loop": 1,
+"name": &"seleccion",
+"speed": 5.0
+}]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_e002p"]
 atlas = ExtResource("3_x6hcr")
@@ -184,7 +293,7 @@ region = Rect2(328, 136, 48, 48)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_w18h1"]
 atlas = ExtResource("8_bmp6k")
-region = Rect2(328, 904, 48, 48)
+region = Rect2(648, 648, 48, 48)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wo01u"]
 atlas = ExtResource("8_bmp6k")
@@ -224,7 +333,54 @@ label_settings = ExtResource("1_assl2")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=795708525]
+[node name="ArmaEleccion" type="TextureButton" parent="." unique_id=1328631955]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 156.0
+offset_top = 45.0
+offset_right = 196.0
+offset_bottom = 85.0
+texture_normal = SubResource("AtlasTexture_8fbuy")
+texture_hover = SubResource("AtlasTexture_t14ga")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="SpriteArmaMostrar" type="AnimatedSprite2D" parent="." unique_id=873614928]
+unique_name_in_owner = true
+position = Vector2(120, 64)
+scale = Vector2(0.6152344, 0.6152344)
+sprite_frames = SubResource("SpriteFrames_62p37")
+animation = &"arma1"
+
+[node name="PersonajeEleccion" type="TextureButton" parent="." unique_id=1356171905]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 51.0
+offset_top = 46.0
+offset_right = 91.0
+offset_bottom = 86.0
+texture_normal = SubResource("AtlasTexture_ui5wk")
+texture_hover = SubResource("AtlasTexture_b5x2r")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="NombrePersonajeArma" type="Label" parent="." unique_id=1486817910]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -76.0
+offset_top = 98.0
+offset_right = 76.0
+offset_bottom = 123.0
+grow_horizontal = 2
+text = "Nombre Usuario"
+label_settings = ExtResource("1_assl2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContenedorPersonaje" type="MarginContainer" parent="." unique_id=795708525]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -232,18 +388,32 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -86.0
-offset_top = -171.0
+offset_top = -64.0
 offset_right = 98.0
 offset_bottom = 48.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SpritePersonaje" type="AnimatedSprite2D" parent="MarginContainer" unique_id=1191032090]
+[node name="SpriteSeleccion" type="AnimatedSprite2D" parent="ContenedorPersonaje" unique_id=1526114277]
 unique_name_in_owner = true
-position = Vector2(89, 123)
+position = Vector2(85, 55.000004)
+scale = Vector2(1.4375, 1.234375)
+sprite_frames = SubResource("SpriteFrames_c2doj")
+animation = &"seleccion"
+
+[node name="SpritePersonaje" type="AnimatedSprite2D" parent="ContenedorPersonaje" unique_id=1191032090]
+unique_name_in_owner = true
+position = Vector2(89, 38)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_0rl2u")
 animation = &"idle5"
+
+[node name="SpriteArma" type="AnimatedSprite2D" parent="ContenedorPersonaje" unique_id=1574071833]
+unique_name_in_owner = true
+position = Vector2(89, 56)
+scale = Vector2(1.125, 1.125)
+sprite_frames = SubResource("SpriteFrames_62p37")
+animation = &"arma1"
 
 [node name="HabilidadesPersonaje" type="MarginContainer" parent="." unique_id=1402338151]
 layout_mode = 1
@@ -257,22 +427,44 @@ offset_right = 1.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HabilidadesPersonaje" unique_id=1576009515]
+[node name="HBoxHabilidadesPersonaje" type="HBoxContainer" parent="HabilidadesPersonaje" unique_id=1576009515]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="Vida" type="TextureRect" parent="HabilidadesPersonaje/HBoxContainer" unique_id=248915423]
+[node name="Vida" type="TextureRect" parent="HabilidadesPersonaje/HBoxHabilidadesPersonaje" unique_id=248915423]
 layout_mode = 2
 texture = SubResource("AtlasTexture_0rl2u")
 stretch_mode = 3
 
-[node name="Ataque" type="TextureRect" parent="HabilidadesPersonaje/HBoxContainer" unique_id=95221168]
+[node name="Ataque" type="TextureRect" parent="HabilidadesPersonaje/HBoxHabilidadesPersonaje" unique_id=95221168]
 layout_mode = 2
 texture = SubResource("AtlasTexture_w18h1")
 stretch_mode = 3
 
-[node name="Defensa" type="TextureRect" parent="HabilidadesPersonaje/HBoxContainer" unique_id=1936233731]
+[node name="Defensa" type="TextureRect" parent="HabilidadesPersonaje/HBoxHabilidadesPersonaje" unique_id=1936233731]
+layout_mode = 2
+texture = SubResource("AtlasTexture_wo01u")
+stretch_mode = 3
+
+[node name="HBoxHabilidadesArma" type="HBoxContainer" parent="HabilidadesPersonaje" unique_id=1282524165]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Velocidad" type="TextureRect" parent="HabilidadesPersonaje/HBoxHabilidadesArma" unique_id=1010214805]
+layout_mode = 2
+texture = SubResource("AtlasTexture_0rl2u")
+stretch_mode = 3
+
+[node name="Explosivo" type="TextureRect" parent="HabilidadesPersonaje/HBoxHabilidadesArma" unique_id=1154198051]
+layout_mode = 2
+texture = SubResource("AtlasTexture_w18h1")
+stretch_mode = 3
+
+[node name="Daño" type="TextureRect" parent="HabilidadesPersonaje/HBoxHabilidadesArma" unique_id=1947199065]
 layout_mode = 2
 texture = SubResource("AtlasTexture_wo01u")
 stretch_mode = 3
@@ -336,10 +528,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.024
 anchor_bottom = 1.0
-offset_left = 72.0
-offset_top = 360.0
-offset_right = -64.0
-offset_bottom = -17.0
+offset_left = 68.0
+offset_top = 332.0
+offset_right = -68.0
+offset_bottom = -45.0
 text = "¿Listo?"
 label_settings = ExtResource("1_assl2")
 horizontal_alignment = 1

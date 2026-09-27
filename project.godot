@@ -113,6 +113,7 @@ test_caido={
 3d_physics/layer_4="paredes"
 3d_physics/layer_5="balas"
 3d_physics/layer_6="PowerUp"
+3d_physics/layer_7="dañoenemigo"
 
 [physics]
 

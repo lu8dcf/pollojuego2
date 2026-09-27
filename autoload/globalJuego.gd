@@ -73,7 +73,9 @@ func _agregar_jugador(peer_id: int):
 			"score": 0,
 			"username": jugador.nameplate.text if jugador.nameplate else "Jugador " + str(peer_id),
 			"salud": SALUD_DEFAULT,
-			"personaje":0
+			"personaje":1,
+			"ping":0,
+			"inventario":[]
 		}
 		_replicar_session_info.rpc(session_info)
 		
@@ -166,15 +168,17 @@ func _replicar_session_info(info: Dictionary):
 func configurar_singleplayer():
 	"""Configura el juego para un solo jugador"""
 	var nombre_temp = "Jugador Solo"
-	if Global.username != "":
-		nombre_temp = Global.username
+	if GlobalJuego.nombre_jugador != "":
+		nombre_temp = GlobalJuego.nombre_jugador
 	
 	session_info.clear()
 	session_info[1] = {
 		"score": 0,
 		"username": nombre_temp,
 		"salud": SALUD_DEFAULT,
-		"personaje":0
+		"personaje":1,
+		"ping":0,
+		"inventario":[]
 	}
 	
 	# Emitir señal global

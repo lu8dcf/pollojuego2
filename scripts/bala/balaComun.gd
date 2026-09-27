@@ -64,14 +64,20 @@ func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
 	eliminarBala()
 	
 func eliminarBala():
-	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
 		return
+	
 	queue_free()
 
 
 func _on_area_comun_body_entered(body: Node3D) -> void:
-	if(body.is_in_group("enemy")):
+	
 				#--------------------------Aca cuando choca con el enemigo
-		eliminarBala()
-	else:
-		eliminarBala()
+	eliminarBala()
+	
+
+
+func _on_area_comun_area_entered(area: Area3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
+		return
+	eliminarBala()

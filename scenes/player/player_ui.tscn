@@ -208,6 +208,10 @@ theme_override_constants/margin_bottom = 20
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="LabelPing" type="Label" parent="TopLeft/ControlsRoot" unique_id=890552647]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="Control" type="HBoxContainer" parent="TopLeft/ControlsRoot" unique_id=1843814823]
 layout_mode = 2
 
@@ -222,6 +226,7 @@ label_settings = ExtResource("4_mo8vb")
 horizontal_alignment = 1
 
 [node name="Control2" type="HBoxContainer" parent="TopLeft/ControlsRoot" unique_id=169031140]
+visible = false
 layout_mode = 2
 
 [node name="TextureRect" type="TextureRect" parent="TopLeft/ControlsRoot/Control2" unique_id=1193325041]

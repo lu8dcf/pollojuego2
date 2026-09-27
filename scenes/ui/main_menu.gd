@@ -396,6 +396,7 @@ func _on_creditos_pressed() -> void:
 func _on_empezar_solo_pressed() -> void:
 	aplicar_impacto()
 	_deactivate_menu_camera()
+	GlobalJuego.un_jugador = true
 	if temp_mundo:
 		temp_mundo.queue_free()
 		await get_tree().process_frame
@@ -413,9 +414,10 @@ func _crear_jugador_local(mundo_instancia: Node3D):
 	jugador.name = "1"
 	#var spawn_container = mundo_instancia.get_node_or_null("SpawnContainer")
 	#if spawn_container == null
+	mundo_instancia.add_child(jugador)
+#global_position es una propiedad que requiere que el nodo esté en el árbol para poder calcular su transformación global. Si el nodo está huérfano (no agregado a ningún padre en el árbol), global_position lanza ese error.
 	jugador.global_position = Vector3(22, 2, 22)
 	GlobalJuego.un_jugador = true
-	mundo_instancia.add_child(jugador)
 
 
 #manejo de errores:
