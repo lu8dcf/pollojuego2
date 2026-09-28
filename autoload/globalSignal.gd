@@ -20,6 +20,25 @@ signal sesion_actualizada(info_sesion: Dictionary)
 @warning_ignore("unused_signal")
 signal error_conexion(mensaje :String)
 
+# ===== SEÑALES DE MENU MAIN =====
+@warning_ignore("unused_signal") # señales de multijugador tube y enet
+signal solicitar_unirse_lan(ip: String, puerto: int, nombre: String)
+@warning_ignore("unused_signal")
+signal solicitar_crear_lan(puerto: int, nombre: String)
+@warning_ignore("unused_signal") 
+signal solicitar_unirse_tube(session_id: String, nombre: String)
+@warning_ignore("unused_signal") 
+signal solicitar_crear_tube(nombre: String)
+# señaes de un solo jugador
+@warning_ignore("unused_signal") 
+signal solicitar_empezar
+# señales de pantalla de carga 
+@warning_ignore("unused_signal") 
+signal cancelado
+@warning_ignore("unused_signal") 
+signal solicitar_cerrar
+
+
 
 # ===== SEÑALES DE JOYSTICK =====
 @warning_ignore("unused_signal")

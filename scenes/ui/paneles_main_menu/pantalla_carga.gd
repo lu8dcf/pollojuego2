@@ -11,6 +11,7 @@ signal cancelado
 
 var jugadores_listos :Dictionary = {}
 var total_jugadores :int = 1
+
 func _ready() -> void:
 	visible = true
 	animated_sprite_2d.play("cargando")
@@ -67,3 +68,6 @@ func mensaje(texto: String) -> void:
 
 func _on_cancelar_pressed() -> void:
 	cancelado.emit()
+
+func ocultar()->void:
+	hide()

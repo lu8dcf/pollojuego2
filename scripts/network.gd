@@ -32,6 +32,11 @@ var _ultimo_ping_enviado:int = 0
 var _timer_ping:Timer = null
 const INTERVALO_PING :=1.0 # cada un segundo se actualiza
 
+# banderas de crear session y unir n tube
+var _uniendo_sesion = false
+var _creando_sesion: bool = false
+
+
 func _ready() -> void:
 	if tube_enabled:
 		tube_client.context = TUBE_CONTEXT
@@ -59,17 +64,57 @@ func _enviar_ping()->void:
 	_ultimo_ping_enviado = Time.get_ticks_msec()
 	_ping_servidor.rpc_id(1, _ultimo_ping_enviado)
 
+# MANEJO DE SEÑALES
+func _conectar_señales_lobby() -> void:
+	"""Conecta las señales de lobby solo si no están conectadas"""
+	if not multiplayer.peer_connected.is_connected(_on_peer_connected_lobby):
+		multiplayer.peer_connected.connect(_on_peer_connected_lobby)
+	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected_lobby):
+		multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
+
+func _desconectar_señales_lobby() -> void:
+	"""Desconecta las señales de lobby si están conectadas"""
+	if multiplayer.peer_connected.is_connected(_on_peer_connected_lobby):
+		multiplayer.peer_connected.disconnect(_on_peer_connected_lobby)
+	if multiplayer.peer_disconnected.is_connected(_on_peer_disconnected_lobby):
+		multiplayer.peer_disconnected.disconnect(_on_peer_disconnected_lobby)
+
 func tube_create():
+	if _creando_sesion:
+		print("Ya se está creando la sesión, ignorando...")
+		return
+	_creando_sesion = true
+	_limpiar_multiplayer_peer()
+	
+	if tube_client.session_id != "":
+		tube_client.leave_session()
+		await get_tree().process_frame
 	en_lobby = true
-	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
+	_conectar_señales_lobby()
+	if not tube_client.session_created.is_connected(_on_tube_creado):
+		tube_client.session_created.connect(_on_tube_creado)
+	
 	tube_client.create_session()
 
+func _on_tube_creado():
+	_creando_sesion = false
+
 func tube_join(session_id: String):
+	if _uniendo_sesion:
+		print("Ya se está uniendo a una sesión, ignorando...")
+		return
+	_uniendo_sesion = true
+	
+	_limpiar_multiplayer_peer()
+	
+	# cerrar cualquier sesion previa de Tube
+	if tube_client.session_id != "":
+		tube_client.leave_session()
+		await get_tree().process_frame
+		await get_tree().process_frame 
+	_limpiar_multiplayer_peer()
 	en_lobby = true
-	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
-	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
+	_conectar_señales_lobby()
 	tube_client.join_session(session_id)
 	_iniciar_timeout_conexion(10.0)
 
@@ -87,6 +132,7 @@ func _actualizar_ip_local() -> void:
 		#print("la ip elegida por el usuario es: ", ip_local)
 
 func empezar_servidor_lan(puerto: int = 9999):
+	_limpiar_multiplayer_peer()
 	en_lobby = true
 	puerto_actual=puerto
 	
@@ -104,12 +150,13 @@ func empezar_servidor_lan(puerto: int = 9999):
 		return false
 		
 	multiplayer.multiplayer_peer = enet_peer
-	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
-	_iniciar_timeout_conexion(8.0)
+	_conectar_señales_lobby()
+
+	#_iniciar_timeout_conexion(8.0)
 	return true
 
 func unirse_servidor_lan(direccion_ip:String, puerto:int)-> bool:
+	_limpiar_multiplayer_peer()
 	en_lobby = true
 	puerto_actual = puerto
 	var error = enet_peer.create_client(direccion_ip, puerto)
@@ -125,10 +172,33 @@ func unirse_servidor_lan(direccion_ip:String, puerto:int)-> bool:
 		GlobalSignal.error_conexion.emit(mensaje)
 		return false
 		
-	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
-	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
 	multiplayer.multiplayer_peer = enet_peer
+	_conectar_señales_lobby()
+	if not multiplayer.connected_to_server.is_connected(_on_connected_to_server_lobby):
+		multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
+	return true
+
+# LIMPIEZA DE SEÑALES EN MULTIJUGADOR
+func _limpiar_multiplayer_peer() -> void:
+	_desconectar_señales_lobby()
+	
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
+	
+	# Recrear el ENetMultiplayerPeer para evitar que quede "sucio"
+	enet_peer = ENetMultiplayerPeer.new()
+
+# ESPERAR A QUE EL PEER SE GENERE ANTES DE CONTINUAR
+func _esperar_peer_listo(timeout: float = 5.0) -> bool: #epera a que multiplayer.multiplayer_peer este asignado
+	var tiempo_inicio = Time.get_ticks_msec()
+	var tiempo_max = timeout * 1000.0
+	
+	while multiplayer.multiplayer_peer == null:
+		if Time.get_ticks_msec() - tiempo_inicio > tiempo_max:
+			return false
+		await get_tree().process_frame
+	
 	return true
 
 # ------------------------------------------------------------
@@ -151,7 +221,9 @@ func _on_peer_disconnected_lobby(peer_id: int):
 		GlobalJuego.session_info.erase(peer_id)
 
 func _on_connected_to_server_lobby():
-
+	_uniendo_sesion = false # se resetean banderas
+	_creando_sesion = false
+	
 	if _timeout_conexion: # si existe el timeout, cancelarlo
 		if _timeout_conexion.timeout.is_connected(_on_timeout_conexion):
 			_timeout_conexion.timeout.disconnect(_on_timeout_conexion)
@@ -284,7 +356,10 @@ func _on_server_disconnected():
 	_volver_al_menu_por_desconexion_host()
 
 func _volver_al_menu_por_desconexion_host():
-	"""Maneja la desconexión del host para los clientes"""
+	# resetear variables
+	_uniendo_sesion = false
+	_creando_sesion = false
+	
 	# Limpiar la conexión
 	if multiplayer.multiplayer_peer:
 		multiplayer.multiplayer_peer.close()
@@ -307,6 +382,10 @@ func eliminar_jugador(peer_id):
 			jugador.queue_free()
 
 func leave_server():
+	# resetear variables
+	_uniendo_sesion = false
+	_creando_sesion = false
+	
 	if tube_enabled:
 		tube_client.leave_session()
 	multiplayer.multiplayer_peer.close()
@@ -325,6 +404,10 @@ func _iniciar_timeout_conexion(segundos: float = 8.0) -> void:
 	
 	
 func _on_timeout_conexion() -> void:
+	# resetear variables
+	_uniendo_sesion = false
+	_creando_sesion = false
+	
 	# Si seguimos en lobby y NO estamos conectados, es un timeout
 	if not en_lobby:
 		return
@@ -352,6 +435,10 @@ func _on_timeout_conexion() -> void:
 
 
 func _on_conexion_fallida():
+	# resetear variables
+	_uniendo_sesion = false
+	_creando_sesion = false
+	
 	if _timeout_conexion:
 		if _timeout_conexion.timeout.is_connected(_on_timeout_conexion):
 			_timeout_conexion.timeout.disconnect(_on_timeout_conexion)

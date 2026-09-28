@@ -1,24 +1,24 @@
 [gd_scene format=3 uid="uid://bym6i52jnwycp"]
 
-[ext_resource type="Script" uid="uid://cpfofbduhbraq" path="res://scenes/ui/pantalla_carga.gd" id="1_y42jc"]
-[ext_resource type="PackedScene" uid="uid://go1lsk1664t3" path="res://scenes/ui/boton_base.tscn" id="2_gf6nl"]
-[ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="2_yxye6"]
-[ext_resource type="Texture2D" uid="uid://bhsw7bb8gny5f" path="res://assets/ui/lobby/personajes/idle2.png" id="3_y42jc"]
+[ext_resource type="Script" uid="uid://cpfofbduhbraq" path="res://scenes/ui/paneles_main_menu/pantalla_carga.gd" id="1_8isox"]
+[ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="2_4gu5t"]
+[ext_resource type="Texture2D" uid="uid://bhsw7bb8gny5f" path="res://assets/ui/lobby/personajes/idle2.png" id="3_ohwxg"]
+[ext_resource type="PackedScene" uid="uid://go1lsk1664t3" path="res://scenes/ui/boton_base.tscn" id="4_qlybx"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yxye6"]
-atlas = ExtResource("3_y42jc")
+atlas = ExtResource("3_ohwxg")
 region = Rect2(0, 0, 128, 128)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_f0q8f"]
-atlas = ExtResource("3_y42jc")
+atlas = ExtResource("3_ohwxg")
 region = Rect2(128, 0, 128, 128)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_t8jet"]
-atlas = ExtResource("3_y42jc")
+atlas = ExtResource("3_ohwxg")
 region = Rect2(256, 0, 128, 128)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ebue7"]
-atlas = ExtResource("3_y42jc")
+atlas = ExtResource("3_ohwxg")
 region = Rect2(384, 0, 128, 128)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_0rl2u"]
@@ -42,7 +42,7 @@ animations = [{
 }]
 
 [node name="PantallaCarga" type="CanvasLayer" unique_id=198192704]
-script = ExtResource("1_y42jc")
+script = ExtResource("1_8isox")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1333326263]
 anchors_preset = 15
@@ -70,7 +70,7 @@ theme_override_constants/separation = 30
 unique_name_in_owner = true
 layout_mode = 2
 text = "Cargando..."
-label_settings = ExtResource("2_yxye6")
+label_settings = ExtResource("2_4gu5t")
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -84,7 +84,7 @@ position = Vector2(134, -51.75)
 sprite_frames = SubResource("SpriteFrames_0rl2u")
 animation = &"cargando"
 
-[node name="BotonCancelar" parent="Centro" unique_id=320612053 instance=ExtResource("2_gf6nl")]
+[node name="BotonCancelar" parent="Centro" unique_id=320612053 instance=ExtResource("4_qlybx")]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Cancelar"
@@ -93,7 +93,7 @@ text = "Cancelar"
 unique_name_in_owner = true
 layout_mode = 2
 text = "1/3 listos"
-label_settings = ExtResource("2_yxye6")
+label_settings = ExtResource("2_4gu5t")
 horizontal_alignment = 1
 vertical_alignment = 1
 
