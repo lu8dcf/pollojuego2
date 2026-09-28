@@ -57,6 +57,7 @@ height = 3.0966797
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 process_mode = 1
 collision_layer = 2
+collision_mask = 3
 script = ExtResource("1_qypkf")
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]

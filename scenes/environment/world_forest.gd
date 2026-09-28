@@ -81,14 +81,14 @@ func fabrica_enemigos(tipo):
 
 		
 	
-	if tipo < 0 or tipo > GlobalJuego.cant_tipo_enemigos: # hasta aca solo 4 enemigos
+	if tipo < 0 or tipo >= GlobalJuego.cant_tipo_enemigos: # hasta aca solo 4 enemigos
 		push_error("Valor X fuera de rango: " + str(tipo))
 		return
 		
 	if tipo==0:
 		variedad_enemigos+=1
 		tipo=variedad_enemigos
-		if variedad_enemigos==3:
+		if variedad_enemigos==GlobalJuego.cant_tipo_enemigos:
 			variedad_enemigos=0
 			 
 	var nuevo_enemigo = enemigo_base.instantiate()

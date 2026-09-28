@@ -71,11 +71,10 @@ func _ready():
 	cargar_movimiento()
 	add_to_group('enemy')
 	tipo_enemigo()
-	marcapaso.timeout.connect(cambios)
 	#jugador = get_tree().get_first_node_in_group("Jugadores")
 	# Esperar un frame para que el NavigationServer se inicialice
 	await get_tree().physics_frame
-	
+	marcapaso.timeout.connect(cambios)
 	
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
@@ -123,7 +122,9 @@ func tipo_enemigo():
 			#Wanderer (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
 			estado_actual=estado.WANDER
 		4:
-			pass
+			#langosta (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
+			estado_actual=estado.WANDER
+			
 
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
@@ -348,7 +349,12 @@ func _on_vision_body_entered(body: Node3D) -> void:
 	if tipo==2 and estado_actual==estado.WANDER:
 		estado_actual=estado.FLEE	
 	
-
+	if tipo==3 and estado_actual==estado.WANDER:
+		estado_actual=estado.PERSIGUE
+	
+	if tipo==4 and estado_actual==estado.WANDER:
+		estado_actual=estado.PERSIGUE	
+		
 
 func _on_vision_body_exited(body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
