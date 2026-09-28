@@ -55,31 +55,15 @@ func agregar_mapa():
 	
 func spawn_enemy():
 	
-	if not multiplayer.has_multiplayer_peer():
+	if not multiplayer.is_server():
 		return
-	
-	if multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
-		return
-	
-	# Verificar que tengamos un ID válido
-	var mi_id = multiplayer.get_unique_id()
-	if mi_id == 0 or mi_id == 1 and not multiplayer.is_server():
-		# Si somos cliente y nos devuelve 1, hay un problema
-		if not multiplayer.is_server():
-			return
-	var cantidad_enemigos = get_tree().get_nodes_in_group("enemy").size()
-	if cantidad_enemigos > GlobalJuego.cant_enemigos:
-		return
-	
+
 	if is_menu_mode:
 		return
-	if not is_multiplayer_authority():
+
+	if get_tree().get_nodes_in_group("enemy").size() >= GlobalJuego.cant_enemigos:
 		return
-	# SOLO el servidor puede spawnear enemigos
-	if not multiplayer.is_server():
-		return  # Los clientes NO spawnean, solo reciben sincronización
-	
-	#GlobalSignal.agrega_enemigo.emit(1)
+
 	instanciar_enemigo()
 
 func instanciar_enemigo():
