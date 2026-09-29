@@ -14,6 +14,7 @@ metadata/_custom_type_script = "uid://b0h5wuf4brlk1"
 [resource]
 script = ExtResource("1_h7l8e")
 id = 2
+nombre = "ee"
 danio = 5.0
 tiempoDeAtaque = 4
 tipo = 2

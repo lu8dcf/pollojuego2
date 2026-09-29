@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://df6wkbhxh2iij"]
+
+[ext_resource type="Script" uid="uid://yqecui0i2g6v" path="res://scripts/habilidades/escudo/escudo.gd" id="1_papwa"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_h4t55"]
+radius = 1.1186941
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_4e15o"]
+radius = 1.0744153
+
+[node name="escudo" type="StaticBody3D" unique_id=2104900375]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+collision_layer = 128
+collision_mask = 2
+script = ExtResource("1_papwa")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=961615633]
+shape = SubResource("SphereShape3D_h4t55")
+
+[node name="Area3D" type="Area3D" parent="." unique_id=173383363]
+collision_layer = 64
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=177052794]
+shape = SubResource("SphereShape3D_4e15o")
+debug_color = Color(0.7596895, 0.27169475, 0.89641833, 0.41960785)

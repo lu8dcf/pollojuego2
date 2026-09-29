@@ -1,5 +1,12 @@
-extends Node
 class_name Habilidad
+extends Node3D
+
+var jugador: Jugador
+
+
+func iniciar(p_jugador: Jugador) -> void:
+	jugador = p_jugador
+
 
 func usar():
-	print("Usando habilidad")
+	pass
