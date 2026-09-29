@@ -1,5 +1,5 @@
 extends CanvasLayer
-
+#pantalla de carga
 
 signal cancelado
 @onready var label_cargando: Label = %LabelCargando

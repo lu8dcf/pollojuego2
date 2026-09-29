@@ -342,6 +342,8 @@ func _iniciar_carga():
 	# Ahora todos empiezan la carga sincronizada
 	if Network and Network.has_method("iniciar_carga_sincronizada"):
 		Network.iniciar_carga_sincronizada(GlobalJuego.session_info.keys())
+	await get_tree().create_timer(0.5).timeout
+	queue_free()
 
 # avisar del cambio de personaje, cuando un usuario cambia su eprsonaje, avisa al host para que todos actualicen
 func notificar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):

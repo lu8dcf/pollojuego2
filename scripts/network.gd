@@ -60,7 +60,11 @@ func _enviar_ping()->void:
 		return
 	if multiplayer.is_server():
 		return # el host no se mide a si mismo
-		
+	var peer = multiplayer.multiplayer_peer
+	if peer == null:
+		return
+	if peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
 	_ultimo_ping_enviado = Time.get_ticks_msec()
 	_ping_servidor.rpc_id(1, _ultimo_ping_enviado)
 

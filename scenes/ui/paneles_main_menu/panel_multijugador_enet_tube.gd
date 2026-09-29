@@ -1,4 +1,5 @@
 extends PanelContainer
+# panel multijugador enet_tube
 
 
 # Sub-paneles
@@ -60,7 +61,7 @@ func _mostrar_local() -> void:
 # NOMBRE Y UNIRSE O CREAR SESION DE TUBE
 func _nombre_actual_tube() -> String:
 	if edit_nombre_tube.text.strip_edges() != "":
-		return edit_nombre_enet.text.strip_edges()
+		return edit_nombre_tube.text.strip_edges()
 	return GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else "Jugador"
 
 

@@ -274,7 +274,7 @@ func _limpiar_lobby() -> void:
 func _on_partida_iniciada_desde_lobby() -> void:
 	_deactivate_menu_camera()
 	hide()
-	_limpiar_lobby()  # libera el lobby para no consumir recursos
+	#_limpiar_lobby()  # libera el lobby para no consumir recursos
 
 # ------------------------------------------------------------
 # MANEJO DE OPCIONES

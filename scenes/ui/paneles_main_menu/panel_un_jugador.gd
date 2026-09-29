@@ -1,5 +1,5 @@
 extends PanelContainer
-
+# panel un solo jugador
 
 @onready var nombre_usuario: LineEdit = %nombre_usuario
 @onready var empezar_solo: TextureButtonAnimado = %empezar_solo
