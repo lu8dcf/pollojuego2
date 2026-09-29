@@ -1,82 +1,47 @@
 extends CharacterBody3D
 
 class_name Jugador
+
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 @export var sensitivity: float = 0.002
 
-const SPEED = 5.0
-const JUMP_VELOCITY = 4.5
+const SPEED := 5.0
+const JUMP_VELOCITY := 4.5
 
-var joystick : Joystick = null
+var joystick: Joystick = null
 
 @onready var camera_3d: Camera3D = $camaraRig/OffsetRig/Camera3D
-#@onready var head: Node3D = %Head
 @onready var nameplate: Label3D = %Nameplate
-
-#@onready var sound_hit: AudioStreamPlayer = %SoundHit
-#@onready var sound_ping: AudioStreamPlayer = %SoundPing
 @onready var player_ui: PlayerUI = %Player_UI
+#@onready var nodoJugador: Node3D = $jugador
 
-
-#SELECCION DE POLLO
-#var personajePollo = preload("res://scenes/pollos/pollo_modelo_1.tscn")
-@onready
-var nodoJugador = $jugador
-
-#obtengo mouse para seguirlo
-var mousePosicion : Vector2
-
-#maquina de estados
-enum Estado {
-	OLEADA, #estado generico, dutante la oleada
-	CAIDO, #incapacitado, solo peude disparar pero no moverse
-	MUERTE, #paso el tiempo de caido y muere
-	TIENDA, #no puede moverse ni atacar.
-	DASH
-}
-@export var estadoActual : Estado
-
-#salud jugador
-var salud = 100
-
-#temporizador de vida en estado CAIDO
 @onready var timer_caido: Timer = $timer_caido
-#tiempo que se debe presionar la tecla para salvar
 @onready var timer_salvar: Timer = $timer_salvar
 
+var pollo
 
-# Jugador que actualmente esta dentro de nuestra zona de ayuda.
+enum Estado {
+OLEADA,
+CAIDO,
+MUERTE,
+TIENDA,
+DASH,
+AYUDANDO
+}
+
+@export var estadoActual: Estado = Estado.OLEADA
+
+var ultimoEstado : Estado = Estado.OLEADA
+var salud := 100
 var objetivo_actual: Node = null
 
-
-
-#-----------------------------------------------------------------HABILIDADES
-
-#habilidad especial
-#@onready var habilidad: Habilidad = $habilidad
-#-----------------------------------------------DASH
-const DASH_SPEED := 20.0
+#DASH
+const DASH_SPEED := 80.0
 const DASH_DURATION := 0.25
-const DASH_COLDOWN :=3
-
 var direccion_dash := Vector3.ZERO
 var tiempo_dash := 0.0
 
-
-
-
-
-#@onready var animation_library_godot_standard: Node3D = %AnimationLibrary_Godot_Standard
-#@export var animation_player: AnimationPlayer 
-#@export var player_mesh: MeshInstance3D
-
-#@onready var arms_root: Node3D = %ArmsRoot
-#@export var weapon_animation_player: AnimationPlayer 
-#@export var hurt_box: HurtBox
-#@export var arm_mesh_right: MeshInstance3D
-#@export var arm_mesh_left: MeshInstance3D
-
-
+#------------------------------------------------------------METODOS
 
 func _enter_tree() -> void:
 	if GlobalJuego.un_jugador:
@@ -88,13 +53,13 @@ func _enter_tree() -> void:
 			id = 1
 		set_multiplayer_authority(id)
 
-func _ready():
-	#add_child(personajePollo.instantiate())
+
+func _ready() -> void:
+	pollo = $FabricaPollos.crear($FabricaPollos.TipoPollo.BLANCO, self) #si queres poner otras habilidades: LENTES = dron, MARRON = escudo, BLANCO = dash
+	add_child(pollo) #eSTO debe recibir ya un nodo pollo elegido
+	pollo.set_multiplayer_authority(get_multiplayer_authority(), true) #para que el pollo tenga el mismo nivel de auoridad que el padre
 	add_to_group("Jugadores")
 	nameplate.text = name
-#	animation_player.playback_default_blend_time = 0.2
-#	arms_root.hide()
-	#replicate_color_changed(player_ui.COLORS[0])
 	player_ui.hide()
 	GlobalSignal.enviar_joystick.connect(recibir_joystick) # para obtener el joystick
 	if GlobalJuego.un_jugador:
@@ -119,90 +84,83 @@ func _ready():
 			camera_3d.current = true
 		ready_client_visuals()
 
-func recibir_joystick(j:Joystick):
+	#GlobalSignal.enviar_joystick.connect(recibir_joystick) #comprobar esto
+	#if not is_multiplayer_authority():
+	#	if camera_3d:
+	#		camera_3d.current = false
+	#	player_ui.hide()
+	#	set_process(false)
+	#	return
+
+	#await get_tree().process_frame
+	#if camera_3d:
+	#	camera_3d.current = true
+	#ready_client_visuals() #hasta aca
+
+
+func recibir_joystick(j: Joystick) -> void:
 	joystick = j
-
-func ready_client_visuals():
+	
+func ready_client_visuals() -> void:
 	player_ui.show()
-	#arms_root.show()
-	#weapon_animation_player.playback_default_blend_time = 0.2
-	#weapon_animation_player.speed_scale = 0.7
-	
-	#player_ui.option_button_color.item_selected.connect(on_color_changed)
-	#animation_library_godot_standard.hide()
-	if GlobalJuego.nombre_jugador: 
-		nameplate.text =  GlobalJuego.nombre_jugador
+	if GlobalJuego.nombre_jugador:
+		nameplate.text = GlobalJuego.nombre_jugador
+
 	camera_3d.current = true
-	
-	#------------------------------------------------------------------------------INPUTS
 
+#-------------------------------------------------------------------------INPUT
 func _unhandled_input(event: InputEvent) -> void:
-
-	
 	if not is_multiplayer_authority():
 		return
-	
-	#si estoy en un estado que no peude interactuar
 	if not puede_interactuar():
 		return
-		
-# Cuando se PRESIONA E.
+
 	if event.is_action_pressed("attack2"):
 		if estadoActual == Estado.CAIDO:
 			return
 		if objetivo_actual == null:
 			return
 		empezar_salvar()
-	#if event is InputEventMouseMotion: #esto hace que no puedo mover mas o menos de los 90 grados
-		#$nodo_jugador.rotate_y(-event.relative.x * sensitivity)	
-		#camera_3d.rotate_x(-event.relative.y * sensitivity)
-		#camera_3d.rotation.x = clamp(camera_3d.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+
 
 func _process(_delta: float) -> void:
-	if Input.is_action_just_pressed('menu'):
+	
+	if not is_multiplayer_authority():
+		return
+		
+	if Input.is_action_just_pressed("habilidad"): # K
+		if puede_usar_habilidad():
+			pollo.usar_habilidad()
+
+	if Input.is_action_just_pressed("menu"):
 		estadoActual = Estado.TIENDA
 		open_menu(player_ui.menu.visible)
 		
-	if Input.is_action_just_pressed("test_caido"):
-		estadoActual = Estado.CAIDO
+	if Input.is_action_just_pressed("test_caido"): # M
+		cambiar_estado(Estado.CAIDO) #aca
 		pedir_ayuda()
-#
-	#if puede_disparar():
-		#shoot()	
 
-	if Input.is_action_just_pressed("attack1"): # Mouse Izq
-		attack(1) 
-		
-	#if Input.is_key_pressed(KEY_SHIFT):# ESTO DEBE SER ACCION PARA EL JOYSTICK VIRTUAL
-		#if habilidad:
-			#habilidad.usar()
-	
 
-func open_menu(current_visibility: bool):
+#-------------------------------------------------------------------------MENU
+func open_menu(current_visibility: bool) -> void:
 	player_ui.menu.visible = !current_visibility
 	player_ui.controls_root.visible = current_visibility
-	
-
 	if player_ui.menu.visible:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-		
-		
-		
-#--------------------------------------------------------------------------------ESTADOS
-		
+
+
+#------------------------------------------------------------------ESTADOS - CONSULTAS
+
 func puede_moverse() -> bool:
 	return estadoActual == Estado.OLEADA
 
-func puede_atacar() -> bool:
-	return estadoActual == Estado.OLEADA
-
 func puede_disparar() -> bool:
-	return estadoActual in [Estado.OLEADA, Estado.CAIDO]
+	return estadoActual in [Estado.OLEADA,Estado.CAIDO]
 
 func puede_usar_habilidad() -> bool:
-	return estadoActual == Estado.OLEADA
+	return estadoActual in [Estado.OLEADA,Estado.DASH]
 
 func puede_interactuar() -> bool:
 	return estadoActual == Estado.OLEADA
@@ -210,28 +168,39 @@ func puede_interactuar() -> bool:
 func esta_vivo() -> bool:
 	return estadoActual != Estado.MUERTE
 
+#---------------------------------------------------------------ENTRAR ESTADOS
 
-func entrar_caido():
-	estadoActual = Estado.CAIDO
-	timer_caido.start()
-	
-func entrar_muerte():
-	estadoActual = Estado.MUERTE
+func entrar_caido() -> void:
+	estado_caido_rpc.rpc() #al servidor!
+
+
+func entrar_muerte() -> void:
 	timer_caido.stop()
+	print("personaje muerto")
 	salud = 0
 	velocity = Vector3.ZERO
 
+
 func entrar_oleada() -> void:
-	estadoActual = Estado.OLEADA
 	timer_caido.stop()
 
-func entrar_tienda():
-	estadoActual = Estado.TIENDA
+func entrar_tienda() -> void:
 	velocity = Vector3.ZERO
-	
+
+func entrar_dash() -> void:
+	pass
+func entrar_ayudando():
+	pass
+
+
+#------------------------------------------------------------------------CAMBIAR ESTADO
 func cambiar_estado(nuevo_estado: Estado) -> void:
+	#if(not is_multiplayer_authority()):
+		#return
 	if estadoActual == nuevo_estado:
 		return
+	ultimoEstado = estadoActual
+	estadoActual = nuevo_estado
 	match nuevo_estado:
 		Estado.CAIDO:
 			entrar_caido()
@@ -241,120 +210,160 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 			entrar_oleada()
 		Estado.TIENDA:
 			entrar_tienda()
+		Estado.DASH:
+			entrar_dash()
+		Estado.AYUDANDO:
+			entrar_ayudando()
 
-	estadoActual = nuevo_estado
+
+
+#-----------------------------------------------------------------------------DASH
+
+func iniciar_dash() -> void:
+	direccion_dash = -pollo.global_transform.basis.z
+	direccion_dash = direccion_dash.normalized()
+	tiempo_dash = DASH_DURATION
+	cambiar_estado(Estado.DASH)
+
+func procesar_dash(delta: float) -> void:
+	tiempo_dash -= delta
+	velocity = direccion_dash * DASH_SPEED
+	move_and_slide()
+	if tiempo_dash <= 0.0:
+		terminar_dash()
+
+
+func terminar_dash() -> void:
+	velocity = Vector3.ZERO
+	direccion_dash = Vector3.ZERO
+	cambiar_estado(Estado.OLEADA)
+
+#--------------------------------------------------------------------PHYSICS PROCESSS
+#func _physics_process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
+
+	#if is_multiplayer_authority() or multiplayer.is_server():
+	#if not is_multiplayer_authority() and not multiplayer.is_server(): 
+		#return 
 	
-func _on_timer_caido_timeout() -> void:
-	cambiar_estado(Estado.MUERTE)
-	pass # Replace with function body.
-#----------------------------------------------------------------HABILIDADES
+	if not is_multiplayer_authority():
+		return
+	match estadoActual:
+		Estado.OLEADA:
+			#if(not multiplayer.is_server()):
+				#print(">>> ENTRA OLEADA")
+			procesar_movimiento(delta)
 
-#-------------------------------------------------DASH
+		Estado.DASH:
+			#if(not multiplayer.is_server()):
+				#print(">>> ENTRA DASH")
+			procesar_dash(delta)
 
-#func empezar_dash(direccion: Vector3) -> void:
-	#if estadoActual != Estado.OLEADA:
-		#return
-	#if direccion.length_squared() < 0.001:
-		#return
-	#direccion_dash = direccion.normalized()
-	#tiempo_dash = DASH_DURATION
-	#cambiar_estado(Estado.DASH)
-#
-#func procesar_dash(delta: float) -> void:
-	#tiempo_dash -= delta
-	#velocity = direccion_dash * DASH_SPEED
-	#move_and_slide()
-	#if tiempo_dash <= 0.0:
-		#terminar_dash()
-#
-#func terminar_dash() -> void:
-	#velocity = Vector3.ZERO
-	#direccion_dash = Vector3.ZERO
-	#cambiar_estado(Estado.OLEADA)
+		Estado.CAIDO:
+			#if(not multiplayer.is_server()):
+				#print(">>> ENTRA CAIDO")
+			procesar_caido()
 
-# --------------------------------------------------------------SISTEMA DE SALVAR
+		Estado.MUERTE:
+			#if(not multiplayer.is_server()):
+				#print(">>> ENTRA MUERTE")
+			procesar_muerte()
+
+		Estado.TIENDA:
+			#if(not multiplayer.is_server()):
+				#print(">>> ENTRA TIENDA")
+			procesar_tienda()
+			
+		Estado.AYUDANDO:
+			procesar_ayudando()
+			procesar_salvar()
+
+#----------------------------------------------------------------------MOVIMIENTO NORMAL
+
+func procesar_movimiento(delta: float) -> void:
+	# GRAVEDAD
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+	# INPUT
+	var direction := Vector3.ZERO
+	# Joystick
+	if (joystick != null and is_instance_valid(joystick) and joystick.direccion != Vector2.ZERO):
+		direction = (transform.basis *Vector3(joystick.direccion.x,0,joystick.direccion.y)).normalized()
+
+	# Teclado
+	else:
+		var input_dir := Input.get_vector("left","right","forward","backward")
+		direction = (transform.basis *Vector3(input_dir.x,0,input_dir.y)).normalized()
+
+	# VELOCIDAD
+	if direction != Vector3.ZERO:
+		velocity.x = direction.x * SPEED
+		velocity.z = direction.z * SPEED
+		if is_multiplayer_authority():
+			pollo.mirar_hacia(direction, delta) #ROTACION POLLO
+	else:
+		velocity.x = move_toward(velocity.x,0,SPEED)
+		velocity.z = move_toward(velocity.z,0,SPEED)
+
+	move_and_slide()
+
+#------------------------------------------------------------------------PROCESAR
+
+func procesar_caido() -> void:
+	velocity = Vector3.ZERO
+	
+func procesar_muerte() -> void:
+	velocity = Vector3.ZERO
+
+func procesar_tienda() -> void:
+	velocity = Vector3.ZERO
+	
+func procesar_ayudando() -> void:
+	velocity = Vector3.ZERO
+#---------------------------------------------------------------#SISTEMA DE SALVAR
+
 func procesar_salvar() -> void:
-	# Si no estamos intentando salvar,
-	# no hacemos nada.
-	if timer_salvar.is_stopped():
-		return
-	# comprobar que se sigue presionando E
-	if not Input.is_action_pressed("attack2"):
+	if timer_salvar.is_stopped(): #si no se hizo durante el tiempo definidp
 		cancelar_salvar()
 		return
-	# Comprobar que el objetivo sigue existiendo
-	if objetivo_actual == null:
+	if not Input.is_action_pressed("attack2"): #mouse derecho
 		cancelar_salvar()
 		return
-	# Comprobar que seguimos en condiciones de salvar
-	if estadoActual != Estado.OLEADA:
+	if objetivo_actual == null: #
 		cancelar_salvar()
 		return
+	if estadoActual != Estado.AYUDANDO:#
+		cancelar_salvar()
 
 
-# EMPEZAR A SALVAR
 func empezar_salvar() -> void:
-	if estadoActual != Estado.OLEADA:
+	if estadoActual == Estado.OLEADA:
+		cambiar_estado(Estado.AYUDANDO)
+	else:
 		return
 	if objetivo_actual == null:
 		return
-	# Evitamos reiniciar el timer si ya estaba contando.
 	if not timer_salvar.is_stopped():
 		return
 	timer_salvar.start()
 
-# CANCELAR SALVAR
+
 func cancelar_salvar() -> void:
 	if timer_salvar.is_stopped():
 		return
 	timer_salvar.stop()
+	cambiar_estado(Estado.OLEADA)
 
-
-# COMPLETAR SALVAR
 func _on_timer_salvar_timeout() -> void:
 	if objetivo_actual == null:
 		return
-	if estadoActual != Estado.OLEADA:
+	if estadoActual != Estado.AYUDANDO:
 		return
-	# Seguridad adicional:
-	# verificamos que EL BOTON DERECHP siga presionada.
 	if not Input.is_action_pressed("attack2"):
 		return
 	var objetivo_id := int(objetivo_actual.name)
 	pedir_salvar(objetivo_id)
-#
-#
-#func procesar_habilidad() -> void:
-	#if not puede_usar_habilidad():
-		#return
-	#if Input.is_action_just_pressed("habilidad"):
-		#print("usoHabilidad")
-		##habilidad.usar()
-
-func _physics_process(delta: float) -> void:
-	match estadoActual:
-		#Estado.OLEADA:
-			#procesar_movimiento(delta)
-		#Estado.DASH:
-			#procesar_dash(delta)
-		Estado.CAIDO:
-			velocity = Vector3.ZERO
-		Estado.MUERTE:
-			velocity = Vector3.ZERO
-		Estado.TIENDA:
-			velocity = Vector3.ZERO
-
-	# Si llegamos aca estamos en OLEADA
-	# Add the gravity.
-	if not is_on_floor():
-		velocity += get_gravity() * delta
-
-	# Handle jump.
-	#if Input.is_action_just_pressed("jump") and is_on_floor():
-		#velocity.y = JUMP_VELOCITY
-
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
+	cambiar_estado(Estado.OLEADA)
 	
 	var direction := Vector3.ZERO
 	
@@ -441,31 +450,6 @@ func mirar_al_mouse(delta: float) -> void:
 	)
 
 
-#func handle_animations(direction: Vector3):
-#	if animation_player.current_animation in one_shots:
-#		return
-
-	#if velocity.y == 0.0:
-		#if direction.x != 0.0 or direction.y != 0.0:
-			#animation_player.play("Jog_Fwd")
-		#else: 
-			#animation_player.play("Idle")
-	#else:
-		#animation_player.play("Jump")
-
-	
-#func shoot():
-	#var force = 100
-	#var pos = global_position
-	#var shoot_dir = get_shoot_direction()
-	#Global.shoot_ball.rpc_id(1, pos, shoot_dir, force)
-	#
-#func get_shoot_direction():
-	#var viewport_rect = get_viewport().get_visible_rect().size
-	#var raycast_start = camera_3d.project_ray_origin(viewport_rect / 2)
-	#var raycast_end = raycast_start + camera_3d.project_ray_normal(viewport_rect / 2) * 200
-	#return -(raycast_start - raycast_end).normalized()
-
 @rpc("any_peer", 'call_local')
 func register_hit(_is_dead = false):
 	#if is_dead:
@@ -516,30 +500,61 @@ func attack(_version: int):
 		#print("id es: ",objetivo_id)
 		#pedir_salvar(objetivo_id)
 
-	
-	#-----------------------------------------SERVIDOR
-	
-	
-		
-
-#-------------------------SERVIDOR----------------------
+#------------------------------------------------------------------------SERVIDOR
 
 @rpc("any_peer")
-func pedir_ayuda():
+func pedir_ayuda() -> void:
 	print("Ayuda!")
 
 
 func pedir_salvar(objetivo_id: int) -> void:
-	Network.pedir_salvar_rpc.rpc_id(1, objetivo_id)
-	
+	if multiplayer.is_server():
+		Network.procesar_salvar(multiplayer.get_unique_id(), objetivo_id) #si es el server esto
+	else:
+		Network.pedir_salvar_rpc.rpc_id(1, objetivo_id) #si es cliente, esto
 	objetivo_actual = null
 
-func _on_deteccion_ayuda_area_entered(area: Area3D) -> void: 
-	# Guardamos al jugador afectado solo si no estamos caídos
-	if estadoActual != Estado.CAIDO: 
+#------------------------------------------------------------DETECCION DE AYUDA
+
+func _on_deteccion_ayuda_area_entered(area: Area3D) -> void:
+	if estadoActual != Estado.CAIDO:
 		objetivo_actual = area.get_parent()
 
+
 func _on_deteccion_ayuda_area_exited(area: Area3D) -> void:
-	# Si el jugador se aleja del área, limpiamos la referencia
 	if objetivo_actual == area.get_parent():
 		objetivo_actual = null
+		
+		
+#------------------------------------------------------------------------TIMER CAIDO y morir
+func _on_timer_caido_timeout() -> void:
+	if not multiplayer.is_server():
+		return
+	if estadoActual != Estado.CAIDO:
+		return
+	morir_rpc.rpc(int(name))
+
+@rpc("any_peer", "call_local", "reliable")
+func morir_rpc(jugador_id: int) -> void:
+	var jugador := GlobalJuego._obtener_jugador(jugador_id)
+	if jugador == null:
+		return
+	cambiar_estado(Estado.MUERTE)
+	jugador.morir()
+
+@rpc("any_peer", "call_local", "reliable")
+func estado_caido_rpc() -> void:
+	timer_caido.start()
+
+func morir():
+	print("jugador ha muerto!")
+#-------------------------------------------------------------------SALVADOO
+func polloSalvado():
+	timer_caido.stop()
+	cambiar_estado(Estado.OLEADA)
+
+#identifico el rpoblema como que no cambia el estado correctamente en el servidor DEL CLIENTE (en el host anda bien
+#--------------------------------------------------------------------debuggPrint
+#func debug_cliente(mensaje: String) -> void:
+	#if not multiplayer.is_server():
+		#print("[CLIENTE] ", mensaje)

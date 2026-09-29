@@ -108,24 +108,7 @@ func _on_tiempo_disparo_timeout() -> void:
 	tiempo.start()
 	pass # Replace with function body.
 
-
-#func disparo():
-	##Mas animacion
-	#var nueva_bala = bala.instantiate()
-	#nueva_bala.top_level = true #autonomo del padre
-	#nueva_bala.set_multiplayer_authority(get_multiplayer_authority())
-	#
-	#var objetivo = buscarObjetivoMasCercano()
-	#if objetivo == null:
-		#return
-		#
-	#var direccion = objetivo - puntero.global_position
-	#direccion.y = 0 #que no vaya ni arriba ni abajo
-	#direccion = direccion.normalized()
-	#
-	#nueva_bala.iniciar(datos.comportamiento, puntero.global_position, direccion)
-	#contenedor.add_child(nueva_bala, true) #lo agrego al contenedor de spawn
-
+#
 func disparo():
 
 	if objetivo == null or not is_instance_valid(objetivo):
@@ -155,8 +138,10 @@ func disparo():
 			#tipo_bala
 		)
 
+
 func _on_buscar_objetivo_timeout() -> void:
 	actualizar_objetivo()
+	
 func crear_bala(posicion: Vector3, direccion: Vector3) -> void:
 	var nueva_bala = balaArma.instantiate()
 	nueva_bala.set_multiplayer_authority(1)

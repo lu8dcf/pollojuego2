@@ -71,3 +71,9 @@ visible = false
 script = ExtResource("5_j6fc8")
 
 [node name="fabrica_obstaculos" parent="." unique_id=495963731 instance=ExtResource("6_0wskc")]
+
+[node name="ContenedorHabilidades" type="Node3D" parent="." unique_id=160804510 groups=["contenedor_habilidades"]]
+
+[node name="SpawnerHabilidades" type="MultiplayerSpawner" parent="." unique_id=1955502881]
+_spawnable_scenes = PackedStringArray("uid://ctd4on41k0ea4", "uid://df6wkbhxh2iij")
+spawn_path = NodePath("../ContenedorHabilidades")

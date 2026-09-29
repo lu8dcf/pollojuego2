@@ -1,6 +1,21 @@
+class_name HabilidadDash
 extends Habilidad
-class_name habilidadDash
+
+@onready var tiempoRecarga = $tiempoRecarga
+
+var disponible := true
+#
+func usar() -> void:
+	if not jugador.puede_usar_habilidad():
+		return
+	if not disponible:
+		return
+	disponible = false
+	jugador.iniciar_dash()
+	tiempoRecarga.start()
+	
 
 
-func usar():
-	print("dash")
+func _on_tiempo_recarga_timeout() -> void:
+	#print("habilidadDisponible")
+	disponible = true
