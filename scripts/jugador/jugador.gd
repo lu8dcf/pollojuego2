@@ -13,7 +13,7 @@ var joystick: Joystick = null
 @onready var camera_3d: Camera3D = $camaraRig/OffsetRig/Camera3D
 @onready var nameplate: Label3D = %Nameplate
 @onready var player_ui: PlayerUI = %Player_UI
-@onready var nodoJugador: Node3D = $jugador
+#@onready var nodoJugador: Node3D = $jugador
 
 @onready var timer_caido: Timer = $timer_caido
 @onready var timer_salvar: Timer = $timer_salvar
@@ -52,7 +52,7 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	pollo = $FabricaPollos.crear($FabricaPollos.TipoPollo.COMUN, self)
+	pollo = $FabricaPollos.crear($FabricaPollos.TipoPollo.BLANCO, self) #si queres poner otras habilidades: LENTES = dron, MARRON = escudo, BLANCO = dash
 	add_child(pollo) #eSTO debe recibir ya un nodo pollo elegido
 	pollo.set_multiplayer_authority(get_multiplayer_authority(), true) #para que el pollo tenga el mismo nivel de auoridad que el padre
 	add_to_group("Jugadores")

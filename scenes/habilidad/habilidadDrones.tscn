@@ -5,10 +5,15 @@
 [node name="HabilidadDrones" type="Node3D" unique_id=637565460]
 script = ExtResource("1_cqhsr")
 
-[node name="tiempoRecarga" type="Timer" parent="." unique_id=760405088]
-wait_time = 4.0
+[node name="punteros" type="Node3D" parent="." unique_id=860406150]
 
-[node name="Marker3D" type="Marker3D" parent="." unique_id=976988339]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4488971, 0)
+[node name="Mark1" type="Marker3D" parent="punteros" unique_id=976988339]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0194595, 0.6287321, 0.9937544)
+
+[node name="Mark2" type="Marker3D" parent="punteros" unique_id=1551796057]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.97691154, 0.5142853, 1.0349014)
+
+[node name="tiempoRecarga" type="Timer" parent="." unique_id=760405088]
+wait_time = 10.0
 
 [connection signal="timeout" from="tiempoRecarga" to="." method="_on_tiempo_recarga_timeout"]

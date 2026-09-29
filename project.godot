@@ -122,6 +122,7 @@ pointing/emulate_touch_from_mouse=true
 3d_physics/layer_4="paredes"
 3d_physics/layer_5="balas"
 3d_physics/layer_6="PowerUp"
+3d_physics/layer_7="escudo"
 
 [physics]
 

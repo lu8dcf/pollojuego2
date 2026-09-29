@@ -3,9 +3,9 @@ extends Node
 
 
 enum TipoPollo {
-	COMUN,
-	NEGRO,
-	AZUL,
+	BLANCO,
+	LENTES,
+	MARRON,
 }
 
 
@@ -13,19 +13,19 @@ const POLLO_SCENE: PackedScene = preload("res://scenes/pollos/pollo.tscn")
 
 
 const POLLOS := {
-	TipoPollo.COMUN: {
+	TipoPollo.BLANCO: {
 		"modelo": preload("res://assets/modelos/pollos/pollo_1.fbx"),
 		"habilidad": preload("res://scenes/habilidad/habilidadDash.tscn"),
 	},
 
-	TipoPollo.NEGRO: {
+	TipoPollo.LENTES: {
 		"modelo": preload("res://assets/modelos/pollos/pollo_1.fbx"),
 		"habilidad": preload("res://scenes/habilidad/habilidadDrones.tscn"),
 	},
 
-	TipoPollo.AZUL: {
-		#"modelo": preload("res://pollo/modelos/PolloAzul.tscn"),
-		#"habilidad": preload("res://habilidades/HabilidadEscudo.tscn"),
+	TipoPollo.MARRON: {
+		"modelo": preload("res://assets/modelos/pollos/pollo_1.fbx"),
+		"habilidad": preload("res://scenes/habilidad/habilidadEscudo.tscn"),
 	},
 
 }
