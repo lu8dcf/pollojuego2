@@ -18,11 +18,6 @@ func inicializar(p_jugador: Jugador,p_modelo: Node3D,p_habilidad: Habilidad) -> 
 
 	habilidad.iniciar(jugador)
 
-#func usar_habilidad() -> void:
-#
-	##if is_instance_valid(habilidad):
-	#if(habilidad != null):
-		#habilidad.usar()
 
 
 func usar_habilidad() -> void:

@@ -115,7 +115,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not puede_interactuar():
 		return
 
-	if event.is_action_pressed("attack2"):
+	if event.is_action_pressed("attack2"): #click derecho (o izq?)
 		if estadoActual == Estado.CAIDO:
 			return
 		if objetivo_actual == null:
@@ -365,140 +365,6 @@ func _on_timer_salvar_timeout() -> void:
 	pedir_salvar(objetivo_id)
 	cambiar_estado(Estado.OLEADA)
 	
-	var direction := Vector3.ZERO
-	
-	# Prioridad al Joystick táctil si es válido
-	if joystick != null and is_instance_valid(joystick) and joystick.direccion != Vector2.ZERO:
-		direction = (transform.basis * Vector3(joystick.direccion.x, 0, joystick.direccion.y)).normalized()
-	else:
-		# Si no hay joystick, leemos el teclado/mando clásico
-		var input_dir := Input.get_vector("left", "right", "forward", "backward")
-		direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-
-	# 3. Aplicar las velocidades calculadas
-	if direction != Vector3.ZERO:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
-	
-	#var input_dir := Input.get_vector("left", "right", "forward", "backward")
-	#var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-#
-#
-	#if direction:
-		#velocity.x = direction.x * SPEED
-		#velocity.z = direction.z * SPEED
-	#else:
-		#velocity.x = move_toward(velocity.x, 0, SPEED)
-		#velocity.z = move_toward(velocity.z, 0, SPEED)
-
-
-	#sigo con la mirada al mouse
-	mirar_al_mouse(delta)
-	
-	move_and_slide()
-	#handle_animations(direction)
-
-#var one_shots: Array[String] = ["Sword_Attack"]
-
-func mirar_al_mouse(delta: float) -> void:
-
-	var camara = get_viewport().get_camera_3d()
-	if not camara:
-		return
-
-	var mouse_pos = get_viewport().get_mouse_position() #pos del mouse ne la pantalla
-
-	#hago un raycast para obtener la pos en el mundo 3d
-	var origen = camara.project_ray_origin(mouse_pos)
-	var direccion_rayo = camara.project_ray_normal(mouse_pos)
-
-	# Plano horizontal del jugador
-	var plano = Plane(Vector3.UP, global_position.y)
-
-	# interseccion del rayo con el plano
-	var punto_mouse = plano.intersects_ray(
-		origen,
-		direccion_rayo
-	)
-
-	if punto_mouse == null:
-		return
-
-	# direccion desde el jugador hacia el mouse
-	var direccion = -(punto_mouse - global_position) #MUCHO MUY IMPORTANTE ESE MENOOOS
-
-	# sin contar la altura
-	direccion.y = 0
-
-	if direccion.length_squared() < 0.001:
-		return
-
-	# rotacion
-	var rotacion_objetivo = atan2(
-		direccion.x,
-		direccion.z
-	)
-
-	# roto el nodo pollo, no todo
-	nodoJugador.rotation.y = lerp_angle(
-		nodoJugador.rotation.y,
-		rotacion_objetivo,
-		delta * 10.0
-	)
-
-
-@rpc("any_peer", 'call_local')
-func register_hit(_is_dead = false):
-	#if is_dead:
-		#sound_hit.play()
-		#sound_ping.play()
-	#else:
-		#sound_hit.play()
-	
-	player_ui.hit_marker.show()
-	await get_tree().create_timer(0.2).timeout
-	player_ui.hit_marker.hide()
-	
-#func on_color_changed(new_item: int):
-	#replicate_color_changed.rpc(player_ui.COLORS[new_item])	
-
-#@rpc("authority", "call_local")
-#func replicate_color_changed(new_color: Color):
-	#var material: StandardMaterial3D = player_mesh.get_active_material(0)
-	#var new_material = material.duplicate()
-	#new_material.albedo_color = new_color
-	#player_mesh.set_surface_override_material(0, new_material)
-	#arm_mesh_left.set_surface_override_material(0, new_material)
-	#arm_mesh_right.set_surface_override_material(0, new_material)
-
-func attack(_version: int):
-	#print ("Ataque")
-	Sonidos.sonidoPollo()
-	#if weapon_animation_player.current_animation.begins_with("arm_model_animations/swing"):
-		#return
-	
-	#if version == 1:
-		#hurt_box.current_damage = 25
-	#elif version == 2:
-		#hurt_box.current_damage = 50
-	#hurt_box.bodies_hit.clear()
-	#
-	#animation_player.stop()
-	#animation_player.play("Sword_Attack")
-	#weapon_animation_player.play("arm_model_animations/swing_0" + str(version))
-	#await weapon_animation_player.animation_finished
-	#weapon_animation_player.play("arm_model_animations/idle")
-	
-#cuando un jugador esta cerca, si se aprieta la E, manda la peticion de salvarlo
-#func _on_deteccion_ayuda_area_entered(area: Area3D) -> void: 
-	#if(estadoActual != estados.CAIDO) and (Input.is_action_just_pressed("attack2")):
-		#var jugador_objetivo = area.get_parent()
-		#var objetivo_id = int(jugador_objetivo.name)
-		#print("id es: ",objetivo_id)
-		#pedir_salvar(objetivo_id)
 
 #------------------------------------------------------------------------SERVIDOR
 

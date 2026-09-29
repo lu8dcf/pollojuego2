@@ -10,7 +10,7 @@ radius = 1.0744153
 
 [node name="escudo" type="StaticBody3D" unique_id=2104900375]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
-collision_layer = 64
+collision_layer = 128
 collision_mask = 2
 script = ExtResource("1_papwa")
 
