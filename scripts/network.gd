@@ -84,21 +84,25 @@ func _desconectar_señales_lobby() -> void:
 		multiplayer.peer_disconnected.disconnect(_on_peer_disconnected_lobby)
 
 func tube_create():
+	print("[NETWORK] tube_create llamado")
 	if _creando_sesion:
 		print("Ya se está creando la sesión, ignorando...")
 		return
 	_creando_sesion = true
 	_limpiar_multiplayer_peer()
+	print("[NETWORK] peer limpiando")
 	
 	if tube_client.session_id != "":
+		print("[NETWORK] Cerrando sesión previa: ", tube_client.session_id)
 		tube_client.leave_session()
 		await get_tree().process_frame
 	en_lobby = true
 	_conectar_señales_lobby()
 	if not tube_client.session_created.is_connected(_on_tube_creado):
 		tube_client.session_created.connect(_on_tube_creado)
-	
+	print("[NETWORK] Llamando a create_session")
 	tube_client.create_session()
+	print("[NETWORK] create_session terminó")
 
 func _on_tube_creado():
 	_creando_sesion = false

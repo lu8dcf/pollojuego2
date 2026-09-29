@@ -44,7 +44,8 @@ func _ready() -> void:
 	GlobalSignal.solicitar_unirse_lan.connect(_on_unirse_lan)
 	GlobalSignal.solicitar_crear_lan.connect(_on_crear_lan)
 	GlobalSignal.solicitar_unirse_tube.connect(_on_unirse_tube)
-	GlobalSignal.solicitar_crear_tube.connect(_on_crear_tube)
+	if not GlobalSignal.solicitar_crear_tube.is_connected(_on_crear_tube):
+		GlobalSignal.solicitar_crear_tube.connect(_on_crear_tube)
 	GlobalSignal.solicitar_cerrar.connect(_ocultar_todos_los_paneles)
 	
 	# Errores de red
@@ -212,8 +213,9 @@ func _on_unirse_tube(session_id: String, nombre: String) -> void:
 	Network.tube_join(session_id)
 
 func _on_crear_tube(nombre: String) -> void:
+	print("[MENU] _on_crear_tube llamado con nombre: ", nombre)
 	if _creando_tube:
-		print("Ya se está creando la sesión, ignorando...")
+		print("[MENU] Ya se está creando, ignorando")
 		return
 	_creando_tube = true
 	GlobalJuego.nombre_jugador = nombre
@@ -221,17 +223,22 @@ func _on_crear_tube(nombre: String) -> void:
 	_deactivate_menu_camera()
 	
 	_mostrar_pantalla_carga("Creando partida...")
-	
+	print("[MENU] Conectando señal session_created")
+
 	# Conectar la señal ANTES de crear la sesión
 	if not Network.tube_client.session_created.is_connected(_on_tube_session_created):
 		Network.tube_client.session_created.connect(_on_tube_session_created)
+	print("[MENU] Llamando a Network.tube_create()")
+
 	Network.tube_create()
 
 func _on_tube_session_created():
+	print("[MENU] ¡session_created recibido!")
 	_creando_tube = false
 	if Network.tube_client.session_created.is_connected(_on_tube_session_created):
 		Network.tube_client.session_created.disconnect(_on_tube_session_created)
 	var peer_listo = await Network._esperar_peer_listo(5.0)
+	print("menu. peer listo: ", peer_listo)
 	if not peer_listo:
 		_ocultar_pantalla_carga()
 		_on_error_conexion("No se pudo inicializar la sesión de Tube.")
@@ -274,7 +281,7 @@ func _limpiar_lobby() -> void:
 func _on_partida_iniciada_desde_lobby() -> void:
 	_deactivate_menu_camera()
 	hide()
-	#_limpiar_lobby()  # libera el lobby para no consumir recursos
+	_limpiar_lobby()  # libera el lobby para no consumir recursos
 
 # ------------------------------------------------------------
 # MANEJO DE OPCIONES

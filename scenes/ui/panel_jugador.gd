@@ -1,5 +1,6 @@
 extends Panel
 
+
 @onready var nombre_usuario: Label = $NombreUsuario
 @onready var estoy_listo_boton: TextureButtonAnimado = $ContenedorBoton/EstoyListoBoton
 @onready var indicador_listo: Label = $IndicadorListo  
