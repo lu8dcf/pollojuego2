@@ -42,6 +42,7 @@ animations = [{
 }]
 
 [node name="PantallaCarga" type="CanvasLayer" unique_id=198192704]
+layer = 20
 script = ExtResource("1_8isox")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1333326263]

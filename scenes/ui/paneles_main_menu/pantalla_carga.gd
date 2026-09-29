@@ -13,6 +13,7 @@ var jugadores_listos :Dictionary = {}
 var total_jugadores :int = 1
 
 func _ready() -> void:
+	layer=100
 	visible = true
 	animated_sprite_2d.play("cargando")
 	boton_cancelar.pressed.connect(_on_cancelar_pressed)
@@ -22,6 +23,7 @@ func _ready() -> void:
 	progreso.value = 0
 
 func configurar_jugadores(lista_peers_ids:Array) -> void:
+	print("configurando jugadores")
 	total_jugadores = lista_peers_ids.size()
 	jugadores_listos.clear()
 	

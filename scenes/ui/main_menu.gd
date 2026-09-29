@@ -281,7 +281,11 @@ func _limpiar_lobby() -> void:
 func _on_partida_iniciada_desde_lobby() -> void:
 	_deactivate_menu_camera()
 	hide()
-	_limpiar_lobby()  # libera el lobby para no consumir recursos
+	if temp_mundo and is_instance_valid(temp_mundo):
+		if menu_camera:
+			menu_camera.current = false
+		temp_mundo.queue_free()
+	#_limpiar_lobby()  # libera el lobby para no consumir recursos
 
 # ------------------------------------------------------------
 # MANEJO DE OPCIONES

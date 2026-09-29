@@ -489,31 +489,41 @@ func _mostrar_pantalla_carga(lista_peer_ids: Array) -> void:
 	pantalla_carga_actual.configurar_jugadores(lista_peer_ids)
 
 func _cargar_mundo_local() -> void: # cada usuario carga su mundo
-	var main_menu = get_tree().current_scene
+	
+	# precargar recursos pesados
+	var recursos_a_precargar = [
+		"uid://yubh30707eb7",  # mundo
+		"uid://bc1ek0bvbgna2",  # jugador
+		# ... otros recursos
+	]
+	
+	for recurso in recursos_a_precargar:
+		ResourceLoader.load_threaded_request(recurso)
+	
+	var todos_listos = false
+	while not todos_listos:
+		todos_listos = true
+		for recurso in recursos_a_precargar:
+			var status = ResourceLoader.load_threaded_get_status(recurso)
+			if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+				todos_listos = false
+				break
+			elif status == ResourceLoader.THREAD_LOAD_FAILED:
+				print("[NETWORK] Error cargando: ", recurso)
+		
+		await get_tree().process_frame
 	var MUNDO = load("uid://yubh30707eb7")
 	
-	# Instanciar mundo si no existe
 	var mundo_existente = obtener_mundo_actual()
 	if not mundo_existente:
-		# liberar el mundo temporal del menu:
-		var temp = main_menu.get_node_or_null("MundoTemporal")
-		if temp and is_instance_valid(temp):
-			# Desactivar la cámara del menú primero
-			var cam = temp.get_node_or_null("Camera3D")
-			if cam:
-				cam.current = false
-			temp.queue_free()
-			await get_tree().process_frame
-	
 		var nuevo_mundo = MUNDO.instantiate()
 		nuevo_mundo.name = "Mundo"
 		nuevo_mundo.add_to_group("mundo")
 		get_tree().current_scene.add_child(nuevo_mundo)
 		
-		# Esperar un frame para que el mundo esté listo
 		await get_tree().process_frame
 		await get_tree().process_frame
-	# una vez que el mundo está cargado, avisar al host que estamos listos
+	
 	notificar_listo()
 
 func notificar_listo() -> void:

@@ -126,28 +126,28 @@ func _on_jugador_conectado(peer_id: int): #245698
 	
 	if es_host:
 		_solicitar_info_jugador.rpc_id(peer_id)
-		_enviar_estado_actual_a_cliente(peer_id)
+		#_enviar_estado_actual_a_cliente(peer_id)
 
-func _enviar_estado_actual_a_cliente(nuevo_cliente_id: int):
-	for peer_id in jugadores_en_lobby.keys():
-		if peer_id == nuevo_cliente_id:
-			continue  # su propia info ya la enviara él mismo
-		
-		var info_lobby = jugadores_en_lobby[peer_id]
-		var info_completa = {
-			"username": info_lobby.get("nombre", "Jugador " + str(peer_id)),
-			"personaje": info_lobby.get("personaje", 1),
-			"listo": info_lobby.get("listo", false),
-			"score": GlobalJuego.session_info.get(peer_id, {}).get("score", 0),
-			"salud": GlobalJuego.session_info.get(peer_id, {}).get("salud", GlobalJuego.SALUD_DEFAULT),
-			"ping": GlobalJuego.session_info.get(peer_id, {}).get("ping",0),
-			"inventario":GlobalJuego.session_info.get(peer_id, {}).get("inventario",[]),
-			"armas_actuales":GlobalJuego.session_info.get(peer_id,{}).get("armas_actuales",[])
-		}
-		
-		# enviar SOLO al nuevo cliente (no a todos)
-		_enviar_info_jugador.rpc_id(nuevo_cliente_id, peer_id, info_completa)
-		
+#func _enviar_estado_actual_a_cliente(nuevo_cliente_id: int):
+	#for peer_id in jugadores_en_lobby.keys():
+		#if peer_id == nuevo_cliente_id:
+			#continue  # su propia info ya la enviara él mismo
+		#
+		#var info_lobby = jugadores_en_lobby[peer_id]
+		#var info_completa = {
+			#"username": info_lobby.get("nombre", "Jugador " + str(peer_id)),
+			#"personaje": info_lobby.get("personaje", 1),
+			#"listo": info_lobby.get("listo", false),
+			#"score": GlobalJuego.session_info.get(peer_id, {}).get("score", 0),
+			#"salud": GlobalJuego.session_info.get(peer_id, {}).get("salud", GlobalJuego.SALUD_DEFAULT),
+			#"ping": GlobalJuego.session_info.get(peer_id, {}).get("ping",0),
+			#"inventario":GlobalJuego.session_info.get(peer_id, {}).get("inventario",[]),
+			#"armas_actuales":GlobalJuego.session_info.get(peer_id,{}).get("armas_actuales",[])
+		#}
+		#
+		## enviar SOLO al nuevo cliente (no a todos)
+		#_enviar_info_jugador.rpc_id(nuevo_cliente_id, peer_id, info_completa)
+		#
 func _on_jugador_desconectado(peer_id: int):
 	
 	if jugadores_en_lobby.has(peer_id):
@@ -438,7 +438,9 @@ func _solicitar_info_jugador():
 			"listo": false,
 			"score": 0,
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"ping":0
+			"ping":0,
+			"inventario":[],
+			"armas_actuales":[0,0]
 		}
 	
 	_enviar_info_jugador.rpc_id(solicitante_id, mi_id, mi_info)
@@ -479,7 +481,7 @@ func _enviar_info_jugador(peer_id: int, info_jugador: Dictionary):
 	if es_host and peer_id != 1:
 		for jugador_id in jugadores_en_lobby.keys():
 			if jugador_id != peer_id and jugador_id != 1 and jugador_id != multiplayer.get_unique_id():
-				_enviar_info_jugador.rpc_id(jugador_id, peer_id, nombre)
+				_enviar_info_jugador.rpc_id(jugador_id, peer_id, info_jugador)
 
 @rpc("any_peer", "call_local", "reliable")
 func _solicitar_info_jugadores():
@@ -491,18 +493,17 @@ func _solicitar_info_jugadores():
 	# eenviar info completa de CADA jugador en el lobby
 	for peer_id in jugadores_en_lobby.keys():
 		var info_lobby = jugadores_en_lobby[peer_id]
-		var session_panel = GlobalJuego.session_info.get(peer_id,{})
+		var session_data = GlobalJuego.session_info.get(peer_id, {})
 		
-		# construir info completa y despues pasarla
 		var info_completa = {
-			"username": info_lobby.get("nombre", "Jugador " + str(peer_id)),
-			"personaje": info_lobby.get("personaje", 1),
+			"username": session_data.get("username", info_lobby.get("nombre", "Jugador " + str(peer_id))),
+			"personaje": session_data.get("personaje", info_lobby.get("personaje", 1)),
 			"listo": info_lobby.get("listo", false),
-			"score": session_panel.get(peer_id, {}).get("score", 0),
-			"salud": session_panel.get(peer_id, {}).get("salud", GlobalJuego.SALUD_DEFAULT),
-			"ping": session_panel.get(peer_id, {}).get("ping", 0),
-			"inventario":session_panel.get(peer_id, {}).get("inventario", []),
-			"armas_actuales": session_panel.get("armas_actuales", [1, 0])
+			"score": session_data.get("score", 0),
+			"salud": session_data.get("salud", GlobalJuego.SALUD_DEFAULT),
+			"ping": session_data.get("ping", 0),
+			"inventario": session_data.get("inventario", []),
+			"armas_actuales": session_data.get("armas_actuales", [1, 0])
 		}
 		
 		_enviar_info_jugador.rpc_id(solicitante_id, peer_id, info_completa)

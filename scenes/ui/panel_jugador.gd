@@ -116,9 +116,15 @@ func conectar_verificar_botones() -> void:
 		personaje_eleccion.visible = es_mi_panel
 	# el sprite arma mostrar es SOLO para los demas jugadores
 	# es para que sepan el arma que tiene el otro
-	if sprite_arma_mostrar:
-		sprite_arma_mostrar.visible = not es_mi_panel
-		
+	#if sprite_arma_mostrar:
+		#sprite_arma_mostrar.visible = not es_mi_panel
+	if vida:
+		vida.visible = es_mi_panel
+	if defensa:
+		defensa.visible = es_mi_panel
+	if ataque:
+		ataque.visible = es_mi_panel
+	
 	if not cambiar_adelante_opcion.pressed.is_connected(cambiar_personaje_arma):
 		cambiar_adelante_opcion.pressed.connect(cambiar_personaje_arma.bind(1))
 	if not cambiar_atras_opcion.pressed.is_connected(cambiar_personaje_arma):

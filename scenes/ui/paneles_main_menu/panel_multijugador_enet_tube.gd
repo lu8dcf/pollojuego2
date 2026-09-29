@@ -38,7 +38,8 @@ func _ready() -> void:
 	boton_unirse_tube.disabled = true
 	edit_sesion.text_changed.connect(func(t): boton_unirse_tube.disabled = t.strip_edges() == "")
 	boton_unirse_tube.pressed.connect(_on_unirse_tube)
-	boton_crear_tube.pressed.connect(_on_crear_tube)
+	if not boton_crear_tube.pressed.is_connected(_on_crear_tube):
+		boton_crear_tube.pressed.connect(_on_crear_tube)
 	
 	# Local
 	boton_unirse_lan.disabled = true
