@@ -28,7 +28,7 @@ var is_dying := false
 var jugador: Node3D = null
 
 # datos de movimiento
-@export var velocidad_base: float = 1
+@export var velocidad_base: float = 2
 @export var velocidad_giro: float = 8.0
 var velocidad: float = velocidad_base # velocidad actual
 var direccion_actual: Vector3 = Vector3.FORWARD
