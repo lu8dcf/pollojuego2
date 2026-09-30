@@ -1,7 +1,7 @@
 extends CharacterBody3D
 class_name EnemigoBase
 
-@export var health := 100
+@export var health := 30
 # @export var animation_player: AnimationPlayer
 
 #@onready var crystal_timer: Timer = $Timer
@@ -126,30 +126,25 @@ func tipo_enemigo():
 			estado_actual=estado.WANDER
 			
 
-func take_damage(damage: int, source: int):
-	var next_health = health - damage
-	
-	var player_to_notify: Jugador
-	for current_player in get_tree().get_nodes_in_group('Jugadores'):
-		if current_player.name == str(source):
-			player_to_notify = current_player
-			break
-	
-	if not player_to_notify:
+func recibir_dano(dano: int):
+	if not multiplayer.is_server():
 		return
+	var vida_actual = health - dano
 	
-	if next_health <= 0:
-		player_to_notify.register_hit.rpc_id(source, true)
-		death(source)
+	
+	
+	if vida_actual <= 0:
+		
+		morir()
 	else:
-		health = next_health
-		player_to_notify.register_hit.rpc_id(source)
+		health = vida_actual
+		
 		is_hurt = true
 		#animation_player.play("Hit_Chest")
 		#await animation_player.animation_finished
 		is_hurt = false
 
-func death(source):
+func morir():
 	#Global.update_score_for(source)
 	set_collision_layer_value(1, false)
 	is_dying = true
@@ -166,6 +161,9 @@ func cambios():
 	
 
 func _physics_process(delta: float) -> void:
+	
+	if rot_byte == null: # Proteccion para evitar recibir null del multiplayer
+		rot_byte = 0
 	
 	var rotacion_actual = modelo.rotation.y		
 	# Cuando SE RECIBE el valor  el valor:

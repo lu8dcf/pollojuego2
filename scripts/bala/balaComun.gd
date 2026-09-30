@@ -17,6 +17,9 @@ var inicio = false
 #TEST
 @onready var textureBullet = $pollo_1
 
+# Cosas Agregadas Viole sobre interaccion con los enemigos
+@onready var dano = 10
+
 
 func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3) -> void:
 
@@ -71,9 +74,17 @@ func eliminarBala():
 
 
 func _on_area_comun_body_entered(body: Node3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
+		return
+	if body.is_in_group("enemy"):
+		# Aplicar daño al enemigo
+		if body.has_method("recibir_dano"):
+			body.recibir_dano(dano)
 	
-				#--------------------------Aca cuando choca con el enemigo
-	eliminarBala()
+	# La bala se destruye en el servidor y se replica
+	queue_free()
+
+			
 	
 
 
