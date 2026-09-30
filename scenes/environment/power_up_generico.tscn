@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://crn45wdggktcp"]
+
+[ext_resource type="Script" uid="uid://bxjoiy0qpt7e2" path="res://scenes/environment/power_up_generico.gd" id="1_o3wrf"]
+[ext_resource type="PackedScene" uid="uid://donw4h8uddm3m" path="res://assets/modelos/power_ups/jeringa_generica.fbx" id="2_uakqo"]
+
+[node name="PowerUpGenerico" type="Node3D" unique_id=1812622002]
+script = ExtResource("1_o3wrf")
+
+[node name="jeringa_generica" parent="." unique_id=623105621 instance=ExtResource("2_uakqo")]
