@@ -3,7 +3,74 @@
 [ext_resource type="Script" uid="uid://bxjoiy0qpt7e2" path="res://scenes/environment/power_up_generico.gd" id="1_o3wrf"]
 [ext_resource type="PackedScene" uid="uid://donw4h8uddm3m" path="res://assets/modelos/power_ups/jeringa_generica.fbx" id="2_uakqo"]
 
+[sub_resource type="Animation" id="Animation_o3wrf"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("jeringa_generica:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0.19218916, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("jeringa_generica:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 6.2831855, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_uakqo"]
+resource_name = "idle_jeringa"
+length = 5.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("jeringa_generica:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2.4666667, 5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.19218916, 0), Vector3(0, 0.38585114, 0), Vector3(0, 0.19218916, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("jeringa_generica:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 6.2831855, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0q2ib"]
+_data = {
+&"RESET": SubResource("Animation_o3wrf"),
+&"idle_jeringa": SubResource("Animation_uakqo")
+}
+
 [node name="PowerUpGenerico" type="Node3D" unique_id=1812622002]
 script = ExtResource("1_o3wrf")
 
 [node name="jeringa_generica" parent="." unique_id=623105621 instance=ExtResource("2_uakqo")]
+transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, 0, 0.19218916, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=105942622]
+libraries/ = SubResource("AnimationLibrary_0q2ib")
+autoplay = &"idle_jeringa"
