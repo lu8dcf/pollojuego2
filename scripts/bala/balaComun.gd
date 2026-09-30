@@ -12,11 +12,11 @@ var direccion
 var inicio = false
 
 #solo comun
-@onready var areaComun = $area_comun
+#@onready var areaComun = $area_comun
 
 #TEST
 @onready var textureBullet = $pollo_1
-
+@onready var dano = 10 # daño de la bala
 
 func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3) -> void:
 
@@ -55,7 +55,7 @@ func balaComun():
 	textureBullet.visible = true
 	#fin Test
 	
-	areaComun.visible = true
+	#areaComun.visible = true
 	avanza=true
 	tiempoDeVida.start()
 
@@ -71,13 +71,32 @@ func eliminarBala():
 
 
 func _on_area_comun_body_entered(body: Node3D) -> void:
-	
+	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
+		return
+		
 				#--------------------------Aca cuando choca con el enemigo
 	eliminarBala()
 	
 
 
 func _on_area_comun_area_entered(area: Area3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
+		return
+	eliminarBala()
+
+
+func _on_body_entered(body: Node3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
+		return
+	if body.is_in_group("enemy"):
+		# Aplicar daño al enemigo
+		if body.has_method("recibir_dano"):
+			body.recibir_dano(dano)
+			queue_free()
+	
+
+
+func _on_area_entered(area: Area3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
 		return
 	eliminarBala()

@@ -1,7 +1,7 @@
 extends CharacterBody3D
 class_name EnemigoBase
 
-@export var health := 100
+@export var health := 30
 # @export var animation_player: AnimationPlayer
 
 #@onready var crystal_timer: Timer = $Timer
@@ -125,7 +125,29 @@ func tipo_enemigo():
 			#langosta (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
 			estado_actual=estado.WANDER
 			
+func recibir_dano(dano: int):
+	if not multiplayer.is_server():
+		return
+	var vida_actual = health - dano
+		
+	if vida_actual <= 0:
+			morir()
+	else:
+		health = vida_actual
+		
+		is_hurt = true
+		#animation_player.play("Hit_Chest")
+		#await animation_player.animation_finished
+		is_hurt = false
 
+func morir():
+	#Global.update_score_for(source)
+	
+	is_dying = true
+	#animation_player.play("Death01")
+	#await animation_player.animation_finished
+	queue_free()
+	
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
 	
@@ -140,7 +162,7 @@ func take_damage(damage: int, source: int):
 	
 	if next_health <= 0:
 		player_to_notify.register_hit.rpc_id(source, true)
-		death(source)
+		
 	else:
 		health = next_health
 		player_to_notify.register_hit.rpc_id(source)
@@ -149,13 +171,7 @@ func take_damage(damage: int, source: int):
 		#await animation_player.animation_finished
 		is_hurt = false
 
-func death(source):
-	#Global.update_score_for(source)
-	set_collision_layer_value(1, false)
-	is_dying = true
-	#animation_player.play("Death01")
-	#await animation_player.animation_finished
-	queue_free()
+
 
 func cambios():
 	if animacion_ataque:
