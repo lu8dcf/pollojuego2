@@ -5,7 +5,7 @@ class_name armaBase
 @onready var synchronizer = $MultiplayerSynchronizer
 
 
-@onready var contenedor = $SpawnContainerBalas
+@onready var containerBalas: Node3D = get_tree().get_first_node_in_group("contenedor_balas")
 @onready var puntero = $Marker3D
 @onready var sprite = $Sprite3D
 @onready var tiempo = $tiempoEntreDisparo
@@ -145,7 +145,7 @@ func _on_buscar_objetivo_timeout() -> void:
 func crear_bala(posicion: Vector3, direccion: Vector3) -> void:
 	var nueva_bala = balaArma.instantiate()
 	nueva_bala.set_multiplayer_authority(1)
-	contenedor.add_child(nueva_bala, true)
+	containerBalas.add_child(nueva_bala, true)
 	nueva_bala.iniciar(
 		datos.comportamiento,
 		posicion,

@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://pcrmqqoftgct"]
+
+[resource]
+resource_name = "tipo_mejora"
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.90676594, 0.8704747, 0.8816255, 1)
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 0.0
