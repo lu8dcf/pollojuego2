@@ -116,14 +116,19 @@ func conectar_verificar_botones() -> void:
 		personaje_eleccion.visible = es_mi_panel
 	# el sprite arma mostrar es SOLO para los demas jugadores
 	# es para que sepan el arma que tiene el otro
-	#if sprite_arma_mostrar:
-		#sprite_arma_mostrar.visible = not es_mi_panel
+	if sprite_arma_mostrar:
+		sprite_arma_mostrar.visible = true
 	if vida:
 		vida.visible = es_mi_panel
 	if defensa:
 		defensa.visible = es_mi_panel
 	if ataque:
 		ataque.visible = es_mi_panel
+	
+	if h_box_habilidades_personaje:
+		h_box_habilidades_personaje.visible = es_mi_panel
+	if h_box_habilidades_arma:
+		h_box_habilidades_arma.visible = es_mi_panel
 	
 	if not cambiar_adelante_opcion.pressed.is_connected(cambiar_personaje_arma):
 		cambiar_adelante_opcion.pressed.connect(cambiar_personaje_arma.bind(1))
@@ -144,16 +149,20 @@ func se_selecciona_personajes() -> void:
 	sprite_personaje.visible = true
 	sprite_arma.visible = false
 	sprite_seleccion.visible = false
-	h_box_habilidades_arma.visible=false
-	h_box_habilidades_personaje.visible=true
+	if h_box_habilidades_arma:
+		h_box_habilidades_arma.visible = false
+	if h_box_habilidades_personaje:
+		h_box_habilidades_personaje.visible = es_mi_panel
 	_actualizar_nombre(indice_personaje)
 	
 func se_selecciona_armas() -> void:
 	sprite_personaje.visible = false
 	sprite_arma.visible = true
 	sprite_seleccion.visible = false
-	h_box_habilidades_arma.visible=true
-	h_box_habilidades_personaje.visible=false
+	if h_box_habilidades_arma:
+		h_box_habilidades_arma.visible = es_mi_panel
+	if h_box_habilidades_personaje:
+		h_box_habilidades_personaje.visible = false
 	_actualizar_nombre(indice_arma)
 	
 
@@ -213,6 +222,19 @@ func _actualizar_nombre(id:int)->void:
 				nombre_personaje_arma.text = nombres_armas[id]
 
 func _actualizar_habilidades(id: int) -> void:
+	if not es_mi_panel:
+		if h_box_habilidades_personaje:
+			h_box_habilidades_personaje.visible = false
+		if h_box_habilidades_arma:
+			h_box_habilidades_arma.visible = false
+		return
+	else:
+		if h_box_habilidades_personaje:
+			h_box_habilidades_personaje.visible = sprite_personaje.visible
+		if h_box_habilidades_arma:
+			h_box_habilidades_arma.visible = sprite_arma.visible
+		if sprite_arma_mostrar:
+			sprite_arma_mostrar.visible = true
 	if sprite_personaje.visible:
 		if not personajes.has(id):
 			return
@@ -255,7 +277,7 @@ func actualizar_info(id: int, nombre_jugador: String,personaje: int = 1):
 	_reproducir_personaje(id_personaje)
 	
 	if sprite_arma_mostrar:
-		sprite_arma_mostrar.visible = not es_mi_panel # solo mostrar el arma elegida a los demas jugadores, no a  mi
+		sprite_arma_mostrar.visible = true
 		var info = GlobalJuego.session_info.get(peer_id,{})
 		var armas_actuales:Array = info.get("armas_actuales",[])
 		var arma = 1 # fallback, en caso de que no se hayan guardado armas

@@ -269,9 +269,12 @@ func _mostrar_lobby() -> void:
 		return
 	
 	lobby_actual = LOBBY.instantiate()
+	lobby_actual.name = "Lobby"
 	get_tree().current_scene.add_child(lobby_actual)
 	if lobby_actual.has_signal("partida_iniciada"):
 		lobby_actual.partida_iniciada.connect(_on_partida_iniciada_desde_lobby)
+	print("current_scene: ", get_tree().current_scene.name)
+	print("lobby path: ", lobby_actual.get_path())
 
 func _limpiar_lobby() -> void:
 	if lobby_actual and is_instance_valid(lobby_actual):
