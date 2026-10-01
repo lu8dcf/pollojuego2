@@ -50,7 +50,7 @@ shadow_opacity = 0.45
 
 [node name="SpawnContainer" type="Node3D" parent="." unique_id=284707713]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.018124, 1.1245222, 42.981445)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1.125, 20.981)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=979900599]
 _spawnable_scenes = PackedStringArray("uid://b8go34qeye00a")
