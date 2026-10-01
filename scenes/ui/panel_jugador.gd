@@ -199,6 +199,8 @@ func cambiar_personaje_arma(direccion:int):
 	
 
 func _reproducir_personaje(id):
+	if id==0:
+		return
 	if sprite_personaje.visible:
 		sprite_personaje.play("idle" + str(id))
 			
@@ -341,7 +343,7 @@ func marcar_listo():
 	_habilitar_deshabilitar_botones(esta_listo)
 	_actualizar_indicador()
 	# Emitir señal para notificar al lobby
-	_notificar_estado_listo.rpc(peer_id, true)
+	Network._notificar_estado_listo.rpc(peer_id, true)
 
 func marcar_no_listo():
 	esta_listo = false
@@ -349,7 +351,7 @@ func marcar_no_listo():
 		estoy_listo_boton.cambiar_texto("¿Listo?")
 	_actualizar_indicador()
 	# Emitir señal para notificar al lobby
-	_notificar_estado_listo.rpc(peer_id, false)
+	Network._notificar_estado_listo.rpc(peer_id, false)
 
 func _on_estoy_listo_boton_pressed() -> void:
 	# Solo permitir si es mi panel
@@ -360,11 +362,3 @@ func _on_estoy_listo_boton_pressed() -> void:
 		marcar_no_listo()
 	else:
 		marcar_listo()
-
-# RPC para notificar a todos sobre el estado de listo
-@rpc("any_peer", "call_local", "reliable")
-func _notificar_estado_listo(peer_id_jugador: int, estado: bool):
-	# Buscar el lobby y actualizar
-	var lobby = get_tree().get_first_node_in_group("lobby")
-	if lobby:
-		lobby.actualizar_estado_listo(peer_id_jugador, estado)

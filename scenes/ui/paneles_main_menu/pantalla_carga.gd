@@ -23,7 +23,6 @@ func _ready() -> void:
 	progreso.value = 0
 
 func configurar_jugadores(lista_peers_ids:Array) -> void:
-	print("configurando jugadores")
 	total_jugadores = lista_peers_ids.size()
 	jugadores_listos.clear()
 	

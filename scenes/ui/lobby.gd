@@ -55,7 +55,8 @@ func _ready() -> void:
 	else:
 		_agregar_jugador_al_lobby(multiplayer.get_unique_id(), _obtener_nombre_jugador())
 		await get_tree().create_timer(0.5).timeout
-		_solicitar_info_jugadores.rpc_id(1)
+		Network._solicitar_info_jugadores.rpc_id(1)
+		_enviar_mi_info_al_host()
 	
 	lobby_inicializado = true
 
@@ -84,8 +85,10 @@ func mostrar_usuarios():
 					if label_ip: label_ip.text = "IP: "+Network.ip_local
 					if label_puerto: label_puerto.text = "Puerto: " + str(Network.puerto_actual)
 				else:
-					if label_ip: label_ip.text = ""
-					if label_puerto: label_puerto.text = ""
+					label_ip.show()
+					label_puerto.show()
+					if label_ip: label_ip.text = "IP: "+Network.ip_local
+					if label_puerto: label_puerto.text = "Puerto: " + str(Network.puerto_actual)
 			else:
 				label_id.show()
 				label_id.text = "ID: " + Network.tube_client.session_id
@@ -124,30 +127,10 @@ func _on_jugador_conectado(peer_id: int): #245698
 	
 	await get_tree().create_timer(1.5).timeout
 	
-	if es_host:
-		_solicitar_info_jugador.rpc_id(peer_id)
+	#if es_host:
+		#_solicitar_info_jugador.rpc_id(peer_id)
 		#_enviar_estado_actual_a_cliente(peer_id)
 
-#func _enviar_estado_actual_a_cliente(nuevo_cliente_id: int):
-	#for peer_id in jugadores_en_lobby.keys():
-		#if peer_id == nuevo_cliente_id:
-			#continue  # su propia info ya la enviara él mismo
-		#
-		#var info_lobby = jugadores_en_lobby[peer_id]
-		#var info_completa = {
-			#"username": info_lobby.get("nombre", "Jugador " + str(peer_id)),
-			#"personaje": info_lobby.get("personaje", 1),
-			#"listo": info_lobby.get("listo", false),
-			#"score": GlobalJuego.session_info.get(peer_id, {}).get("score", 0),
-			#"salud": GlobalJuego.session_info.get(peer_id, {}).get("salud", GlobalJuego.SALUD_DEFAULT),
-			#"ping": GlobalJuego.session_info.get(peer_id, {}).get("ping",0),
-			#"inventario":GlobalJuego.session_info.get(peer_id, {}).get("inventario",[]),
-			#"armas_actuales":GlobalJuego.session_info.get(peer_id,{}).get("armas_actuales",[])
-		#}
-		#
-		## enviar SOLO al nuevo cliente (no a todos)
-		#_enviar_info_jugador.rpc_id(nuevo_cliente_id, peer_id, info_completa)
-		#
 func _on_jugador_desconectado(peer_id: int):
 	
 	if jugadores_en_lobby.has(peer_id):
@@ -212,7 +195,24 @@ func _agregar_jugador_al_lobby(peer_id: int, nombre: String):
 	}
 	
 	_actualizar_estado_lobby()
+
+func _enviar_mi_info_al_host() :
+	var mi_id = multiplayer.get_unique_id()
 	
+	var mi_info = GlobalJuego.session_info.get(mi_id, {})
+	if mi_info.is_empty():
+		mi_info = {
+			"username": _obtener_nombre_jugador(),
+			"personaje": 1,
+			"listo": false,
+			"score": 0,
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"ping": 0,
+			"inventario": [],
+			"armas_actuales": [0, 0]
+		}
+	
+	Network._enviar_info_jugador.rpc_id(1, mi_id, mi_info)
 func _actualizar_panel(panel: Node, peer_id: int, nombre: String, listo: bool = false,personaje:int = 1):
 	if panel.has_method("actualizar_info"):
 		panel.actualizar_info(peer_id, nombre,personaje)
@@ -221,41 +221,25 @@ func _actualizar_panel(panel: Node, peer_id: int, nombre: String, listo: bool = 
 			panel.actualizar_estado_listo(listo)
 
 func actualizar_estado_listo(peer_id_jugador: int, estado: bool):
-	
-	if jugadores_en_lobby.has(peer_id_jugador):
-		var info = jugadores_en_lobby[peer_id_jugador]
-		info["listo"] = estado
-		jugadores_en_lobby[peer_id_jugador] = info
-		
-		# Actualizar visualmente el panel
-		var panel = info.get("panel")
-		if panel and is_instance_valid(panel):
-			if panel.has_method("actualizar_estado_listo"):
-				panel.actualizar_estado_listo(estado)
-		
+	_procesar_estado_listo(peer_id_jugador,estado)
+	#if jugadores_en_lobby.has(peer_id_jugador):
+		#var info = jugadores_en_lobby[peer_id_jugador]
+		#info["listo"] = estado
+		#jugadores_en_lobby[peer_id_jugador] = info
+		#
+		## Actualizar visualmente el panel
+		#var panel = info.get("panel")
+		#if panel and is_instance_valid(panel):
+			#if panel.has_method("actualizar_estado_listo"):
+				#panel.actualizar_estado_listo(estado)
+		#
 		# Si somos host, reenviar a todos
-		if es_host:
-			_replicar_estado_listo.rpc(peer_id_jugador, estado)
+	if es_host:
+		Network._replicar_estado_listo.rpc(peer_id_jugador, estado)
 		
-		_actualizar_estado_lobby()
-		_verificar_todos_listos()
+		#_actualizar_estado_lobby()
+		#_verificar_todos_listos()
 
-@rpc("authority", "call_local", "reliable")
-func _replicar_estado_listo(peer_id_jugador: int, estado: bool):
-	
-	
-	if jugadores_en_lobby.has(peer_id_jugador):
-		var info = jugadores_en_lobby[peer_id_jugador]
-		info["listo"] = estado
-		jugadores_en_lobby[peer_id_jugador] = info
-		
-		var panel = info.get("panel")
-		if panel and is_instance_valid(panel):
-			if panel.has_method("actualizar_estado_listo"):
-				panel.actualizar_estado_listo(estado)
-		
-		_actualizar_estado_lobby()
-		_verificar_todos_listos()
 
 func _verificar_todos_listos():
 	if not es_host:
@@ -323,40 +307,14 @@ func _on_iniciar_partida_pressed():
 				break
 		
 		if todos_listos:
-			_iniciar_carga.rpc()
+			Network._iniciar_carga.rpc()
 
-@rpc("authority", "call_local", "reliable")
-func _iniciar_carga():
-	# Cambiar Network a modo partida
-	if Network and Network.has_method("iniciar_partida_desde_lobby"):
-		Network.iniciar_partida_desde_lobby()
-	
-	# Emitir la señal para que main_menu libere su mundo
-	partida_iniciada.emit()
-	hide()
-	
-	# Esperar un frame a que el main_menu libere su temp_mundo
-	await get_tree().process_frame
-	await get_tree().process_frame
-	
-	# Ahora todos empiezan la carga sincronizada
-	if Network and Network.has_method("iniciar_carga_sincronizada"):
-		Network.iniciar_carga_sincronizada(GlobalJuego.session_info.keys())
-	await get_tree().create_timer(1.0).timeout
-	queue_free()
 
 # avisar del cambio de personaje, cuando un usuario cambia su eprsonaje, avisa al host para que todos actualicen
 func notificar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
-	_sincronizar_cambio_personaje_arma(peer_id_jugador, id_personaje,id_arma)
-	# enviar RPC a todos
-	_sincronizar_cambio_personaje_arma.rpc(peer_id_jugador, id_personaje,id_arma)
-
-
-@rpc("any_peer", "call_local", "reliable")
-func _sincronizar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
-	"""Sincroniza el cambio de personaje a todos los clientes"""
-	_aplicar_cambio_personaje_arma(peer_id_jugador, id_personaje,id_arma)
-
+	_procesar_cambio_personaje_arma(peer_id_jugador,id_personaje,id_arma) # primero procesar localmente
+	Network._sincronizar_cambio_personaje_arma.rpc(peer_id_jugador, id_personaje,id_arma) # y despues procesar a los demas jugadores
+	
 func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int): 
 	# esto es solo un panel visual
 	if jugadores_en_lobby.has(peer_id_jugador):
@@ -407,10 +365,6 @@ func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_a
 	## guardar armas que se estan usando, suelen ser 2, lista de dos armas
 	
 
-@rpc("authority", "call_local", "reliable")
-func _iniciar_partida():
-	_comenzar_partida()
-
 func _comenzar_partida():
 	if partida_iniciada_flag:
 		return
@@ -424,40 +378,31 @@ func _comenzar_partida():
 	partida_iniciada.emit()
 	hide()
 
-@rpc("any_peer", "call_local", "reliable")
-func _solicitar_info_jugador():
-	var solicitante_id = multiplayer.get_remote_sender_id()
-	var mi_id = multiplayer.get_unique_id()
-	
-	var mi_info = GlobalJuego.session_info.get(mi_id, {})
-	if mi_info.is_empty():
-		mi_info = {
-			"username": _obtener_nombre_jugador(),
-			"personaje": 1,
-			"listo": false,
-			"score": 0,
-			"salud": GlobalJuego.SALUD_DEFAULT,
-			"ping":0,
-			"inventario":[],
-			"armas_actuales":[0,0]
-		}
-	
-	_enviar_info_jugador.rpc_id(solicitante_id, mi_id, mi_info)
 
-@rpc("any_peer", "call_local", "reliable")
-func _enviar_info_jugador(peer_id: int, info_jugador: Dictionary):	
-	print("[LOBBY-CLIENTE] Recibiendo info de ", peer_id, ": ", info_jugador)
+func _on_regresar_boton_pressed() -> void:
+	if Network:
+		Network.leave_server()
+	else:
+		get_tree().reload_current_scene()
+
+# ============================================================
+# FUNCIONES LLAMADAS POR NETWORK 
+# ============================================================
+
+func _procesar_info_jugador(peer_id: int, info_jugador: Dictionary):
+	
 	if peer_id == 1 and es_host:
 		return
-	var nombre = info_jugador.get("username","Jugador " +str(peer_id))
-	var personaje = info_jugador.get("personaje",1)
-	var listo= info_jugador.get("listo",false)
-	var armas_actuales= info_jugador.get("armas_actuales",[1,0])
 	
-	await _agregar_jugador_al_lobby(peer_id,nombre)
+	var nombre = info_jugador.get("username", "Jugador " + str(peer_id))
+	var personaje = info_jugador.get("personaje", 1)
+	var listo = info_jugador.get("listo", false)
+	var armas_actuales = info_jugador.get("armas_actuales", [1, 0])
+	
+	await _agregar_jugador_al_lobby(peer_id, nombre)
 	
 	if jugadores_en_lobby.has(peer_id):
-		var info = jugadores_en_lobby[peer_id] # se obtiene la info de cada jugadro
+		var info = jugadores_en_lobby[peer_id]
 		info["personaje"] = personaje
 		info["listo"] = listo
 		jugadores_en_lobby[peer_id] = info
@@ -469,28 +414,23 @@ func _enviar_info_jugador(peer_id: int, info_jugador: Dictionary):
 			if panel.has_method("actualizar_estado_listo"):
 				panel.actualizar_estado_listo(listo)
 			if panel.has_method("actualizar_arma_remoto"):
-				if armas_actuales.size()>0:
+				if armas_actuales.size() > 0:
 					panel.actualizar_arma_remoto(armas_actuales[0])
-		
+	
 	if not GlobalJuego.session_info.has(peer_id):
 		GlobalJuego.session_info[peer_id] = info_jugador
 	else:
-		for key in info_jugador.keys(): # combinacion de todos los clave valor de l dict session_info
+		for key in info_jugador.keys():
 			GlobalJuego.session_info[peer_id][key] = info_jugador[key]
 	
+	# Reenviar a los demás
 	if es_host and peer_id != 1:
 		for jugador_id in jugadores_en_lobby.keys():
 			if jugador_id != peer_id and jugador_id != 1 and jugador_id != multiplayer.get_unique_id():
-				_enviar_info_jugador.rpc_id(jugador_id, peer_id, info_jugador)
+				Network._enviar_info_jugador.rpc_id(jugador_id, peer_id, info_jugador)
 
-@rpc("any_peer", "call_local", "reliable")
-func _solicitar_info_jugadores():
-	if not es_host:
-		return
+func _responder_info_jugadores(solicitante_id: int):
 	
-	var solicitante_id = multiplayer.get_remote_sender_id()
-	print("[LOBBY-HOST] Enviando info a ", solicitante_id)
-	# eenviar info completa de CADA jugador en el lobby
 	for peer_id in jugadores_en_lobby.keys():
 		var info_lobby = jugadores_en_lobby[peer_id]
 		var session_data = GlobalJuego.session_info.get(peer_id, {})
@@ -505,11 +445,73 @@ func _solicitar_info_jugadores():
 			"inventario": session_data.get("inventario", []),
 			"armas_actuales": session_data.get("armas_actuales", [1, 0])
 		}
-		print("[LOBBY-HOST] Enviando info_completa de ", peer_id, ": ", info_completa)
-		_enviar_info_jugador.rpc_id(solicitante_id, peer_id, info_completa)
 		
-func _on_regresar_boton_pressed() -> void:
-	if Network:
-		Network.leave_server()
+		Network._enviar_info_jugador.rpc_id(solicitante_id, peer_id, info_completa)
+
+func _procesar_estado_listo(peer_id_jugador: int, estado: bool):
+	"""Procesa el cambio de estado listo de un jugador"""
+	if jugadores_en_lobby.has(peer_id_jugador):
+		var info = jugadores_en_lobby[peer_id_jugador]
+		info["listo"] = estado
+		jugadores_en_lobby[peer_id_jugador] = info
+		
+		var panel = info.get("panel")
+		if panel and is_instance_valid(panel):
+			if panel.has_method("actualizar_estado_listo"):
+				panel.actualizar_estado_listo(estado)
+		
+		_actualizar_estado_lobby()
+		_verificar_todos_listos()
+
+func _procesar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int, id_arma: int):
+	"""Procesa el cambio de personaje/arma de un jugador"""
+	# Actualizar panel visual
+	if jugadores_en_lobby.has(peer_id_jugador):
+		var info = jugadores_en_lobby[peer_id_jugador]
+		info["personaje"] = id_personaje
+		info["arma"] = id_arma
+		jugadores_en_lobby[peer_id_jugador] = info
+		
+		var panel = info.get("panel")
+		if panel and is_instance_valid(panel):
+			if panel.has_method("actualizar_personaje_remoto"):
+				panel.actualizar_personaje_remoto(id_personaje)
+			if panel.has_method("actualizar_arma_remoto"):
+				panel.actualizar_arma_remoto(id_arma)
+	
+	# Actualizar session_info
+	if not GlobalJuego.session_info.has(peer_id_jugador):
+		if id_personaje == 0:
+			id_personaje = 1
+		GlobalJuego.session_info[peer_id_jugador] = {
+			"score": 0,
+			"username": "Jugador " + str(peer_id_jugador),
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"personaje": id_personaje,
+			"ping": 0,
+			"inventario": [id_arma],
+			"armas_actuales": [id_arma, 0],
+			"listo": false
+		}
 	else:
-		get_tree().reload_current_scene()
+		var info_peer = GlobalJuego.session_info[peer_id_jugador]
+		info_peer["personaje"] = id_personaje
+		
+		var armas_actuales: Array = info_peer.get("armas_actuales", [1, 0])
+		if armas_actuales.is_empty():
+			armas_actuales = [id_arma, 0]
+		else:
+			armas_actuales[0] = id_arma
+		info_peer["armas_actuales"] = armas_actuales
+		
+		var inventario: Array = info_peer.get("inventario", [])
+		if not id_arma in inventario and inventario.size() < 6:
+			inventario.append(id_arma)
+		info_peer["inventario"] = inventario
+		
+		GlobalJuego.session_info[peer_id_jugador] = info_peer
+
+func _procesar_inicio_partida():
+	"""Se llama cuando Network._iniciar_carga se dispara"""
+	partida_iniciada.emit()
+	hide()

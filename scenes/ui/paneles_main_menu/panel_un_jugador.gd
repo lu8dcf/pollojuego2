@@ -13,12 +13,19 @@ func _ready() -> void:
 		nombre_usuario.text = GlobalJuego.nombre_jugador
 	nombre_usuario.text_changed.connect(_on_nombre_changed)
 
+
+
+func obtener_nombre_azar():
+	var nombres = ["Iku","Len","Yue","Zaci","Vati","Babu","Michu","Blacky","Sanson","Violeta"]
+	return nombres.pick_random()
+	
 func _on_nombre_changed(txt: String) -> void:
 	GlobalJuego.nombre_jugador = txt
 
 func _on_empezar_pressed() -> void:
 	if nombre_usuario.text.strip_edges() == "":
-		GlobalJuego.nombre_jugador = "Jugador"
+		var nombre = obtener_nombre_azar()
+		GlobalJuego.nombre_jugador = nombre
 	else:
 		GlobalJuego.nombre_jugador = nombre_usuario.text.strip_edges()
 	GlobalSignal.solicitar_empezar.emit()

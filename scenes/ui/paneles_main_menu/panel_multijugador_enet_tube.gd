@@ -37,6 +37,7 @@ func _ready() -> void:
 	# Online
 	boton_unirse_tube.disabled = true
 	edit_sesion.text_changed.connect(func(t): boton_unirse_tube.disabled = t.strip_edges() == "")
+	#edit_sesion.text_changed.connect(func(t):t.to_upper())
 	boton_unirse_tube.pressed.connect(_on_unirse_tube)
 	if not boton_crear_tube.pressed.is_connected(_on_crear_tube):
 		boton_crear_tube.pressed.connect(_on_crear_tube)
@@ -63,7 +64,10 @@ func _mostrar_local() -> void:
 func _nombre_actual_tube() -> String:
 	if edit_nombre_tube.text.strip_edges() != "":
 		return edit_nombre_tube.text.strip_edges()
-	return GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else "Jugador"
+	var nombre_azar = obtener_nombre_azar()
+	
+	return GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else nombre_azar
+
 
 
 func _on_unirse_tube() -> void:
@@ -80,7 +84,9 @@ func _on_crear_tube() -> void:
 func _nombre_actual_enet() -> String:
 	if edit_nombre_enet.text.strip_edges() != "":
 		return edit_nombre_enet.text.strip_edges()
-	return GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else "Jugador"
+	var nombre_azar = obtener_nombre_azar()
+	
+	return GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else nombre_azar
 
 func _on_unirse_lan() -> void:
 	var ip = edit_ip.text.strip_edges()
@@ -94,3 +100,8 @@ func _on_crear_lan() -> void:
 	if not puerto_str.is_valid_int():
 		return
 	GlobalSignal.solicitar_crear_lan.emit(int(puerto_str), _nombre_actual_enet())
+
+
+func obtener_nombre_azar():
+	var nombres = ["Iku","Len","Yue","Zaci","Vati","Babu","Michu","Blacky","Sanson","Violeta"]
+	return nombres.pick_random()

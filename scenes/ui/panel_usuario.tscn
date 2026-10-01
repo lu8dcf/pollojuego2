@@ -176,14 +176,6 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_8uptv"]
-properties/0/path = NodePath("VBoxContainer/ContenedorPersonaje/SpritePersonaje:animation")
-properties/0/spawn = true
-properties/0/replication_mode = 2
-properties/1/path = NodePath("VBoxContainer/ContenedorPersonaje/Aro:modulate")
-properties/1/spawn = true
-properties/1/replication_mode = 2
-
 [node name="PanelUsuario" type="PanelContainer" unique_id=1454902434]
 script = ExtResource("1_8uptv")
 
@@ -211,6 +203,3 @@ texture = ExtResource("7_f4h5v")
 [node name="BarraVida" type="ProgressBar" parent="VBoxContainer" unique_id=1498169694]
 visible = false
 layout_mode = 2
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1254396704]
-replication_config = SubResource("SceneReplicationConfig_8uptv")

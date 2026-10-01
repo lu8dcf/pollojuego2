@@ -84,25 +84,19 @@ func _desconectar_señales_lobby() -> void:
 		multiplayer.peer_disconnected.disconnect(_on_peer_disconnected_lobby)
 
 func tube_create():
-	print("[NETWORK] tube_create llamado")
 	if _creando_sesion:
-		print("Ya se está creando la sesión, ignorando...")
 		return
 	_creando_sesion = true
 	_limpiar_multiplayer_peer()
-	print("[NETWORK] peer limpiando")
 	
 	if tube_client.session_id != "":
-		print("[NETWORK] Cerrando sesión previa: ", tube_client.session_id)
 		tube_client.leave_session()
 		await get_tree().process_frame
 	en_lobby = true
 	_conectar_señales_lobby()
 	if not tube_client.session_created.is_connected(_on_tube_creado):
 		tube_client.session_created.connect(_on_tube_creado)
-	print("[NETWORK] Llamando a create_session")
 	tube_client.create_session()
-	print("[NETWORK] create_session terminó")
 
 func _on_tube_creado():
 	_creando_sesion = false
@@ -143,6 +137,7 @@ func empezar_servidor_lan(puerto: int = 9999):
 	_limpiar_multiplayer_peer()
 	en_lobby = true
 	puerto_actual=puerto
+	_conectar_señales_lobby()
 	
 	var error = enet_peer.create_server(puerto_actual)
 	if error != OK:
@@ -158,9 +153,9 @@ func empezar_servidor_lan(puerto: int = 9999):
 		return false
 		
 	multiplayer.multiplayer_peer = enet_peer
-	_conectar_señales_lobby()
 
 	#_iniciar_timeout_conexion(8.0)
+	await get_tree().create_timer(0.5).timeout 
 	return true
 
 func unirse_servidor_lan(direccion_ip:String, puerto:int)-> bool:
@@ -248,6 +243,105 @@ func _on_connected_to_server_lobby():
 			"ping":0,
 			"inventario":[]
 		}
+
+@rpc("any_peer", "call_local", "reliable")
+func _solicitar_info_jugador():
+	var solicitante_id = multiplayer.get_remote_sender_id()
+	var mi_id = multiplayer.get_unique_id()
+	
+	var mi_info = GlobalJuego.session_info.get(mi_id, {})
+	if mi_info.is_empty():
+		mi_info = {
+			"username": GlobalJuego.nombre_jugador,
+			"personaje": 1,
+			"listo": false,
+			"score": 0,
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"ping":0,
+			"inventario":[],
+			"armas_actuales":[0,0]
+		}
+	
+	_enviar_info_jugador.rpc_id(solicitante_id, mi_id, mi_info)
+
+@rpc("any_peer", "call_local", "reliable")
+func _enviar_info_jugador(peer_id: int, info_jugador: Dictionary):	
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if not lobby:
+		return
+	
+	# Delegar al lobby
+	lobby._procesar_info_jugador(peer_id, info_jugador)
+
+
+
+@rpc("any_peer", "call_local", "reliable")
+func _solicitar_info_jugadores():
+	if not multiplayer.is_server():
+		return
+	
+	var solicitante_id = multiplayer.get_remote_sender_id()
+	print("[NETWORK] _solicitar_info_jugadores de ", solicitante_id)
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if not lobby:
+		return
+	
+	lobby._responder_info_jugadores(solicitante_id)
+	
+@rpc("authority", "call_local", "reliable")
+func _replicar_estado_listo(peer_id_jugador: int, estado: bool):
+	
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if not lobby:
+		return
+	lobby._procesar_estado_listo(peer_id_jugador, estado)
+	
+
+@rpc("any_peer", "call_local", "reliable")
+func _sincronizar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if not lobby:
+		return
+	lobby._procesar_cambio_personaje_arma(peer_id_jugador, id_personaje, id_arma)
+
+@rpc("authority", "call_local", "reliable")
+func _iniciar_carga():
+
+	iniciar_partida_desde_lobby()
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if lobby:
+		lobby._procesar_inicio_partida()
+	
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
+	# Iniciar carga sincronizada
+	iniciar_carga_sincronizada(GlobalJuego.session_info.keys())
+	
+	# Liberar el lobby
+	if lobby and is_instance_valid(lobby):
+		await get_tree().create_timer(1.0).timeout
+		lobby.queue_free()
+
+
+@rpc("authority", "call_local", "reliable")
+func _iniciar_partida():
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if lobby:
+		lobby._comenzar_partida()
+
+# ------------------------------------------------------------
+# ESTADO LISTO DE PANEL JUGADOR
+# ------------------------------------------------------------
+
+# RPC para notificar a todos sobre el estado de listo
+@rpc("any_peer", "call_local", "reliable")
+func _notificar_estado_listo(peer_id_jugador: int, estado: bool):
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if lobby:
+		lobby.actualizar_estado_listo(peer_id_jugador, estado)
+
+
 
 # ------------------------------------------------------------
 # PARTIDA - CREACIÓN DE JUGADORES
@@ -341,7 +435,6 @@ func _on_peer_disconnected_partida(peer_id: int):
 	eliminar_jugador(peer_id)
 	# si el que pauso se desconecta, despausar
 	if multiplayer.is_server() and pausa_activa and peer_id == peer_que_pauso:
-		print("El que pausó (", peer_id, ") se desconectó. Despausando...")
 		pausa_activa = false
 		peer_que_pauso = 0
 		_aplicar_pausa.rpc(false, 0)
@@ -355,7 +448,6 @@ func _on_peer_disconnected_partida(peer_id: int):
 	eliminar_jugador(peer_id)
 func _on_server_disconnected():
 	"""Se llama cuando se pierde la conexión con el servidor (host)"""
-	print("¡Se perdió la conexión con el HOST!")
 	
 	# Solo los clientes deben reaccionar
 	if multiplayer.is_server():
@@ -715,7 +807,6 @@ func solicitar_pausa(activar: bool) -> void: # CUALQUIERO PERSONA PUEDE PAUSAR P
 	if peer_solicitante == 0:
 		peer_solicitante = multiplayer.get_unique_id()  # si es local
 	
-	print("Solicitud de pausa: activar=", activar, " de peer=", peer_solicitante)
 	
 	# Solo el host valida y distribuye
 	if not multiplayer.is_server():
@@ -734,7 +825,6 @@ func solicitar_pausa(activar: bool) -> void: # CUALQUIERO PERSONA PUEDE PAUSAR P
 		if not pausa_activa:
 			return
 		if peer_solicitante != peer_que_pauso:
-			print("Peer ", peer_solicitante, " intentó despausar pero no es quien pausó (", peer_que_pauso, ")")
 			return
 		
 		pausa_activa = false
@@ -743,7 +833,6 @@ func solicitar_pausa(activar: bool) -> void: # CUALQUIERO PERSONA PUEDE PAUSAR P
 
 @rpc("authority", "call_local", "reliable")
 func _aplicar_pausa(activar: bool, quien_pauso: int) -> void: # el host autoriza la pausa o despausa y actualiza a todos
-	print("Aplicando pausa: ", activar, " por peer ", quien_pauso)
 	
 	pausa_activa = activar
 	peer_que_pauso = quien_pauso

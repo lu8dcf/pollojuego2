@@ -58,12 +58,8 @@ func _ready() -> void:
 	# Activamos cámara del menú
 	_activate_menu_camera()
 	
-	# Registrar botones "volver"
-	_registrar_botones_volver()
 
-func _registrar_botones_volver() -> void:
-	# Cada panel puede tener un botón "volver" que emite "solicitar_cerrar"
-	pass
+
 
 func conectar_botones()->void:
 	un_jugador.pressed.connect(_mostrar_un_jugador)
@@ -188,7 +184,7 @@ func _on_crear_lan(puerto: int, nombre: String) -> void:
 	if temp_mundo:
 		temp_mundo.queue_free()
 	
-	if not Network.empezar_servidor_lan(puerto):
+	if not await Network.empezar_servidor_lan(puerto):
 		_ocultar_pantalla_carga()
 		return
 	
@@ -213,9 +209,7 @@ func _on_unirse_tube(session_id: String, nombre: String) -> void:
 	Network.tube_join(session_id)
 
 func _on_crear_tube(nombre: String) -> void:
-	print("[MENU] _on_crear_tube llamado con nombre: ", nombre)
 	if _creando_tube:
-		print("[MENU] Ya se está creando, ignorando")
 		return
 	_creando_tube = true
 	GlobalJuego.nombre_jugador = nombre
@@ -223,22 +217,18 @@ func _on_crear_tube(nombre: String) -> void:
 	_deactivate_menu_camera()
 	
 	_mostrar_pantalla_carga("Creando partida...")
-	print("[MENU] Conectando señal session_created")
 
 	# Conectar la señal ANTES de crear la sesión
 	if not Network.tube_client.session_created.is_connected(_on_tube_session_created):
 		Network.tube_client.session_created.connect(_on_tube_session_created)
-	print("[MENU] Llamando a Network.tube_create()")
 
 	Network.tube_create()
 
 func _on_tube_session_created():
-	print("[MENU] ¡session_created recibido!")
 	_creando_tube = false
 	if Network.tube_client.session_created.is_connected(_on_tube_session_created):
 		Network.tube_client.session_created.disconnect(_on_tube_session_created)
 	var peer_listo = await Network._esperar_peer_listo(5.0)
-	print("menu. peer listo: ", peer_listo)
 	if not peer_listo:
 		_ocultar_pantalla_carga()
 		_on_error_conexion("No se pudo inicializar la sesión de Tube.")
@@ -271,10 +261,6 @@ func _mostrar_lobby() -> void:
 	lobby_actual = LOBBY.instantiate()
 	lobby_actual.name = "Lobby"
 	get_tree().current_scene.add_child(lobby_actual)
-	if lobby_actual.has_signal("partida_iniciada"):
-		lobby_actual.partida_iniciada.connect(_on_partida_iniciada_desde_lobby)
-	print("current_scene: ", get_tree().current_scene.name)
-	print("lobby path: ", lobby_actual.get_path())
 
 func _limpiar_lobby() -> void:
 	if lobby_actual and is_instance_valid(lobby_actual):
