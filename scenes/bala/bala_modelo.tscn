@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://e6voal8m8oud"]
+
+[ext_resource type="PackedScene" uid="uid://dm11qdphcqssb" path="res://assets/modelos/balas/bala.fbx" id="1_8vlsf"]
+
+[node name="bala" unique_id=1089801484 instance=ExtResource("1_8vlsf")]

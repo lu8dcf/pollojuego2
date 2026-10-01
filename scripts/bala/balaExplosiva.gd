@@ -15,7 +15,7 @@ var inicio = false
 @onready var areaExplosiva = $area_explosion
 
 #TEST
-@onready var textureBullet = $pollo_1
+@onready var textureBullet = $impactoPrevio/CollisionShape3D/explosiva
 
 
 func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3) -> void:

@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://bs4bbj6uxnukc"]
+
+[ext_resource type="PackedScene" uid="uid://b5vmppry5kuxs" path="res://assets/modelos/balas/explosiva.fbx" id="1_0twmv"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wtgwx"]
+albedo_color = Color(0.60224104, 0.17530811, 2.4065375e-07, 1)
+emission_enabled = true
+emission = Color(1, 0, 0, 1)
+emission_energy_multiplier = 7.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_fodb4"]
+material = SubResource("StandardMaterial3D_wtgwx")
+
+[sub_resource type="Curve" id="Curve_wprwl"]
+_limits = [-360.0, 360.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.045353983, 360), 0.0, 0.0, 0, 0, Vector2(0.46902654, -334.35117), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="Curve" id="Curve_0minr"]
+_data = [Vector2(0, 0.65903306), 0.0, 0.0, 0, 0, Vector2(0.7367256, 0.8956742), 0.0, 0.0, 0, 0, Vector2(1, 0.017543912), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[node name="explosiva" unique_id=240397053 instance=ExtResource("1_0twmv")]
+
+[node name="CPUParticles3D" type="CPUParticles3D" parent="." index="1" unique_id=1343577566]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.002044119, 0.00057994574, -0.108841315)
+amount = 160
+lifetime = 1.46
+speed_scale = 2.82
+use_fixed_seed = true
+seed = 100111378
+mesh = SubResource("BoxMesh_fodb4")
+emission_shape = 1
+emission_sphere_radius = 0.03
+direction = Vector3(0, 0, -1.455)
+spread = 13.67
+gravity = Vector3(0, 0, 0)
+initial_velocity_max = 1.15
+angle_min = 33.7
+angle_max = 241.5
+angle_curve = SubResource("Curve_wprwl")
+scale_amount_min = 0.01
+scale_amount_max = 0.03
+scale_amount_curve = SubResource("Curve_0minr")
