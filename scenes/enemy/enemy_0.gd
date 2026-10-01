@@ -65,7 +65,7 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 @onready var marcapaso: Timer = $Marcapaso
 
 @onready var geometry: MeshInstance3D 
-
+var shader_muerte = ShaderMaterial.new()
 var material_original
 
 
@@ -193,7 +193,9 @@ func take_damage(damage: int, source: int):
 		is_hurt = false
 		
 func animacion_muerte():
-	
+	shader_muerte = load("res://assets/modelos/shader/muerte.gdshader")
+
+	geometry.material_override = shader_muerte
 	#gravity_scale = 0
 			
 	var tween = create_tween()
