@@ -1,6 +1,11 @@
 # global_juego.gd - Datos y lógica del juego (SIN señales)
 extends Node
 
+
+# ===== VARIABLES GLOBALES =====
+var semilla_mapa: int = 123456
+
+
 # ===== INVENTARIO GLOBAL =====
 var inventario_jugador = [null, null, null, null, null, null] # inventario de maximo 6 slots
 
@@ -48,8 +53,7 @@ func _ready():
 		multiplayer.peer_disconnected.connect(_eliminar_jugador)
 
 func _configurar_sesion():
-	"""Configura la sesión inicial con el jugador local"""
-	var nombre_temp = "Anónimo"
+	var nombre_temp = "Jugador"
 	if GlobalJuego.nombre_jugador != "":
 		nombre_temp = GlobalJuego.nombre_jugador
 	
@@ -57,13 +61,20 @@ func _configurar_sesion():
 		"score": 0,
 		"username": nombre_temp,
 		"salud": SALUD_DEFAULT,
-		"personaje":1
+		"personaje":1,
+		"ping":0,
+		"inventario":[],
+		"armas_actuales":[]
 	}
-	
+	#  veerificar que el peer esté listo antes de hacer RPC
+	if multiplayer.multiplayer_peer == null:
+		await get_tree().create_timer(0.5).timeout
+		if multiplayer.multiplayer_peer == null:
+			print("ERROR: peer sigue null, no se puede replicar session_info")
+			return
 	_replicar_session_info.rpc(session_info)
 
 func _agregar_jugador(peer_id: int):
-	"""Agrega un nuevo jugador a la sesión"""
 	await get_tree().create_timer(1.0).timeout
 	
 	var jugador = _obtener_jugador(peer_id)
@@ -74,7 +85,8 @@ func _agregar_jugador(peer_id: int):
 			"salud": SALUD_DEFAULT,
 			"personaje":1,
 			"ping":0,
-			"inventario":[]
+			"inventario":[],
+			"armas_actuales":[]
 		}
 		_replicar_session_info.rpc(session_info)
 		
@@ -174,8 +186,10 @@ func configurar_singleplayer():
 		"salud": SALUD_DEFAULT,
 		"personaje":1,
 		"ping":0,
-		"inventario":[]
+		"inventario":[],
+		"armas_actuales":[]
 	}
 	
 	# Emitir señal global
 	GlobalSignal.sesion_actualizada.emit(session_info)
+	

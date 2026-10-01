@@ -1,5 +1,5 @@
 extends CanvasLayer
-
+#pantalla de carga
 
 signal cancelado
 @onready var label_cargando: Label = %LabelCargando
@@ -11,7 +11,9 @@ signal cancelado
 
 var jugadores_listos :Dictionary = {}
 var total_jugadores :int = 1
+
 func _ready() -> void:
+	layer=100
 	visible = true
 	animated_sprite_2d.play("cargando")
 	boton_cancelar.pressed.connect(_on_cancelar_pressed)
@@ -67,3 +69,6 @@ func mensaje(texto: String) -> void:
 
 func _on_cancelar_pressed() -> void:
 	cancelado.emit()
+
+func ocultar()->void:
+	hide()
