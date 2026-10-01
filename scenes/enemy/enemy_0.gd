@@ -64,14 +64,20 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 @export var rot_byte = 0
 @onready var marcapaso: Timer = $Marcapaso
 
-@onready var geometry: MeshInstance3D 
+@export var geometry: MeshInstance3D
+ 
 var shader_muerte = ShaderMaterial.new()
-var material_original
+var material_original: Material
+var material_rojo: StandardMaterial3D
 
 
 func _ready():
-	
-	
+	material_rojo = StandardMaterial3D.new()
+	material_rojo.albedo_color = Color.RED
+	# Si querés que se “ilumine”, podés subir emissive:
+	material_rojo.emission_enabled = true
+	material_rojo.emission = Color.RED
+	material_rojo.emission_energy_multiplier = 2.0 
 	# Areas de colision
 
 	cargar_modelo()
@@ -135,7 +141,7 @@ func tipo_enemigo():
 			#langosta (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
 			estado_actual=estado.WANDER
 			geometry = $modelo/enemigo_4/saltamontes/Skeleton3D/Cubo_104
-	material_original = geometry.get_active_material(0)
+	material_original = geometry.get_surface_override_material(0)
 	
 func recibir_dano(dano: int):
 	if not multiplayer.is_server():
@@ -153,10 +159,9 @@ func recibir_dano(dano: int):
 		is_hurt = false
 		
 func flash_rojo():
-	var mat = material_original.duplicate()
-	mat.albedo_color = Color.RED
-	geometry.material_override = mat
-	await get_tree().create_timer(0.3).timeout
+	
+	geometry.material_override = material_rojo
+	await get_tree().create_timer(0.2).timeout
 	geometry.material_override = material_original
 	
 func morir():
