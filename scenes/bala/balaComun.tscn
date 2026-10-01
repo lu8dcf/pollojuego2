@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://beawwqs832562"]
+[gd_scene format=3 uid="uid://d0hnrx2eowpsn"]
 
 [ext_resource type="Script" uid="uid://b5nlexba6mjke" path="res://scripts/bala/balaComun.gd" id="1_ckbog"]
-[ext_resource type="PackedScene" uid="uid://6dr1scr4fnwt" path="res://scenes/pollos/pollo_modelo_1.tscn" id="2_y2pfj"]
+[ext_resource type="PackedScene" uid="uid://c1yny3sauy8yu" path="res://scenes/environment/ball.tscn" id="2_ckbog"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_tdw23"]
 properties/0/path = NodePath(".:global_position")
@@ -19,11 +19,10 @@ collision_layer = 16
 collision_mask = 10
 script = ExtResource("1_ckbog")
 
+[node name="Ball" parent="." unique_id=1248059213 instance=ExtResource("2_ckbog")]
+
 [node name="tiempoVida" type="Timer" parent="." unique_id=1022337294]
 wait_time = 5.0
-
-[node name="pollo_1" parent="." unique_id=1188442573 instance=ExtResource("2_y2pfj")]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, -0.25, 0)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2072508626]
 replication_config = SubResource("SceneReplicationConfig_tdw23")
