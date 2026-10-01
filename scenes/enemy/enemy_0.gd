@@ -1,7 +1,7 @@
 extends CharacterBody3D
 class_name EnemigoBase
 
-@export var health := 100
+@export var health := 30
 # @export var animation_player: AnimationPlayer
 
 #@onready var crystal_timer: Timer = $Timer
@@ -64,7 +64,14 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 @export var rot_byte = 0
 @onready var marcapaso: Timer = $Marcapaso
 
+@onready var mesh: MeshInstance3D = $modelo/enemigo_1/Babosa/Skeleton3D/Cubo_106
+
+var material_original
+
+
 func _ready():
+	
+	
 	# Areas de colision
 
 	cargar_modelo()
@@ -115,17 +122,51 @@ func tipo_enemigo():
 		1:
 			#Chaser (ninja) debe hacer Seek para perseguir al jugador cuando éste se acerca, o cuando Chaser se acerca al jugador mientras hace Wander. Si el jugador se aleja una cierta distancia, Chaser debe volver a hacer Wander. Además Chaser debe hacer Arrive cuando llega a la posición del jugador.
 			estado_actual=estado.WANDER
+			mesh = $modelo/enemigo_1/Babosa/Skeleton3D/Cubo_106
 		2:
 			#Coward (payaso) debe hacer Flee para huir del jugador cuando éste se acerca, o cuando Coward se acerca al jugador mientras hace Wander. Si el jugador (o Coward) se aleja una cierta distancia, Coward debe volver a hacer Wander
 			estado_actual=estado.WANDER
+			mesh = $modelo/enemigo_2/caracol/Skeleton3D/Cubo_105
 		3:
 			#Wanderer (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
 			estado_actual=estado.WANDER
+			mesh = $modelo/enemigo_3/acaro/Skeleton3D/Cubo_086
 		4:
 			#langosta (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
 			estado_actual=estado.WANDER
-			
-
+			mesh = $modelo/enemigo_4/saltamontes/Skeleton3D/Cubo_104
+	material_original = mesh.get_active_material(0)
+	
+func recibir_dano(dano: int):
+	if not multiplayer.is_server():
+		return
+	var vida_actual = health - dano
+	flash_rojo()
+	if vida_actual <= 0:
+			morir()
+	else:
+		health = vida_actual
+		
+		is_hurt = true
+		#animation_player.play("Hit_Chest")
+		#await animation_player.animation_finished
+		is_hurt = false
+		
+func flash_rojo():
+	var mat = material_original.duplicate()
+	mat.albedo_color = Color.RED
+	mesh.set_surface_override_material(0, mat)
+	await get_tree().create_timer(0.3).timeout
+	mesh.set_surface_override_material(0, material_original) 
+	
+func morir():
+	#Global.update_score_for(source)
+	
+	is_dying = true
+	#animation_player.play("Death01")
+	#await animation_player.animation_finished
+	queue_free()
+	
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
 	
@@ -140,7 +181,7 @@ func take_damage(damage: int, source: int):
 	
 	if next_health <= 0:
 		player_to_notify.register_hit.rpc_id(source, true)
-		death(source)
+		
 	else:
 		health = next_health
 		player_to_notify.register_hit.rpc_id(source)
@@ -149,13 +190,7 @@ func take_damage(damage: int, source: int):
 		#await animation_player.animation_finished
 		is_hurt = false
 
-func death(source):
-	#Global.update_score_for(source)
-	set_collision_layer_value(1, false)
-	is_dying = true
-	#animation_player.play("Death01")
-	#await animation_player.animation_finished
-	queue_free()
+
 
 func cambios():
 	if animacion_ataque:

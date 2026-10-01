@@ -50,14 +50,10 @@ radius = 17.664063
 height = 1.5380859
 radius = 1.5854492
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sugfe"]
-radius = 1.0170898
-height = 3.0966797
-
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 process_mode = 1
 collision_layer = 2
-collision_mask = 3
+collision_mask = 27
 script = ExtResource("1_qypkf")
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]
@@ -85,7 +81,7 @@ visible = false
 
 [node name="vision" type="Area3D" parent="." unique_id=1579723558]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.067131, 0)
-collision_layer = 2
+collision_layer = 0
 collision_mask = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="vision" unique_id=296586098]
@@ -108,18 +104,9 @@ collision_mask = 8
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23095703, 0)
 shape = SubResource("CylinderShape3D_50d1r")
 
-[node name="danio" type="Area3D" parent="." unique_id=1659760012]
-collision_layer = 64
-collision_mask = 16
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="danio" unique_id=519725807]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.54833984, 0)
-shape = SubResource("CapsuleShape3D_sugfe")
-
 [connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]
 [connection signal="body_exited" from="vision" to="." method="_on_vision_body_exited"]
 [connection signal="area_entered" from="bigote" to="." method="_on_bigote_area_entered"]
 [connection signal="area_exited" from="bigote" to="." method="_on_bigote_area_exited"]
 [connection signal="body_entered" from="bigote" to="." method="_on_bigote_body_entered"]
 [connection signal="body_exited" from="bigote" to="." method="_on_bigote_body_exited"]
-[connection signal="area_entered" from="danio" to="." method="_on_danio_area_entered"]
