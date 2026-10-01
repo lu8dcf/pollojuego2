@@ -204,7 +204,7 @@ func animacion_muerte():
 	# Subir y rotar lentamente
 	tween.tween_property(self, "global_position:y", global_position.y + 10 ,3)
 	#tween.tween_property(self, "rotation:y", rotation.y + 10, 2)  # Girar mientras sube
-	tween.tween_property(self, "scale", Vector3.ZERO, 1.5)
+	tween.tween_property(self, "scale", Vector3(0.1,0.1,0.1), 1.5)
 		
 	await tween.finished
 		
