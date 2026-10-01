@@ -16,7 +16,7 @@ var inicio = false
 
 #TEST
 @onready var textureBullet = $pollo_1
-@onready var dano = 10 # daño de la bala
+@onready var dano = 10 # daño de la balad
 
 func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3) -> void:
 
@@ -79,7 +79,7 @@ func _on_area_comun_body_entered(body: Node3D) -> void:
 	
 
 
-func _on_area_comun_area_entered(area: Area3D) -> void:
+func _on_area_comun_area_entered(_area: Area3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
 		return
 	eliminarBala()
@@ -96,7 +96,7 @@ func _on_body_entered(body: Node3D) -> void:
 	
 
 
-func _on_area_entered(area: Area3D) -> void:
+func _on_area_entered(_area: Area3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
 		return
 	eliminarBala()
