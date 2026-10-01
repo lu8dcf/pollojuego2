@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://yubh30707eb7"]
 
 [ext_resource type="Script" uid="uid://c06gks0biq762" path="res://scenes/environment/world_forest.gd" id="1_3pli8"]
-[ext_resource type="PackedScene" uid="uid://c1uh3pf0og1vi" path="res://scenes/environment/mapa_1.tscn" id="2_1o1l2"]
+[ext_resource type="PackedScene" uid="uid://bnvhc0sx2djou" path="res://scenes/environment/generador_mapa.tscn" id="2_dxoa6"]
 [ext_resource type="Script" uid="uid://c7p2vuotjcwys" path="res://scenes/environment/camera_3d.gd" id="3_1o1l2"]
 [ext_resource type="Texture2D" uid="uid://2eivyf2ta2m7" path="res://assets/ui/prueba entorno.jpg" id="4_0wskc"]
 [ext_resource type="PackedScene" uid="uid://cypdi1lb7klts" path="res://assets/models/crystal/scene.gltf" id="4_1o1l2"]
@@ -19,8 +19,6 @@ background_mode = 2
 sky = SubResource("Sky_bpyjm")
 tonemap_mode = 2
 ssr_enabled = true
-ssao_enabled = true
-ssil_enabled = true
 glow_enabled = true
 fog_enabled = true
 fog_mode = 1
@@ -31,10 +29,10 @@ fog_sky_affect = 0.3
 process_mode = 1
 script = ExtResource("1_3pli8")
 
-[node name="mapa_1" parent="." unique_id=1924362278 instance=ExtResource("2_1o1l2")]
+[node name="mapa" parent="." unique_id=139508461 instance=ExtResource("2_dxoa6")]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1711943740]
-transform = Transform3D(0.57484823, -0.09363707, 0.8128848, -1.4901161e-08, 0.99343085, 0.11443438, -0.8182601, -0.06578241, 0.5710719, 25.365261, 3.181158, 25.67688)
+transform = Transform3D(0.57484823, -0.09363707, 0.8128848, -1.4901161e-08, 0.99343085, 0.11443438, -0.8182601, -0.06578241, 0.5710719, 40.108917, 3.1898546, 46.12387)
 script = ExtResource("3_1o1l2")
 sway_amplitude = 0.01
 sway_frequency = 0.1
@@ -46,7 +44,7 @@ environment = SubResource("Environment_1o1l2")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=98634334]
 transform = Transform3D(-0.86602527, -0.25000006, 0.4330127, 0.3161283, 0.39718598, 0.8615719, -0.38737956, 0.88303065, -0.26494098, 0, 10.745858, 0)
-light_angular_distance = 21.47
+light_angular_distance = 24.16
 shadow_enabled = true
 shadow_opacity = 0.45
 

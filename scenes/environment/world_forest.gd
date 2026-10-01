@@ -50,7 +50,7 @@ func disable_menu_mode() -> void:
 		pass  # El timer ya está corriendo
 
 func agregar_mapa():
-	var mapa = load("res://scenes/environment/mapa1.tscn")
+	var mapa = load("res://scenes/environment/generador_mapa.tscn")
 	var mapa_actual = mapa.instanciate()
 	add_child(mapa_actual)
 	
