@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://d37myfnv3u0q2"]
+
+[ext_resource type="PackedScene" uid="uid://cq3n25sk01q65" path="res://assets/modelos/mapas/piso.fbx" id="1_slw17"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dklp6"]
+size = Vector3(1, 2.5268555, 1)
+
+[node name="Node3D" type="Node3D" unique_id=1855021651]
+
+[node name="piso" parent="." unique_id=1977600842 instance=ExtResource("1_slw17")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0.0230809, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="piso" unique_id=88092087]
+transform = Transform3D(1.001, 0, 0, 0, 1.001, 0, 0, 0, 1.001, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="piso/StaticBody3D" unique_id=1764477793]
+transform = Transform3D(1.001, 0, 0, 0, 1.001, 0, 0, 0, 1.001, 0, -1.2823973, 0)
+shape = SubResource("BoxShape3D_dklp6")

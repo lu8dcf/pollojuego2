@@ -1,6 +1,11 @@
 # global_juego.gd - Datos y lógica del juego (SIN señales)
 extends Node
 
+
+# ===== VARIABLES GLOBALES =====
+var semilla_mapa: int = 123456
+
+
 # ===== INVENTARIO GLOBAL =====
 var inventario_jugador = [null, null, null, null, null, null] # inventario de maximo 6 slots
 
@@ -179,3 +184,4 @@ func configurar_singleplayer():
 	
 	# Emitir señal global
 	GlobalSignal.sesion_actualizada.emit(session_info)
+	
