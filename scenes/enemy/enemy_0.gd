@@ -64,7 +64,7 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 @export var rot_byte = 0
 @onready var marcapaso: Timer = $Marcapaso
 
-@onready var mesh: MeshInstance3D = $modelo/enemigo_1/Babosa/Skeleton3D/Cubo_106
+@onready var mesh: MeshInstance3D 
 
 var material_original
 
