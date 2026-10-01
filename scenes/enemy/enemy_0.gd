@@ -64,7 +64,7 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 @export var rot_byte = 0
 @onready var marcapaso: Timer = $Marcapaso
 
-@onready var mesh: MeshInstance3D 
+@onready var geometry: MeshInstance3D 
 
 var material_original
 
@@ -122,20 +122,20 @@ func tipo_enemigo():
 		1:
 			#Chaser (ninja) debe hacer Seek para perseguir al jugador cuando éste se acerca, o cuando Chaser se acerca al jugador mientras hace Wander. Si el jugador se aleja una cierta distancia, Chaser debe volver a hacer Wander. Además Chaser debe hacer Arrive cuando llega a la posición del jugador.
 			estado_actual=estado.WANDER
-			mesh = $modelo/enemigo_1/Babosa/Skeleton3D/Cubo_106
+			geometry = $modelo/enemigo_1/Babosa/Skeleton3D/Cubo_106
 		2:
 			#Coward (payaso) debe hacer Flee para huir del jugador cuando éste se acerca, o cuando Coward se acerca al jugador mientras hace Wander. Si el jugador (o Coward) se aleja una cierta distancia, Coward debe volver a hacer Wander
 			estado_actual=estado.WANDER
-			mesh = $modelo/enemigo_2/caracol/Skeleton3D/Cubo_105
+			geometry = $modelo/enemigo_2/caracol/Skeleton3D/Cubo_105
 		3:
 			#Wanderer (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
 			estado_actual=estado.WANDER
-			mesh = $modelo/enemigo_3/acaro/Skeleton3D/Cubo_086
+			geometry = $modelo/enemigo_3/acaro/Skeleton3D/Cubo_086
 		4:
 			#langosta (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
 			estado_actual=estado.WANDER
-			mesh = $modelo/enemigo_4/saltamontes/Skeleton3D/Cubo_104
-	material_original = mesh.get_active_material(0)
+			geometry = $modelo/enemigo_4/saltamontes/Skeleton3D/Cubo_104
+	material_original = geometry.get_active_material(0)
 	
 func recibir_dano(dano: int):
 	if not multiplayer.is_server():
@@ -155,9 +155,9 @@ func recibir_dano(dano: int):
 func flash_rojo():
 	var mat = material_original.duplicate()
 	mat.albedo_color = Color.RED
-	mesh.set_surface_override_material(0, mat)
+	geometry.material_override = mat
 	await get_tree().create_timer(0.3).timeout
-	mesh.set_surface_override_material(0, material_original) 
+	geometry.material_override = material_original
 	
 func morir():
 	#Global.update_score_for(source)
@@ -165,7 +165,9 @@ func morir():
 	is_dying = true
 	#animation_player.play("Death01")
 	#await animation_player.animation_finished
-	queue_free()
+	
+	animacion_muerte()
+	# queue_free()
 	
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
@@ -189,7 +191,22 @@ func take_damage(damage: int, source: int):
 		#animation_player.play("Hit_Chest")
 		#await animation_player.animation_finished
 		is_hurt = false
-
+		
+func animacion_muerte():
+	
+	#gravity_scale = 0
+			
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Subir y rotar lentamente
+	tween.tween_property(self, "global_position:y", global_position.y + 10 ,3)
+	#tween.tween_property(self, "rotation:y", rotation.y + 10, 2)  # Girar mientras sube
+	tween.tween_property(self, "scale", Vector3.ZERO, 1.5)
+		
+	await tween.finished
+		
+	queue_free()
 
 
 func cambios():
@@ -197,8 +214,6 @@ func cambios():
 		animation_player.play("ataque_bicho")
 	else:
 		animation_player.play("caminar_bicho")
-	
-	
 
 func _physics_process(delta: float) -> void:
 	
@@ -347,7 +362,6 @@ func byte_a_angulo(rot_byte: int) -> float:
 	return (rot_byte / 255.0) * tau
 	
 
-
 func mostrar_cruz(): # titila la cruz 
 	var tween = create_tween()
 	ver_cruz = false # solo parpadela la primera vez
@@ -389,15 +403,13 @@ func _on_vision_body_entered(body: Node3D) -> void:
 	
 	if tipo==4 and estado_actual==estado.WANDER:
 		estado_actual=estado.PERSIGUE	
-		
+
 
 func _on_vision_body_exited(body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
 	if tipo==1 and estado_actual==estado.PERSIGUE:
 		estado_actual=estado.WANDER
-		
-		
 
 
 func _on_bigote_area_entered(_area: Area3D) -> void:
@@ -408,7 +420,7 @@ func _on_bigote_area_entered(_area: Area3D) -> void:
 	
 	evadir_obstaculo=true
 	evasion._activar_evasion()
-		
+	
 
 func _on_bigote_area_exited(_area: Area3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
