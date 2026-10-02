@@ -15,7 +15,7 @@ var inicio = false
 #@onready var areaComun = $area_comun
 
 #TEST
-@onready var textureBullet = $Ball
+@onready var textureBullet = $pollo_1
 @onready var dano = 10 # daño de la balad
 
 func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3) -> void:
