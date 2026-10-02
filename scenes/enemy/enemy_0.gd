@@ -75,7 +75,10 @@ var material_rojo: StandardMaterial3D
 
 func _ready():
 	#shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
- 
+	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
+	shader_muerte = ShaderMaterial.new()
+	shader_muerte.shader = shader
+	
 	material_rojo = StandardMaterial3D.new()
 	material_rojo.albedo_color = Color.RED
 	# Si querés que se “ilumine”, podés subir emissive:
@@ -95,6 +98,9 @@ func _ready():
 	
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
+	
+	
+	
 	
 func cargar_modelo(): # tipo de enemigo
 	
@@ -202,8 +208,7 @@ func take_damage(damage: int, source: int):
 		is_hurt = false
 		
 func animacion_muerte():
-	shader_muerte = load("res://assets/modelos/shader/muerte.gdshader")
-
+	
 	geometry.material_override = shader_muerte
 	#gravity_scale = 0
 			
