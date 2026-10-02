@@ -1,4 +1,6 @@
 extends Node3D
+@export_group("Spawn")
+@export var altura_spawn: float = 5.0
 
 # Referencias a las escenas que vamos a instanciar
 var bloque_terreno: PackedScene = preload("res://scenes/environment/BloqueTerreno.tscn")
@@ -260,3 +262,21 @@ func calcular_distancias_al_borde(suelo_dict: Dictionary, dirs: Array) -> Dictio
 				cola.append(vecino)
 				
 	return distancias
+
+
+func obtener_posicion_spawn(indice: int = 0, total: int = 1) -> Vector3:
+	"""Devuelve una posición de spawn alrededor del centro del mapa."""
+	var centro_x = (float(ancho) / 2.0) * tamano_bloque
+	var centro_z = (float(largo) / 2.0) * tamano_bloque
+	
+	# Si hay varios jugadores, los distribuimos en círculo alrededor del centro
+	if total <= 1:
+		return Vector3(centro_x, altura_spawn, centro_z)
+	
+	# Radio del círculo de spawn
+	var radio = 3.0
+	var angulo = (float(indice) / float(total)) * TAU
+	var offset_x = cos(angulo) * radio
+	var offset_z = sin(angulo) * radio
+	
+	return Vector3(centro_x + offset_x, altura_spawn, centro_z + offset_z)
