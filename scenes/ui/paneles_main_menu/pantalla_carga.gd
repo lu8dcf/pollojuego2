@@ -1,5 +1,5 @@
 extends CanvasLayer
-
+#pantalla de carga
 
 signal cancelado
 @onready var label_cargando: Label = %LabelCargando
@@ -9,12 +9,23 @@ signal cancelado
 @onready var label_estado_jugadores: Label = %LabelEstadoJugadores
 @onready var jugadores: HBoxContainer = %Jugadores
 
+# panel de error - manejo de errores
+@onready var panel_error: PanelContainer = %PanelError
+@onready var label_titulo_error: Label = %LabelTituloError
+@onready var label_info_error: Label = %LabelInfoError
+@onready var boton_volver: AnimatedButton = %BotonVolver
+
 var jugadores_listos :Dictionary = {}
 var total_jugadores :int = 1
+
 func _ready() -> void:
+	layer=100
 	visible = true
+	panel_error.visible = false
 	animated_sprite_2d.play("cargando")
+	# conectar señales de botonces
 	boton_cancelar.pressed.connect(_on_cancelar_pressed)
+	boton_volver.pressed.connect(_on_boton_volver_pressed)
 	
 	label_estado_jugadores.text = "0/" + str(total_jugadores) + " listos"
 	progreso.max_value = 100
@@ -65,5 +76,31 @@ func mensaje(texto: String) -> void:
 	if label_cargando:
 		label_cargando.text = texto
 
+# botones funciones
 func _on_cancelar_pressed() -> void:
 	cancelado.emit()
+	
+func _on_boton_volver_pressed() -> void:
+	cancelado.emit()
+
+func ocultar()->void:
+	hide()
+
+
+# ------------------------------------------------------------
+# MOSTRAR ERROR
+# ------------------------------------------------------------
+func mostrar_error(mensaje:String,titulo:String = "Error") -> void:
+	# Ocultar todo lo de carga
+	animated_sprite_2d.visible = false
+	label_cargando.visible = false
+	progreso.visible = false
+	label_estado_jugadores.visible = false
+	jugadores.visible = false
+	boton_cancelar.visible = false
+	
+	# Mostrar el panel de error
+	panel_error.visible = true
+	label_titulo_error.text = titulo
+	label_info_error.text = mensaje
+	

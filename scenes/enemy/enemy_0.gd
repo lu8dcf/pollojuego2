@@ -1,7 +1,7 @@
 extends CharacterBody3D
 class_name EnemigoBase
 
-@export var health := 100
+@export var health := 30
 # @export var animation_player: AnimationPlayer
 
 #@onready var crystal_timer: Timer = $Timer
@@ -28,7 +28,7 @@ var is_dying := false
 var jugador: Node3D = null
 
 # datos de movimiento
-@export var velocidad_base: float = 1
+@export var velocidad_base: float = 2
 @export var velocidad_giro: float = 8.0
 var velocidad: float = velocidad_base # velocidad actual
 var direccion_actual: Vector3 = Vector3.FORWARD
@@ -64,21 +64,40 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 @export var rot_byte = 0
 @onready var marcapaso: Timer = $Marcapaso
 
+@export var geometry: MeshInstance3D
+
+
+var shader_muerte: ShaderMaterial = null  #  ShaderMaterial
+
+var material_original: Material
+var material_rojo: StandardMaterial3D
+
+
 func _ready():
+	
+	
+	material_rojo = StandardMaterial3D.new()
+	material_rojo.albedo_color = Color.RED
+	# Si querés que se “ilumine”, podés subir emissive:
+	material_rojo.emission_enabled = true
+	material_rojo.emission = Color.RED
+	material_rojo.emission_energy_multiplier = 2.0 
 	# Areas de colision
 
 	cargar_modelo()
 	cargar_movimiento()
 	add_to_group('enemy')
 	tipo_enemigo()
-	marcapaso.timeout.connect(cambios)
 	#jugador = get_tree().get_first_node_in_group("Jugadores")
 	# Esperar un frame para que el NavigationServer se inicialice
 	await get_tree().physics_frame
-	
+	marcapaso.timeout.connect(cambios)
 	
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
+	
+	
+	
 	
 func cargar_modelo(): # tipo de enemigo
 	
@@ -116,15 +135,59 @@ func tipo_enemigo():
 		1:
 			#Chaser (ninja) debe hacer Seek para perseguir al jugador cuando éste se acerca, o cuando Chaser se acerca al jugador mientras hace Wander. Si el jugador se aleja una cierta distancia, Chaser debe volver a hacer Wander. Además Chaser debe hacer Arrive cuando llega a la posición del jugador.
 			estado_actual=estado.WANDER
+			geometry = $modelo/enemigo_1/Babosa/Skeleton3D/Cubo_106
 		2:
 			#Coward (payaso) debe hacer Flee para huir del jugador cuando éste se acerca, o cuando Coward se acerca al jugador mientras hace Wander. Si el jugador (o Coward) se aleja una cierta distancia, Coward debe volver a hacer Wander
 			estado_actual=estado.WANDER
+			geometry = $modelo/enemigo_2/caracol/Skeleton3D/Cubo_105
 		3:
 			#Wanderer (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
 			estado_actual=estado.WANDER
+			geometry = $modelo/enemigo_3/acaro/Skeleton3D/Cubo_086
 		4:
-			pass
+			#langosta (mago) simplemente hace Wander sin verse afectado ni por el jugador, ni por los otros NPCs
+			estado_actual=estado.WANDER
+			geometry = $modelo/enemigo_4/saltamontes/Skeleton3D/Cubo_104
+	material_original = geometry.get_surface_override_material(0)
+	
+func recibir_dano(dano: int):
+	if not multiplayer.is_server():
+		return
+	var vida_actual = health - dano
+	flash_rojo.rpc()  # aviso a todos que brille
+	if vida_actual <= 0:
+			morir()
+	else:
+		health = vida_actual
+		
+		is_hurt = true
+		#animation_player.play("Hit_Chest")
+		#await animation_player.animation_finished
+		is_hurt = false
+		
+@rpc("authority", "call_local")		
+func flash_rojo():
+	geometry.material_override = material_rojo
+	await get_tree().create_timer(0.2).timeout
+	geometry.material_override = material_original
 
+@rpc("authority", "call_local", "reliable")		
+func flash_claro():
+	#shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
+	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
+	shader_muerte = ShaderMaterial.new()
+	shader_muerte.shader = shader
+	#Global.update_score_for(source)
+	geometry.set_surface_override_material(0, shader_muerte)
+	
+func morir():
+	flash_claro.rpc()
+	is_dying = true
+	#animation_player.play("Death01")
+	#await animation_player.animation_finished
+	animacion_muerte()
+	# queue_free()
+	
 func take_damage(damage: int, source: int):
 	var next_health = health - damage
 	
@@ -139,7 +202,7 @@ func take_damage(damage: int, source: int):
 	
 	if next_health <= 0:
 		player_to_notify.register_hit.rpc_id(source, true)
-		death(source)
+		
 	else:
 		health = next_health
 		player_to_notify.register_hit.rpc_id(source)
@@ -147,25 +210,32 @@ func take_damage(damage: int, source: int):
 		#animation_player.play("Hit_Chest")
 		#await animation_player.animation_finished
 		is_hurt = false
-
-func death(source):
-	#Global.update_score_for(source)
-	set_collision_layer_value(1, false)
-	is_dying = true
-	#animation_player.play("Death01")
-	#await animation_player.animation_finished
+		
+func animacion_muerte():
+	
+	geometry.material_override = shader_muerte
+	#gravity_scale = 0
+			
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Subir y rotar lentamente
+	tween.tween_property(self, "global_position:y", global_position.y + 10 ,3)
+	#tween.tween_property(self, "rotation:y", rotation.y + 10, 2)  # Girar mientras sube
+	tween.tween_property(self, "scale", Vector3(0.1,0.1,0.1), 1.5)
+		
+	await tween.finished
+		
 	queue_free()
+
 
 func cambios():
 	if animacion_ataque:
 		animation_player.play("ataque_bicho")
 	else:
 		animation_player.play("caminar_bicho")
-	
-	
 
 func _physics_process(delta: float) -> void:
-	
 	var rotacion_actual = modelo.rotation.y		
 	# Cuando SE RECIBE el valor  el valor:
 	var angulo_recibido = byte_a_angulo(rot_byte)
@@ -306,11 +376,10 @@ func angulo_a_byte(angulo: float) -> int:
 	# Mapa a [0, 255]
 	return int(norm / tau * 255.0 + 0.5)
 	
-func byte_a_angulo(rot_byte: int) -> float:
+func byte_a_angulo(rot_byte) -> float:
 	var tau = TAU
 	return (rot_byte / 255.0) * tau
 	
-
 
 func mostrar_cruz(): # titila la cruz 
 	var tween = create_tween()
@@ -348,6 +417,11 @@ func _on_vision_body_entered(body: Node3D) -> void:
 	if tipo==2 and estado_actual==estado.WANDER:
 		estado_actual=estado.FLEE	
 	
+	if tipo==3 and estado_actual==estado.WANDER:
+		estado_actual=estado.PERSIGUE
+	
+	if tipo==4 and estado_actual==estado.WANDER:
+		estado_actual=estado.PERSIGUE	
 
 
 func _on_vision_body_exited(body: Node3D) -> void:
@@ -355,8 +429,6 @@ func _on_vision_body_exited(body: Node3D) -> void:
 		return
 	if tipo==1 and estado_actual==estado.PERSIGUE:
 		estado_actual=estado.WANDER
-		
-		
 
 
 func _on_bigote_area_entered(_area: Area3D) -> void:
@@ -367,7 +439,7 @@ func _on_bigote_area_entered(_area: Area3D) -> void:
 	
 	evadir_obstaculo=true
 	evasion._activar_evasion()
-		
+	
 
 func _on_bigote_area_exited(_area: Area3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos

@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://mn3ancqbnvq1"]
+
+[ext_resource type="Script" uid="uid://bfve28q4fvv73" path="res://scripts/habilidades/habilidadEscudo.gd" id="1_t8eba"]
+
+[node name="HabilidadEscudo" type="Node3D" unique_id=1375354752]
+script = ExtResource("1_t8eba")
+
+[node name="tiempoRecarga" type="Timer" parent="." unique_id=2147375495]
+wait_time = 4.0
+
+[connection signal="timeout" from="tiempoRecarga" to="." method="_on_tiempo_recarga_timeout"]

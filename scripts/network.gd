@@ -32,12 +32,20 @@ var _ultimo_ping_enviado:int = 0
 var _timer_ping:Timer = null
 const INTERVALO_PING :=1.0 # cada un segundo se actualiza
 
+# banderas de crear session y unir n tube
+var _uniendo_sesion = false
+var _creando_sesion: bool = false
+
+
 func _ready() -> void:
 	if tube_enabled:
 		tube_client.context = TUBE_CONTEXT
 		get_tree().root.add_child.call_deferred(tube_client)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 	multiplayer.connection_failed.connect(_on_conexion_fallida)
+	
+	Network.tube_client.error_raised.connect(_on_tube_error_raised)
+
 	
 	# timer para medir el ping
 	_timer_ping = Timer.new()
@@ -55,21 +63,73 @@ func _enviar_ping()->void:
 		return
 	if multiplayer.is_server():
 		return # el host no se mide a si mismo
-		
+	var peer = multiplayer.multiplayer_peer
+	if peer == null:
+		return
+	if peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
 	_ultimo_ping_enviado = Time.get_ticks_msec()
 	_ping_servidor.rpc_id(1, _ultimo_ping_enviado)
 
+# MANEJO DE SEÑALES
+func _conectar_señales_lobby() -> void:
+	"""Conecta las señales de lobby solo si no están conectadas"""
+	if not multiplayer.peer_connected.is_connected(_on_peer_connected_lobby):
+		multiplayer.peer_connected.connect(_on_peer_connected_lobby)
+	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected_lobby):
+		multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
+
+func _desconectar_señales_lobby() -> void:
+	"""Desconecta las señales de lobby si están conectadas"""
+	if multiplayer.peer_connected.is_connected(_on_peer_connected_lobby):
+		multiplayer.peer_connected.disconnect(_on_peer_connected_lobby)
+	if multiplayer.peer_disconnected.is_connected(_on_peer_disconnected_lobby):
+		multiplayer.peer_disconnected.disconnect(_on_peer_disconnected_lobby)
+
 func tube_create():
+	if _creando_sesion:
+		return
+	_creando_sesion = true
+	_limpiar_multiplayer_peer()
+	
+	if tube_client.session_id != "":
+		tube_client.leave_session()
+		await get_tree().process_frame
 	en_lobby = true
-	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
+	_conectar_señales_lobby()
+	if not tube_client.session_created.is_connected(_on_tube_creado):
+		tube_client.session_created.connect(_on_tube_creado)
+	# se maneja un time para verificar que si aun no se conecta en 10 segundos es un probema de internet
+	var tiempo_inicio = Time.get_ticks_msec()
 	tube_client.create_session()
+	
+	while _creando_sesion:
+		if Time.get_ticks_msec() - tiempo_inicio > 10000:  # 10s
+			_creando_sesion = false
+			GlobalSignal.error_timeout_conexion.emit(
+				"No se pudo crear la sesión.\nVerificá tu conexión a internet."
+			)
+			return
+		await get_tree().process_frame
+
+func _on_tube_creado():
+	_creando_sesion = false
 
 func tube_join(session_id: String):
+	if _uniendo_sesion:
+		return
+	_uniendo_sesion = true
+	
+	_limpiar_multiplayer_peer()
+	
+	# cerrar cualquier sesion previa de Tube
+	if tube_client.session_id != "":
+		tube_client.leave_session()
+		await get_tree().process_frame
+		await get_tree().process_frame 
+	_limpiar_multiplayer_peer()
 	en_lobby = true
-	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
-	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
+	_conectar_señales_lobby()
 	tube_client.join_session(session_id)
 	_iniciar_timeout_conexion(10.0)
 
@@ -87,29 +147,30 @@ func _actualizar_ip_local() -> void:
 		#print("la ip elegida por el usuario es: ", ip_local)
 
 func empezar_servidor_lan(puerto: int = 9999):
+	_limpiar_multiplayer_peer()
 	en_lobby = true
 	puerto_actual=puerto
+	_conectar_señales_lobby()
 	
 	var error = enet_peer.create_server(puerto_actual)
 	if error != OK:
-		var mensaje = "No se pudo crear el servidor en el puerto " + str(puerto_actual) + ".\n"
 		match  error:
 			ERR_ALREADY_IN_USE:
-				mensaje += "El puerto ya está en uso. Prueba con otro."
+				GlobalSignal.error_puerto_en_uso.emit()
 			ERR_CANT_CREATE:
-				mensaje += "No se pudo crear el servidor. Verifica permisos del firewall."
+				GlobalSignal.error_conexion.emit("No se pudo crear el servidor.\nVerificá permisos del firewall.")
 			_:
-				mensaje += "Código de error: " + str(error)
-		GlobalSignal.error_conexion.emit(mensaje) # se emite el error de conexion para poder manejarlo en el hud
+				GlobalSignal.error_conexion.emit("Error desconocido: " + str(error)) # se emite el error de conexion para poder manejarlo en el hud
 		return false
 		
 	multiplayer.multiplayer_peer = enet_peer
-	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
-	_iniciar_timeout_conexion(8.0)
+
+	#_iniciar_timeout_conexion(8.0)
+	await get_tree().create_timer(0.5).timeout 
 	return true
 
 func unirse_servidor_lan(direccion_ip:String, puerto:int)-> bool:
+	_limpiar_multiplayer_peer()
 	en_lobby = true
 	puerto_actual = puerto
 	var error = enet_peer.create_client(direccion_ip, puerto)
@@ -125,10 +186,34 @@ func unirse_servidor_lan(direccion_ip:String, puerto:int)-> bool:
 		GlobalSignal.error_conexion.emit(mensaje)
 		return false
 		
-	multiplayer.peer_connected.connect(_on_peer_connected_lobby)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
-	multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
 	multiplayer.multiplayer_peer = enet_peer
+	_conectar_señales_lobby()
+	if not multiplayer.connected_to_server.is_connected(_on_connected_to_server_lobby):
+		multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
+	_iniciar_timeout_conexion(8.0) 
+	return true
+
+# LIMPIEZA DE SEÑALES EN MULTIJUGADOR
+func _limpiar_multiplayer_peer() -> void:
+	_desconectar_señales_lobby()
+	
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
+	
+	# Recrear el ENetMultiplayerPeer para evitar que quede "sucio"
+	enet_peer = ENetMultiplayerPeer.new()
+
+# ESPERAR A QUE EL PEER SE GENERE ANTES DE CONTINUAR
+func _esperar_peer_listo(timeout: float = 5.0) -> bool: #epera a que multiplayer.multiplayer_peer este asignado
+	var tiempo_inicio = Time.get_ticks_msec()
+	var tiempo_max = timeout * 1000.0
+	
+	while multiplayer.multiplayer_peer == null:
+		if Time.get_ticks_msec() - tiempo_inicio > tiempo_max:
+			return false
+		await get_tree().process_frame
+	
 	return true
 
 # ------------------------------------------------------------
@@ -151,7 +236,9 @@ func _on_peer_disconnected_lobby(peer_id: int):
 		GlobalJuego.session_info.erase(peer_id)
 
 func _on_connected_to_server_lobby():
-
+	_uniendo_sesion = false # se resetean banderas
+	_creando_sesion = false
+	
 	if _timeout_conexion: # si existe el timeout, cancelarlo
 		if _timeout_conexion.timeout.is_connected(_on_timeout_conexion):
 			_timeout_conexion.timeout.disconnect(_on_timeout_conexion)
@@ -168,6 +255,105 @@ func _on_connected_to_server_lobby():
 			"ping":0,
 			"inventario":[]
 		}
+
+@rpc("any_peer", "call_local", "reliable")
+func _solicitar_info_jugador():
+	var solicitante_id = multiplayer.get_remote_sender_id()
+	var mi_id = multiplayer.get_unique_id()
+	
+	var mi_info = GlobalJuego.session_info.get(mi_id, {})
+	if mi_info.is_empty():
+		mi_info = {
+			"username": GlobalJuego.nombre_jugador,
+			"personaje": 1,
+			"listo": false,
+			"score": 0,
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"ping":0,
+			"inventario":[],
+			"armas_actuales":[0,0]
+		}
+	
+	_enviar_info_jugador.rpc_id(solicitante_id, mi_id, mi_info)
+
+@rpc("any_peer", "call_local", "reliable")
+func _enviar_info_jugador(peer_id: int, info_jugador: Dictionary):	
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if not lobby:
+		return
+	
+	# Delegar al lobby
+	lobby._procesar_info_jugador(peer_id, info_jugador)
+
+
+
+@rpc("any_peer", "call_local", "reliable")
+func _solicitar_info_jugadores():
+	if not multiplayer.is_server():
+		return
+	
+	var solicitante_id = multiplayer.get_remote_sender_id()
+	print("[NETWORK] _solicitar_info_jugadores de ", solicitante_id)
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if not lobby:
+		return
+	
+	lobby._responder_info_jugadores(solicitante_id)
+	
+@rpc("authority", "call_local", "reliable")
+func _replicar_estado_listo(peer_id_jugador: int, estado: bool):
+	
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if not lobby:
+		return
+	lobby._procesar_estado_listo(peer_id_jugador, estado)
+	
+
+@rpc("any_peer", "call_local", "reliable")
+func _sincronizar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if not lobby:
+		return
+	lobby._procesar_cambio_personaje_arma(peer_id_jugador, id_personaje, id_arma)
+
+@rpc("authority", "call_local", "reliable")
+func _iniciar_carga():
+
+	iniciar_partida_desde_lobby()
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if lobby:
+		lobby._procesar_inicio_partida()
+	
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
+	# Iniciar carga sincronizada
+	iniciar_carga_sincronizada(GlobalJuego.session_info.keys())
+	
+	# Liberar el lobby
+	if lobby and is_instance_valid(lobby):
+		await get_tree().create_timer(1.0).timeout
+		lobby.queue_free()
+
+
+@rpc("authority", "call_local", "reliable")
+func _iniciar_partida():
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if lobby:
+		lobby._comenzar_partida()
+
+# ------------------------------------------------------------
+# ESTADO LISTO DE PANEL JUGADOR
+# ------------------------------------------------------------
+
+# RPC para notificar a todos sobre el estado de listo
+@rpc("any_peer", "call_local", "reliable")
+func _notificar_estado_listo(peer_id_jugador: int, estado: bool):
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if lobby:
+		lobby.actualizar_estado_listo(peer_id_jugador, estado)
+
+
 
 # ------------------------------------------------------------
 # PARTIDA - CREACIÓN DE JUGADORES
@@ -261,7 +447,6 @@ func _on_peer_disconnected_partida(peer_id: int):
 	eliminar_jugador(peer_id)
 	# si el que pauso se desconecta, despausar
 	if multiplayer.is_server() and pausa_activa and peer_id == peer_que_pauso:
-		print("El que pausó (", peer_id, ") se desconectó. Despausando...")
 		pausa_activa = false
 		peer_que_pauso = 0
 		_aplicar_pausa.rpc(false, 0)
@@ -273,9 +458,9 @@ func _on_peer_disconnected_partida(peer_id: int):
 		GlobalSignal.sesion_actualizada.emit(GlobalJuego.session_info)
 	
 	eliminar_jugador(peer_id)
+
 func _on_server_disconnected():
 	"""Se llama cuando se pierde la conexión con el servidor (host)"""
-	print("¡Se perdió la conexión con el HOST!")
 	
 	# Solo los clientes deben reaccionar
 	if multiplayer.is_server():
@@ -284,7 +469,10 @@ func _on_server_disconnected():
 	_volver_al_menu_por_desconexion_host()
 
 func _volver_al_menu_por_desconexion_host():
-	"""Maneja la desconexión del host para los clientes"""
+	# resetear variables
+	_uniendo_sesion = false
+	_creando_sesion = false
+	
 	# Limpiar la conexión
 	if multiplayer.multiplayer_peer:
 		multiplayer.multiplayer_peer.close()
@@ -307,10 +495,16 @@ func eliminar_jugador(peer_id):
 			jugador.queue_free()
 
 func leave_server():
+	# resetear variables
+	_uniendo_sesion = false
+	_creando_sesion = false
+	
 	if tube_enabled:
 		tube_client.leave_session()
-	multiplayer.multiplayer_peer.close()
-	multiplayer.multiplayer_peer = null
+		
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
 	get_tree().reload_current_scene()
 
 # MANEJO DE ERRORES:
@@ -325,6 +519,10 @@ func _iniciar_timeout_conexion(segundos: float = 8.0) -> void:
 	
 	
 func _on_timeout_conexion() -> void:
+	# resetear variables
+	_uniendo_sesion = false
+	_creando_sesion = false
+	
 	# Si seguimos en lobby y NO estamos conectados, es un timeout
 	if not en_lobby:
 		return
@@ -352,6 +550,10 @@ func _on_timeout_conexion() -> void:
 
 
 func _on_conexion_fallida():
+	# resetear variables
+	_uniendo_sesion = false
+	_creando_sesion = false
+	
 	if _timeout_conexion:
 		if _timeout_conexion.timeout.is_connected(_on_timeout_conexion):
 			_timeout_conexion.timeout.disconnect(_on_timeout_conexion)
@@ -367,6 +569,15 @@ func _on_conexion_fallida():
 		multiplayer.multiplayer_peer = null
 	
 	GlobalSignal.error_conexion.emit(mensaje)
+
+func _on_tube_error_raised(code: int, message: String) -> void:
+	GlobalSignal.error_conexion.emit(
+		"Error de sesión: " + message + "\n(Código: " + str(code) + ")"
+	)
+
+@rpc("authority", "reliable")
+func _error_lobby_lleno() -> void:
+	GlobalSignal.error_conexion.emit("La sala está llena (máximo 4 jugadores).")
 
 # ------------------------------------------------------------
 # MANEJO DE PANTALLA DE CARGA
@@ -394,31 +605,41 @@ func _mostrar_pantalla_carga(lista_peer_ids: Array) -> void:
 	pantalla_carga_actual.configurar_jugadores(lista_peer_ids)
 
 func _cargar_mundo_local() -> void: # cada usuario carga su mundo
-	var main_menu = get_tree().current_scene
+	
+	# precargar recursos pesados
+	var recursos_a_precargar = [
+		"uid://yubh30707eb7",  # mundo
+		"uid://bc1ek0bvbgna2",  # jugador
+		# ... otros recursos
+	]
+	
+	for recurso in recursos_a_precargar:
+		ResourceLoader.load_threaded_request(recurso)
+	
+	var todos_listos = false
+	while not todos_listos:
+		todos_listos = true
+		for recurso in recursos_a_precargar:
+			var status = ResourceLoader.load_threaded_get_status(recurso)
+			if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+				todos_listos = false
+				break
+			elif status == ResourceLoader.THREAD_LOAD_FAILED:
+				print("[NETWORK] Error cargando: ", recurso)
+		
+		await get_tree().process_frame
 	var MUNDO = load("uid://yubh30707eb7")
 	
-	# Instanciar mundo si no existe
 	var mundo_existente = obtener_mundo_actual()
 	if not mundo_existente:
-		# liberar el mundo temporal del menu:
-		var temp = main_menu.get_node_or_null("MundoTemporal")
-		if temp and is_instance_valid(temp):
-			# Desactivar la cámara del menú primero
-			var cam = temp.get_node_or_null("Camera3D")
-			if cam:
-				cam.current = false
-			temp.queue_free()
-			await get_tree().process_frame
-	
 		var nuevo_mundo = MUNDO.instantiate()
 		nuevo_mundo.name = "Mundo"
 		nuevo_mundo.add_to_group("mundo")
 		get_tree().current_scene.add_child(nuevo_mundo)
 		
-		# Esperar un frame para que el mundo esté listo
 		await get_tree().process_frame
 		await get_tree().process_frame
-	# una vez que el mundo está cargado, avisar al host que estamos listos
+	
 	notificar_listo()
 
 func notificar_listo() -> void:
@@ -530,30 +751,44 @@ func _exit_tree() -> void:
 		tube_client.leave_session()
 
 
-#---------- Interacciones Jugador
-@rpc("any_peer", "call_local")
-func pedir_salvar_rpc(objetivo_id: int) -> void:
 
+#----------------------------------------------------- Interacciones Jugador
+
+@rpc("any_peer", "reliable") #falta aca un call_local?
+func pedir_salvar_rpc(objetivo_id: int) -> void:
 	if not multiplayer.is_server():
 		return
-
 	var salvador_id := multiplayer.get_remote_sender_id()
+	procesar_salvar(salvador_id, objetivo_id)
 
+
+func procesar_salvar(salvador_id: int, objetivo_id: int) -> void:
 	var salvador := GlobalJuego._obtener_jugador(salvador_id)
 	var objetivo := GlobalJuego._obtener_jugador(objetivo_id)
 
-	if salvador == null or objetivo == null:
+	if salvador == null:
+		print("salvador no encontrado: ", salvador_id)
 		return
 
-	# comprobar que el objetivo esta caido
+	if objetivo == null:
+		print("objetivo no encontrado: ", objetivo_id)
+		return
+
 	if objetivo.estadoActual != Jugador.Estado.CAIDO:
-		print("El jugador no está caido")
+		print("El jugador: ", objetivo,"no está caido")
 		return
 
-	# Cambiar el estado del objetivo
-	objetivo.cambiar_estado(Jugador.Estado.OLEADA)
-	print("¡Salvado!")
+	print("Salvado!")
 
+	salvado_rpc.rpc(objetivo_id)
+
+
+@rpc("authority", "call_local", "reliable")
+func salvado_rpc(objetivo_id: int) -> void: 
+	var objetivo := GlobalJuego._obtener_jugador(objetivo_id)
+	if objetivo == null:
+		return
+	objetivo.polloSalvado()
 
 # ------------------------------------------------------------
 # PING PONG DE CONEXION
@@ -596,7 +831,6 @@ func solicitar_pausa(activar: bool) -> void: # CUALQUIERO PERSONA PUEDE PAUSAR P
 	if peer_solicitante == 0:
 		peer_solicitante = multiplayer.get_unique_id()  # si es local
 	
-	print("Solicitud de pausa: activar=", activar, " de peer=", peer_solicitante)
 	
 	# Solo el host valida y distribuye
 	if not multiplayer.is_server():
@@ -615,7 +849,6 @@ func solicitar_pausa(activar: bool) -> void: # CUALQUIERO PERSONA PUEDE PAUSAR P
 		if not pausa_activa:
 			return
 		if peer_solicitante != peer_que_pauso:
-			print("Peer ", peer_solicitante, " intentó despausar pero no es quien pausó (", peer_que_pauso, ")")
 			return
 		
 		pausa_activa = false
@@ -624,7 +857,6 @@ func solicitar_pausa(activar: bool) -> void: # CUALQUIERO PERSONA PUEDE PAUSAR P
 
 @rpc("authority", "call_local", "reliable")
 func _aplicar_pausa(activar: bool, quien_pauso: int) -> void: # el host autoriza la pausa o despausa y actualiza a todos
-	print("Aplicando pausa: ", activar, " por peer ", quien_pauso)
 	
 	pausa_activa = activar
 	peer_que_pauso = quien_pauso

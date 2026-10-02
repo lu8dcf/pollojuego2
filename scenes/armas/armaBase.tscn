@@ -31,13 +31,6 @@ autostart = true
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2103318625]
 replication_config = SubResource("SceneReplicationConfig_xu1fw")
 
-[node name="SpawnContainerBalas" type="Node3D" parent="." unique_id=831218319]
-unique_name_in_owner = true
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1437828170]
-_spawnable_scenes = PackedStringArray("uid://beawwqs832562", "uid://b635l88o7cpj4", "uid://dmk64w66uhmkc")
-spawn_path = NodePath("../SpawnContainerBalas")
-
 [node name="testArma" parent="." unique_id=111605971 instance=ExtResource("2_q77go")]
 
 [node name="buscarObjetivo" type="Timer" parent="." unique_id=424682024]

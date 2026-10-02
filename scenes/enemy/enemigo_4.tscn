@@ -608,10 +608,10 @@ _data = {
 [node name="enemigo_4" unique_id=1496230025 instance=ExtResource("1_4pobs")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 
-[node name="saltamontes" parent="." index="0" unique_id=192442745]
+[node name="saltamontes" parent="." index="0" unique_id=1581960760]
 transform = Transform3D(11.307489, -3.176697e-08, -0.7267435, 2.5159473e-15, 11.330819, -4.952858e-07, 0.7267435, 4.9426603e-07, 11.307489, 0.01884079, 0.6518216, -0.05512707)
 
-[node name="Skeleton3D" parent="saltamontes" index="0" unique_id=1777260513]
+[node name="Skeleton3D" parent="saltamontes" index="0" unique_id=2064029168]
 bones/0/position = Vector3(-0.0009784983, 0.004984851, -0.00021262027)
 bones/0/rotation = Quaternion(0.69502985, 0.030088324, -0.027094755, 0.71783996)
 bones/1/position = Vector3(-1.7729443e-10, 0.022474425, 3.4932859e-09)
@@ -703,8 +703,8 @@ bones/45/rotation = Quaternion(0.31789228, 0.66122764, -0.2004912, 0.6492502)
 bones/47/position = Vector3(-0.00089344324, 0.0049848477, -0.00023747135)
 bones/47/rotation = Quaternion(-0.3891884, 0.75029176, -0.14847796, -0.51337016)
 
-[node name="Cubo_104" parent="saltamontes/Skeleton3D" index="0" unique_id=216400179]
+[node name="Cubo_104" parent="saltamontes/Skeleton3D" index="0" unique_id=83368614]
 transform = Transform3D(-1, 4.440892e-15, 9.685755e-08, -3.330669e-15, 0.99999976, -8.742276e-08, -9.685755e-08, -8.7422755e-08, -1, -1.9574538e-05, 0.00014430657, 0.00026077265)
 
-[node name="AnimationPlayer" parent="." index="1" unique_id=1230198689]
+[node name="AnimationPlayer" parent="." index="1" unique_id=409645350]
 libraries/ = SubResource("AnimationLibrary_o4fh2")

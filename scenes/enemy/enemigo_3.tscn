@@ -257,7 +257,7 @@ _data = {
 [node name="enemigo_3" unique_id=955269760 instance=ExtResource("1_qv8j6")]
 transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, 0, 0, 0)
 
-[node name="Skeleton3D" parent="acaro" parent_id_path=PackedInt32Array(1163147084) index="0" unique_id=1246387530]
+[node name="Skeleton3D" parent="acaro" parent_id_path=PackedInt32Array(1256010746) index="0" unique_id=2073652321]
 bones/0/rotation = Quaternion(0.48200747, -0.22720107, 0.22847128, 0.8147695)
 bones/1/rotation = Quaternion(0.32381135, -0.4055761, 0.8156823, 0.25557125)
 bones/3/rotation = Quaternion(0.7620849, -0.14417633, 0.36449367, 0.51534873)
@@ -275,5 +275,5 @@ bones/17/scale = Vector3(0.99901, 1.0000001, 0.7594413)
 bones/19/position = Vector3(0.003111901, -0.0023480859, 0.001358088)
 bones/21/rotation = Quaternion(-0.00017707898, -3.0921987e-07, -0.00073670654, 0.9999997)
 
-[node name="AnimationPlayer" parent="." index="1" unique_id=239423262]
+[node name="AnimationPlayer" parent="." index="1" unique_id=496235956]
 libraries/ = SubResource("AnimationLibrary_gvr5s")

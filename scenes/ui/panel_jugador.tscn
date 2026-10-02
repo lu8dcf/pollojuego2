@@ -396,6 +396,7 @@ grow_vertical = 2
 
 [node name="SpriteSeleccion" type="AnimatedSprite2D" parent="ContenedorPersonaje" unique_id=1526114277]
 unique_name_in_owner = true
+visible = false
 position = Vector2(85, 55.000004)
 scale = Vector2(1.4375, 1.234375)
 sprite_frames = SubResource("SpriteFrames_c2doj")

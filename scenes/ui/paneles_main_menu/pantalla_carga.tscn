@@ -1,0 +1,130 @@
+[gd_scene format=3 uid="uid://bym6i52jnwycp"]
+
+[ext_resource type="Script" uid="uid://cpfofbduhbraq" path="res://scenes/ui/paneles_main_menu/pantalla_carga.gd" id="1_8isox"]
+[ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="2_4gu5t"]
+[ext_resource type="Texture2D" uid="uid://bhsw7bb8gny5f" path="res://assets/ui/lobby/personajes/idle2.png" id="3_ohwxg"]
+[ext_resource type="PackedScene" uid="uid://go1lsk1664t3" path="res://scenes/ui/boton_base.tscn" id="4_qlybx"]
+[ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="5_4gu5t"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxye6"]
+atlas = ExtResource("3_ohwxg")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f0q8f"]
+atlas = ExtResource("3_ohwxg")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t8jet"]
+atlas = ExtResource("3_ohwxg")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ebue7"]
+atlas = ExtResource("3_ohwxg")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0rl2u"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yxye6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f0q8f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t8jet")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ebue7")
+}],
+"loop": 1,
+"name": &"cargando",
+"speed": 5.0
+}]
+
+[node name="PantallaCarga" type="CanvasLayer" unique_id=198192704]
+layer = 20
+script = ExtResource("1_8isox")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1333326263]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.07762883, 0.07762881, 0.07762881, 1)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1118614784]
+unique_name_in_owner = true
+position = Vector2(574, 126.25)
+sprite_frames = SubResource("SpriteFrames_0rl2u")
+animation = &"cargando"
+
+[node name="Centro" type="VBoxContainer" parent="." unique_id=502041075]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -136.0
+offset_top = -134.0
+offset_right = 136.0
+offset_bottom = 158.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+
+[node name="LabelCargando" type="Label" parent="Centro" unique_id=1287305138]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Cargando..."
+label_settings = ExtResource("2_4gu5t")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Progreso" type="ProgressBar" parent="Centro" unique_id=499963690]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BotonCancelar" parent="Centro" unique_id=320612053 instance=ExtResource("4_qlybx")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Cancelar"
+
+[node name="LabelEstadoJugadores" type="Label" parent="Centro" unique_id=1907389831]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1/3 listos"
+label_settings = ExtResource("2_4gu5t")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Jugadores" type="HBoxContainer" parent="Centro" unique_id=416400760]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PanelError" type="PanelContainer" parent="Centro" unique_id=1282385804]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Centro/PanelError" unique_id=426929992]
+layout_mode = 2
+
+[node name="LabelTituloError" type="Label" parent="Centro/PanelError/VBoxContainer" unique_id=984398323]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Error"
+label_settings = ExtResource("2_4gu5t")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelInfoError" type="Label" parent="Centro/PanelError/VBoxContainer" unique_id=1117598713]
+unique_name_in_owner = true
+layout_mode = 2
+text = "info"
+label_settings = ExtResource("5_4gu5t")
+
+[node name="BotonVolver" parent="Centro/PanelError/VBoxContainer" unique_id=877180944 instance=ExtResource("4_qlybx")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Volver"

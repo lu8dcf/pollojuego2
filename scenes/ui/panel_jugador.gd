@@ -1,5 +1,6 @@
 extends Panel
 
+
 @onready var nombre_usuario: Label = $NombreUsuario
 @onready var estoy_listo_boton: TextureButtonAnimado = $ContenedorBoton/EstoyListoBoton
 @onready var indicador_listo: Label = $IndicadorListo  
@@ -83,6 +84,9 @@ func _ready() -> void:
 	_actualizar_habilidades(indice_personaje)
 	_actualizar_nombre(indice_arma)
 	nombre_personaje_arma.text="arturo"
+	if GlobalJuego.un_jugador:
+		estoy_listo_boton.visible=false
+		indicador_listo.visible=false
 	if estoy_listo_boton:
 		estoy_listo_boton.disabled = true
 	
@@ -116,8 +120,19 @@ func conectar_verificar_botones() -> void:
 	# el sprite arma mostrar es SOLO para los demas jugadores
 	# es para que sepan el arma que tiene el otro
 	if sprite_arma_mostrar:
-		sprite_arma_mostrar.visible = not es_mi_panel
-		
+		sprite_arma_mostrar.visible = true
+	if vida:
+		vida.visible = es_mi_panel
+	if defensa:
+		defensa.visible = es_mi_panel
+	if ataque:
+		ataque.visible = es_mi_panel
+	
+	if h_box_habilidades_personaje:
+		h_box_habilidades_personaje.visible = es_mi_panel
+	if h_box_habilidades_arma:
+		h_box_habilidades_arma.visible = es_mi_panel
+	
 	if not cambiar_adelante_opcion.pressed.is_connected(cambiar_personaje_arma):
 		cambiar_adelante_opcion.pressed.connect(cambiar_personaje_arma.bind(1))
 	if not cambiar_atras_opcion.pressed.is_connected(cambiar_personaje_arma):
@@ -137,16 +152,20 @@ func se_selecciona_personajes() -> void:
 	sprite_personaje.visible = true
 	sprite_arma.visible = false
 	sprite_seleccion.visible = false
-	h_box_habilidades_arma.visible=false
-	h_box_habilidades_personaje.visible=true
+	if h_box_habilidades_arma:
+		h_box_habilidades_arma.visible = false
+	if h_box_habilidades_personaje:
+		h_box_habilidades_personaje.visible = es_mi_panel
 	_actualizar_nombre(indice_personaje)
 	
 func se_selecciona_armas() -> void:
 	sprite_personaje.visible = false
 	sprite_arma.visible = true
 	sprite_seleccion.visible = false
-	h_box_habilidades_arma.visible=true
-	h_box_habilidades_personaje.visible=false
+	if h_box_habilidades_arma:
+		h_box_habilidades_arma.visible = es_mi_panel
+	if h_box_habilidades_personaje:
+		h_box_habilidades_personaje.visible = false
 	_actualizar_nombre(indice_arma)
 	
 
@@ -183,6 +202,8 @@ func cambiar_personaje_arma(direccion:int):
 	
 
 func _reproducir_personaje(id):
+	if id==0:
+		return
 	if sprite_personaje.visible:
 		sprite_personaje.play("idle" + str(id))
 			
@@ -206,6 +227,19 @@ func _actualizar_nombre(id:int)->void:
 				nombre_personaje_arma.text = nombres_armas[id]
 
 func _actualizar_habilidades(id: int) -> void:
+	if not es_mi_panel:
+		if h_box_habilidades_personaje:
+			h_box_habilidades_personaje.visible = false
+		if h_box_habilidades_arma:
+			h_box_habilidades_arma.visible = false
+		return
+	else:
+		if h_box_habilidades_personaje:
+			h_box_habilidades_personaje.visible = sprite_personaje.visible
+		if h_box_habilidades_arma:
+			h_box_habilidades_arma.visible = sprite_arma.visible
+		if sprite_arma_mostrar:
+			sprite_arma_mostrar.visible = true
 	if sprite_personaje.visible:
 		if not personajes.has(id):
 			return
@@ -248,7 +282,7 @@ func actualizar_info(id: int, nombre_jugador: String,personaje: int = 1):
 	_reproducir_personaje(id_personaje)
 	
 	if sprite_arma_mostrar:
-		sprite_arma_mostrar.visible = not es_mi_panel # solo mostrar el arma elegida a los demas jugadores, no a  mi
+		sprite_arma_mostrar.visible = true
 		var info = GlobalJuego.session_info.get(peer_id,{})
 		var armas_actuales:Array = info.get("armas_actuales",[])
 		var arma = 1 # fallback, en caso de que no se hayan guardado armas
@@ -257,7 +291,7 @@ func actualizar_info(id: int, nombre_jugador: String,personaje: int = 1):
 		
 		actualizar_arma_remoto(arma)
 			
-	if estoy_listo_boton:
+	if estoy_listo_boton and not GlobalJuego.un_jugador:
 		# Solo habilitar el botón si es mi panel
 		estoy_listo_boton.disabled = not es_mi_panel
 		estoy_listo_boton.visible = es_mi_panel  # Solo mostrar botón en tu panel
@@ -284,7 +318,7 @@ func actualizar_arma_remoto(id:int)->void:
 		sprite_arma_mostrar.play("arma" + str(id))
 	
 func _actualizar_indicador():
-	if indicador_listo:
+	if indicador_listo and not GlobalJuego.un_jugador:
 		if esta_listo:
 			indicador_listo.text = "✓ Listo"
 			indicador_listo.modulate = Color.GREEN
@@ -312,7 +346,7 @@ func marcar_listo():
 	_habilitar_deshabilitar_botones(esta_listo)
 	_actualizar_indicador()
 	# Emitir señal para notificar al lobby
-	_notificar_estado_listo.rpc(peer_id, true)
+	Network._notificar_estado_listo.rpc(peer_id, true)
 
 func marcar_no_listo():
 	esta_listo = false
@@ -320,7 +354,7 @@ func marcar_no_listo():
 		estoy_listo_boton.cambiar_texto("¿Listo?")
 	_actualizar_indicador()
 	# Emitir señal para notificar al lobby
-	_notificar_estado_listo.rpc(peer_id, false)
+	Network._notificar_estado_listo.rpc(peer_id, false)
 
 func _on_estoy_listo_boton_pressed() -> void:
 	# Solo permitir si es mi panel
@@ -331,11 +365,3 @@ func _on_estoy_listo_boton_pressed() -> void:
 		marcar_no_listo()
 	else:
 		marcar_listo()
-
-# RPC para notificar a todos sobre el estado de listo
-@rpc("any_peer", "call_local", "reliable")
-func _notificar_estado_listo(peer_id_jugador: int, estado: bool):
-	# Buscar el lobby y actualizar
-	var lobby = get_tree().get_first_node_in_group("lobby")
-	if lobby:
-		lobby.actualizar_estado_listo(peer_id_jugador, estado)

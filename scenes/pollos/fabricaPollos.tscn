@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bbb4xo85dnq0r"]
+
+[ext_resource type="Script" uid="uid://dhxx1wfjrr4vs" path="res://scripts/jugador/fabricaPollos.gd" id="1_q8u1n"]
+
+[node name="FabricaPollos" type="Node3D" unique_id=824404091]
+script = ExtResource("1_q8u1n")

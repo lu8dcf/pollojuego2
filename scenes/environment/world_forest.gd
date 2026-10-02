@@ -1,6 +1,7 @@
 extends Node3D
 
 @onready var spawn_container: Node3D = %SpawnContainer
+@onready var spawn_proyectiles: Node3D = %ContenedorProyectiles
 @onready var timer_enemy: Timer = %TimerEnemy
 @onready var menu_camera: MenuCameraController = $Camera3D
 #@onready var contenedor_mapa: Node3D = $Conteendor_mapa
@@ -49,37 +50,21 @@ func disable_menu_mode() -> void:
 		pass  # El timer ya está corriendo
 
 func agregar_mapa():
-	var mapa = load("res://scenes/environment/mapa1.tscn")
+	var mapa = load("res://scenes/environment/generador_mapa.tscn")
 	var mapa_actual = mapa.instanciate()
 	add_child(mapa_actual)
 	
 func spawn_enemy():
 	
-	if not multiplayer.has_multiplayer_peer():
+	if not multiplayer.is_server():
 		return
-	
-	if multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
-		return
-	
-	# Verificar que tengamos un ID válido
-	var mi_id = multiplayer.get_unique_id()
-	if mi_id == 0 or mi_id == 1 and not multiplayer.is_server():
-		# Si somos cliente y nos devuelve 1, hay un problema
-		if not multiplayer.is_server():
-			return
-	var cantidad_enemigos = get_tree().get_nodes_in_group("enemy").size()
-	if cantidad_enemigos > GlobalJuego.cant_enemigos:
-		return
-	
+
 	if is_menu_mode:
 		return
-	if not is_multiplayer_authority():
+
+	if get_tree().get_nodes_in_group("enemy").size() >= GlobalJuego.cant_enemigos:
 		return
-	# SOLO el servidor puede spawnear enemigos
-	if not multiplayer.is_server():
-		return  # Los clientes NO spawnean, solo reciben sincronización
-	
-	#GlobalSignal.agrega_enemigo.emit(1)
+
 	instanciar_enemigo()
 
 func instanciar_enemigo():
@@ -90,35 +75,24 @@ func instanciar_enemigo():
 			var rand_x = randf_range(GlobalJuego.mapa_x_min, GlobalJuego.mapa_x_max)
 			var rand_z = randf_range(GlobalJuego.mapa_z_min, GlobalJuego.mapa_z_max)
 			#print (rand_x," ",rand_z)
-			new_target.position = Vector3(rand_x, 2.0, rand_z)
+			new_target.position = Vector3(rand_x, 10.0, rand_z)
 			spawn_container.add_child(new_target, true)
 
 func fabrica_enemigos(tipo):
 
 		
 	
-	if tipo < 0 or tipo > GlobalJuego.cant_tipo_enemigos: # hasta aca solo 4 enemigos
+	if tipo < 0 or tipo >= GlobalJuego.cant_tipo_enemigos: # hasta aca solo 4 enemigos
 		push_error("Valor X fuera de rango: " + str(tipo))
 		return
 		
 	if tipo==0:
 		variedad_enemigos+=1
 		tipo=variedad_enemigos
-		if variedad_enemigos==3:
+		if variedad_enemigos==GlobalJuego.cant_tipo_enemigos:
 			variedad_enemigos=0
 			 
 	var nuevo_enemigo = enemigo_base.instantiate()
 	nuevo_enemigo.tipo = tipo
 	
 	return nuevo_enemigo
-
-
-func partida_unsolojugador():
-	is_menu_mode = false
-	
-	# Desactivar cámara del menú
-	if menu_camera:
-		menu_camera.deactivate_menu_camera()
-	
-	set_process(true)
-	
