@@ -75,7 +75,7 @@ func instanciar_enemigo():
 			var rand_x = randf_range(GlobalJuego.mapa_x_min, GlobalJuego.mapa_x_max)
 			var rand_z = randf_range(GlobalJuego.mapa_z_min, GlobalJuego.mapa_z_max)
 			#print (rand_x," ",rand_z)
-			new_target.position = Vector3(rand_x, 2.0, rand_z)
+			new_target.position = Vector3(rand_x, 10.0, rand_z)
 			spawn_container.add_child(new_target, true)
 
 func fabrica_enemigos(tipo):
@@ -96,14 +96,3 @@ func fabrica_enemigos(tipo):
 	nuevo_enemigo.tipo = tipo
 	
 	return nuevo_enemigo
-
-
-func partida_unsolojugador():
-	is_menu_mode = false
-	
-	# Desactivar cámara del menú
-	if menu_camera:
-		menu_camera.deactivate_menu_camera()
-	
-	set_process(true)
-	

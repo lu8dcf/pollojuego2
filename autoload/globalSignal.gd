@@ -31,7 +31,9 @@ signal solicitar_unirse_tube(session_id: String, nombre: String)
 signal solicitar_crear_tube(nombre: String)
 # señaes de un solo jugador
 @warning_ignore("unused_signal") 
-signal solicitar_empezar
+signal solicitar_crear_partida_un_jugador()
+#@warning_ignore("unused_signal") 
+#signal solicitar_empezar
 # señales de pantalla de carga 
 @warning_ignore("unused_signal") 
 signal cancelado

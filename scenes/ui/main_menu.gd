@@ -9,6 +9,8 @@ extends CanvasLayer
 # Botones de selección
 @onready var boton_online: TextureButton = %BotonOnline
 @onready var boton_local: TextureButton = %BotonLocal
+# gaficos 
+@onready var check_button: CheckButton = %CheckButton
 
 # Referencias a paneles
 @onready var panel_un_jugador: Control = %PanelUnJugador
@@ -40,10 +42,11 @@ func _ready() -> void:
 	conectar_botones()
 	
 	# Conectar señales de los paneles
-	GlobalSignal.solicitar_empezar.connect(_on_empezar_un_jugador)
+	#GlobalSignal.solicitar_empezar.connect(_on_empezar_un_jugador)
 	GlobalSignal.solicitar_unirse_lan.connect(_on_unirse_lan)
 	GlobalSignal.solicitar_crear_lan.connect(_on_crear_lan)
 	GlobalSignal.solicitar_unirse_tube.connect(_on_unirse_tube)
+	GlobalSignal.solicitar_crear_partida_un_jugador.connect(_crear_partida_un_jugador)
 	if not GlobalSignal.solicitar_crear_tube.is_connected(_on_crear_tube):
 		GlobalSignal.solicitar_crear_tube.connect(_on_crear_tube)
 	GlobalSignal.solicitar_cerrar.connect(_ocultar_todos_los_paneles)
@@ -59,15 +62,16 @@ func _ready() -> void:
 	_activate_menu_camera()
 	
 
-
-
 func conectar_botones()->void:
 	un_jugador.pressed.connect(_mostrar_un_jugador)
 	multijugador.pressed.connect(_mostrar_multijugador)
 	opciones.pressed.connect(_mostrar_opciones)
 	boton_salir.pressed.connect(_boton_salir)
-	
+	check_button.toggled.connect(_boton_requisitos)
 
+
+func _boton_requisitos(tongle:bool):
+	GlobalJuego.carga_mapa_simple =tongle
 # ------------------------------------------------------------
 # NAVEGACIÓN ENTRE PANELES
 # ------------------------------------------------------------
@@ -128,6 +132,19 @@ func _on_pantalla_carga_cancelada() -> void:
 func _mostrar_un_jugador():
 	mostrar_panel(panel_un_jugador)
 
+func _crear_partida_un_jugador() -> void:
+	GlobalJuego.un_jugador = true
+	_deactivate_menu_camera()
+	
+	_mostrar_pantalla_carga("Creando Juego para un solo jugador...")
+	
+	if temp_mundo:
+		temp_mundo.queue_free()
+	
+	await get_tree().create_timer(0.3).timeout
+	_ocultar_pantalla_carga()
+	_ir_al_lobby()
+
 func _on_empezar_un_jugador() -> void:
 	_deactivate_menu_camera()
 	GlobalJuego.un_jugador = true
@@ -151,6 +168,17 @@ func _crear_jugador_local(mundo_instancia: Node3D) -> void:
 	jugador.name = "1"
 	mundo_instancia.add_child(jugador)
 	jugador.global_position = Vector3(22, 2, 22)
+
+func _crear_mundo_un_jugador():
+	var nuevo_mundo = MUNDO.instantiate()
+	get_tree().current_scene.add_child(nuevo_mundo)
+	await get_tree().process_frame
+	
+	if nuevo_mundo.has_method("partida_unsolojugador"):
+		nuevo_mundo.partida_unsolojugador()
+	
+	_crear_jugador_local(nuevo_mundo)
+	_limpiar_lobby()
 
 # ------------------------------------------------------------
 # MULTIJUGADOR LAN
@@ -261,6 +289,8 @@ func _mostrar_lobby() -> void:
 	lobby_actual = LOBBY.instantiate()
 	lobby_actual.name = "Lobby"
 	get_tree().current_scene.add_child(lobby_actual)
+	if lobby_actual.has_signal("partida_iniciada"):
+		lobby_actual.partida_iniciada.connect(_on_partida_iniciada_desde_lobby)
 
 func _limpiar_lobby() -> void:
 	if lobby_actual and is_instance_valid(lobby_actual):
@@ -274,6 +304,9 @@ func _on_partida_iniciada_desde_lobby() -> void:
 		if menu_camera:
 			menu_camera.current = false
 		temp_mundo.queue_free()
+		
+	if GlobalJuego.un_jugador:
+		_crear_mundo_un_jugador()
 	#_limpiar_lobby()  # libera el lobby para no consumir recursos
 
 # ------------------------------------------------------------

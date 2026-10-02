@@ -28,4 +28,5 @@ func _on_empezar_pressed() -> void:
 		GlobalJuego.nombre_jugador = nombre
 	else:
 		GlobalJuego.nombre_jugador = nombre_usuario.text.strip_edges()
-	GlobalSignal.solicitar_empezar.emit()
+	GlobalSignal.solicitar_crear_partida_un_jugador.emit()
+	#GlobalSignal.solicitar_empezar.emit()
