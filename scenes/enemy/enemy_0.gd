@@ -65,13 +65,17 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 @onready var marcapaso: Timer = $Marcapaso
 
 @export var geometry: MeshInstance3D
- 
+
 var shader_muerte = ShaderMaterial.new()
+
+
 var material_original: Material
 var material_rojo: StandardMaterial3D
 
 
 func _ready():
+	shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
+ 
 	material_rojo = StandardMaterial3D.new()
 	material_rojo.albedo_color = Color.RED
 	# Si querés que se “ilumine”, podés subir emissive:
@@ -166,7 +170,7 @@ func flash_rojo():
 	
 func morir():
 	#Global.update_score_for(source)
-	
+	geometry.set_surface_override_material(0, shader_muerte)
 	is_dying = true
 	#animation_player.play("Death01")
 	#await animation_player.animation_finished
