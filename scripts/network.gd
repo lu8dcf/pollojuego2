@@ -44,6 +44,9 @@ func _ready() -> void:
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 	multiplayer.connection_failed.connect(_on_conexion_fallida)
 	
+	Network.tube_client.error_raised.connect(_on_tube_error_raised)
+
+	
 	# timer para medir el ping
 	_timer_ping = Timer.new()
 	_timer_ping.wait_time = INTERVALO_PING
@@ -96,14 +99,24 @@ func tube_create():
 	_conectar_señales_lobby()
 	if not tube_client.session_created.is_connected(_on_tube_creado):
 		tube_client.session_created.connect(_on_tube_creado)
+	# se maneja un time para verificar que si aun no se conecta en 10 segundos es un probema de internet
+	var tiempo_inicio = Time.get_ticks_msec()
 	tube_client.create_session()
+	
+	while _creando_sesion:
+		if Time.get_ticks_msec() - tiempo_inicio > 10000:  # 10s
+			_creando_sesion = false
+			GlobalSignal.error_timeout_conexion.emit(
+				"No se pudo crear la sesión.\nVerificá tu conexión a internet."
+			)
+			return
+		await get_tree().process_frame
 
 func _on_tube_creado():
 	_creando_sesion = false
 
 func tube_join(session_id: String):
 	if _uniendo_sesion:
-		print("Ya se está uniendo a una sesión, ignorando...")
 		return
 	_uniendo_sesion = true
 	
@@ -141,15 +154,13 @@ func empezar_servidor_lan(puerto: int = 9999):
 	
 	var error = enet_peer.create_server(puerto_actual)
 	if error != OK:
-		var mensaje = "No se pudo crear el servidor en el puerto " + str(puerto_actual) + ".\n"
 		match  error:
 			ERR_ALREADY_IN_USE:
-				mensaje += "El puerto ya está en uso. Prueba con otro."
+				GlobalSignal.error_puerto_en_uso.emit()
 			ERR_CANT_CREATE:
-				mensaje += "No se pudo crear el servidor. Verifica permisos del firewall."
+				GlobalSignal.error_conexion.emit("No se pudo crear el servidor.\nVerificá permisos del firewall.")
 			_:
-				mensaje += "Código de error: " + str(error)
-		GlobalSignal.error_conexion.emit(mensaje) # se emite el error de conexion para poder manejarlo en el hud
+				GlobalSignal.error_conexion.emit("Error desconocido: " + str(error)) # se emite el error de conexion para poder manejarlo en el hud
 		return false
 		
 	multiplayer.multiplayer_peer = enet_peer
@@ -179,6 +190,7 @@ func unirse_servidor_lan(direccion_ip:String, puerto:int)-> bool:
 	_conectar_señales_lobby()
 	if not multiplayer.connected_to_server.is_connected(_on_connected_to_server_lobby):
 		multiplayer.connected_to_server.connect(_on_connected_to_server_lobby)
+	_iniciar_timeout_conexion(8.0) 
 	return true
 
 # LIMPIEZA DE SEÑALES EN MULTIJUGADOR
@@ -446,6 +458,7 @@ func _on_peer_disconnected_partida(peer_id: int):
 		GlobalSignal.sesion_actualizada.emit(GlobalJuego.session_info)
 	
 	eliminar_jugador(peer_id)
+
 func _on_server_disconnected():
 	"""Se llama cuando se pierde la conexión con el servidor (host)"""
 	
@@ -488,8 +501,10 @@ func leave_server():
 	
 	if tube_enabled:
 		tube_client.leave_session()
-	multiplayer.multiplayer_peer.close()
-	multiplayer.multiplayer_peer = null
+		
+	if multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = null
 	get_tree().reload_current_scene()
 
 # MANEJO DE ERRORES:
@@ -554,6 +569,15 @@ func _on_conexion_fallida():
 		multiplayer.multiplayer_peer = null
 	
 	GlobalSignal.error_conexion.emit(mensaje)
+
+func _on_tube_error_raised(code: int, message: String) -> void:
+	GlobalSignal.error_conexion.emit(
+		"Error de sesión: " + message + "\n(Código: " + str(code) + ")"
+	)
+
+@rpc("authority", "reliable")
+func _error_lobby_lleno() -> void:
+	GlobalSignal.error_conexion.emit("La sala está llena (máximo 4 jugadores).")
 
 # ------------------------------------------------------------
 # MANEJO DE PANTALLA DE CARGA

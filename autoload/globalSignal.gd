@@ -17,8 +17,22 @@ signal seleccion_pollo_confirmada(pollo_id: String)
 signal sesion_actualizada(info_sesion: Dictionary)
 
 # ===== SEÑALES DE MENU AL HABER ERRRORES DE CONEXION =====
+
+# ===== SEÑALES DE ERRORES ESPECIFICAS =====
 @warning_ignore("unused_signal")
-signal error_conexion(mensaje :String)
+signal error_conexion(mensaje: String)             # genérico
+@warning_ignore("unused_signal")
+signal error_sala_llena()                          # sala con 4 jugadores
+@warning_ignore("unused_signal")
+signal error_timeout_conexion()                    # tiempo agotado
+@warning_ignore("unused_signal")
+signal error_ip_invalida()                         # IP mal formada
+@warning_ignore("unused_signal")
+signal error_host_desconectado()                   # host se fue
+@warning_ignore("unused_signal")
+signal error_sesion_invalida()                     # ID de sesión mal
+@warning_ignore("unused_signal")
+signal error_puerto_en_uso()                       # puerto ya usado
 
 # ===== SEÑALES DE MENU MAIN =====
 @warning_ignore("unused_signal") # señales de multijugador tube y enet
@@ -29,12 +43,11 @@ signal solicitar_crear_lan(puerto: int, nombre: String)
 signal solicitar_unirse_tube(session_id: String, nombre: String)
 @warning_ignore("unused_signal") 
 signal solicitar_crear_tube(nombre: String)
-# señaes de un solo jugador
+# ===== SEÑALES DE MENU MAIN - UN JUGADOR =====
 @warning_ignore("unused_signal") 
 signal solicitar_crear_partida_un_jugador()
-#@warning_ignore("unused_signal") 
-#signal solicitar_empezar
-# señales de pantalla de carga 
+
+# ===== SEÑALES DE PANTALLA DE CARGA =====
 @warning_ignore("unused_signal") 
 signal cancelado
 @warning_ignore("unused_signal") 
