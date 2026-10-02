@@ -17,7 +17,7 @@ extends PanelContainer
 @onready var boton_unirse_tube: Button = %BotonUnirseTube
 @onready var boton_crear_tube: Button = %BotonCrearPartidaTube
 
-# Local (LAN)
+# local
 @onready var edit_ip: LineEdit = %EditIp
 @onready var edit_puerto: LineEdit = %EditPuerto
 @onready var edit_nombre_enet: LineEdit = %EditNombreEnet
@@ -91,8 +91,8 @@ func _nombre_actual_enet() -> String:
 func _on_unirse_lan() -> void:
 	var ip = edit_ip.text.strip_edges()
 	var puerto_str = edit_puerto.text.strip_edges()
-	if ip == "" or not puerto_str.is_valid_int():
-		return
+	#if ip == "" or not puerto_str.is_valid_int():
+		#return
 	GlobalSignal.solicitar_unirse_lan.emit(ip, int(puerto_str), _nombre_actual_enet())
 
 func _on_crear_lan() -> void:

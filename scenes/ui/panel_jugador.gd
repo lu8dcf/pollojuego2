@@ -84,6 +84,9 @@ func _ready() -> void:
 	_actualizar_habilidades(indice_personaje)
 	_actualizar_nombre(indice_arma)
 	nombre_personaje_arma.text="arturo"
+	if GlobalJuego.un_jugador:
+		estoy_listo_boton.visible=false
+		indicador_listo.visible=false
 	if estoy_listo_boton:
 		estoy_listo_boton.disabled = true
 	
@@ -288,7 +291,7 @@ func actualizar_info(id: int, nombre_jugador: String,personaje: int = 1):
 		
 		actualizar_arma_remoto(arma)
 			
-	if estoy_listo_boton:
+	if estoy_listo_boton and not GlobalJuego.un_jugador:
 		# Solo habilitar el botón si es mi panel
 		estoy_listo_boton.disabled = not es_mi_panel
 		estoy_listo_boton.visible = es_mi_panel  # Solo mostrar botón en tu panel
@@ -315,7 +318,7 @@ func actualizar_arma_remoto(id:int)->void:
 		sprite_arma_mostrar.play("arma" + str(id))
 	
 func _actualizar_indicador():
-	if indicador_listo:
+	if indicador_listo and not GlobalJuego.un_jugador:
 		if esta_listo:
 			indicador_listo.text = "✓ Listo"
 			indicador_listo.modulate = Color.GREEN

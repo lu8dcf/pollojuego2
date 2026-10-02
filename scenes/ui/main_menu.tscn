@@ -195,6 +195,7 @@ label_settings = ExtResource("3_wb0q5")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_8g5eo")
+virtual_keyboard_type = 2
 
 [node name="LabelPuerto" type="Label" parent="Control/PanelMultijugadorEnet/MarginContainer/HBoxContainer/TubeMenu" unique_id=1668496600]
 layout_mode = 2
@@ -586,6 +587,7 @@ offset_left = 668.0
 offset_top = 602.0
 offset_right = 712.0
 offset_bottom = 634.0
+button_pressed = true
 
 [node name="MundoTemporal" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
 unique_name_in_owner = true

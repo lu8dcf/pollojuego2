@@ -134,7 +134,7 @@ func _on_jugador_conectado(peer_id: int): #245698
 	
 	if jugadores_en_lobby.size() >= 4:
 		Network._error_lobby_lleno.rpc_id(peer_id)
-		# Desconectar al cliente después de un momento
+		# desconectar al cliente después de un momento
 		await get_tree().create_timer(0.5).timeout
 		multiplayer.multiplayer_peer.disconnect_peer(peer_id)
 		return
@@ -226,6 +226,7 @@ func _enviar_mi_info_al_host() :
 		}
 	
 	Network._enviar_info_jugador.rpc_id(1, mi_id, mi_info)
+
 func _actualizar_panel(panel: Node, peer_id: int, nombre: String, listo: bool = false,personaje:int = 1):
 	if panel.has_method("actualizar_info"):
 		panel.actualizar_info(peer_id, nombre,personaje)

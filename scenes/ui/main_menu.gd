@@ -21,16 +21,7 @@ extends CanvasLayer
 # Pantalla de carga
 var pantalla_carga_actual: CanvasLayer = null
 
-# SEÑALES PARA LOS ERRORES ESPECIFICOS
-GlobalSignal.error_conexion.connect(_on_error_generico)
-GlobalSignal.error_sala_llena.connect(_on_error_sala_llena)
-GlobalSignal.error_timeout_conexion.connect(_on_error_timeout)
-GlobalSignal.error_ip_invalida.connect(_on_error_ip_invalida)
-GlobalSignal.error_host_desconectado.connect(_on_error_host_desconectado)
-GlobalSignal.error_sesion_invalida.connect(_on_error_sesion_invalida)
-GlobalSignal.error_puerto_en_uso.connect(_on_error_puerto_en_uso)
 
-# Cámara del menú
 @onready var temp_mundo: Node3D = %MundoTemporal
 @onready var menu_camera: MenuCameraController = %MundoTemporal.get_node("Camera3D")
 
@@ -64,6 +55,15 @@ func _ready() -> void:
 	GlobalSignal.error_conexion.connect(_on_error_conexion)
 	Network.tube_client.error_raised.connect(_on_error_conexion)
 	
+	# SEÑALES PARA LOS ERRORES ESPECIFICOS
+	GlobalSignal.error_conexion.connect(_on_error_generico)
+	GlobalSignal.error_sala_llena.connect(_on_error_sala_llena)
+	GlobalSignal.error_timeout_conexion.connect(_on_error_timeout)
+	GlobalSignal.error_ip_invalida.connect(_on_error_ip_invalida)
+	GlobalSignal.error_host_desconectado.connect(_on_error_host_desconectado)
+	GlobalSignal.error_sesion_invalida.connect(_on_error_sesion_invalida)
+	GlobalSignal.error_puerto_en_uso.connect(_on_error_puerto_en_uso)
+
 	# Pantalla de carga
 	GlobalSignal.cancelado.connect(_on_pantalla_carga_cancelada)
 	
@@ -202,6 +202,7 @@ func _mostrar_multijugador():
 
 func _on_unirse_lan(ip: String, puerto: int, nombre: String) -> void:
 	GlobalJuego.nombre_jugador = nombre
+	
 	GlobalJuego.un_jugador = false
 	_deactivate_menu_camera()
 	
@@ -211,7 +212,7 @@ func _on_unirse_lan(ip: String, puerto: int, nombre: String) -> void:
 		multiplayer.connected_to_server.connect(_on_conectado_para_lobby)
 	
 	if not Network.unirse_servidor_lan(ip, puerto):
-		_ocultar_pantalla_carga()
+		return
 
 func _on_crear_lan(puerto: int, nombre: String) -> void:
 	GlobalJuego.nombre_jugador = nombre
@@ -411,3 +412,9 @@ func _on_error_puerto_en_uso() -> void:
 		"El puerto ya está en uso.\nProbá con otro número.",
 		"Puerto en uso"
 	)
+func _mostrar_error(mensaje: String, titulo: String = "Error de conexión") -> void:
+	if not pantalla_carga_actual or not is_instance_valid(pantalla_carga_actual):
+		_mostrar_pantalla_carga("Error")
+	
+	if pantalla_carga_actual and pantalla_carga_actual.has_method("mostrar_error"):
+		pantalla_carga_actual.mostrar_error(mensaje, titulo)
