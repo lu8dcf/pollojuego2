@@ -66,16 +66,16 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 
 @export var geometry: MeshInstance3D
 
-var shader_muerte = ShaderMaterial.new()
 
+var shader_muerte: ShaderMaterial = null  #  ShaderMaterial
 
 var material_original: Material
 var material_rojo: StandardMaterial3D
 
 
 func _ready():
-	shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
- 
+	
+	
 	material_rojo = StandardMaterial3D.new()
 	material_rojo.albedo_color = Color.RED
 	# Si querés que se “ilumine”, podés subir emissive:
@@ -95,6 +95,9 @@ func _ready():
 	
 
 	# CONFIGURAR MultiplayerSynchronizer correctamente
+	
+	
+	
 	
 func cargar_modelo(): # tipo de enemigo
 	
@@ -151,7 +154,7 @@ func recibir_dano(dano: int):
 	if not multiplayer.is_server():
 		return
 	var vida_actual = health - dano
-	flash_rojo()
+	flash_rojo.rpc()  # aviso a todos que brille
 	if vida_actual <= 0:
 			morir()
 	else:
@@ -162,19 +165,26 @@ func recibir_dano(dano: int):
 		#await animation_player.animation_finished
 		is_hurt = false
 		
+@rpc("authority", "call_local")		
 func flash_rojo():
-	
 	geometry.material_override = material_rojo
 	await get_tree().create_timer(0.2).timeout
 	geometry.material_override = material_original
-	
-func morir():
+
+@rpc("authority", "call_local", "reliable")		
+func flash_claro():
+	#shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
+	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
+	shader_muerte = ShaderMaterial.new()
+	shader_muerte.shader = shader
 	#Global.update_score_for(source)
 	geometry.set_surface_override_material(0, shader_muerte)
+	
+func morir():
+	flash_claro.rpc()
 	is_dying = true
 	#animation_player.play("Death01")
 	#await animation_player.animation_finished
-	
 	animacion_muerte()
 	# queue_free()
 	
@@ -202,8 +212,7 @@ func take_damage(damage: int, source: int):
 		is_hurt = false
 		
 func animacion_muerte():
-	shader_muerte = load("res://assets/modelos/shader/muerte.gdshader")
-
+	
 	geometry.material_override = shader_muerte
 	#gravity_scale = 0
 			
@@ -227,7 +236,6 @@ func cambios():
 		animation_player.play("caminar_bicho")
 
 func _physics_process(delta: float) -> void:
-	
 	var rotacion_actual = modelo.rotation.y		
 	# Cuando SE RECIBE el valor  el valor:
 	var angulo_recibido = byte_a_angulo(rot_byte)
@@ -368,7 +376,7 @@ func angulo_a_byte(angulo: float) -> int:
 	# Mapa a [0, 255]
 	return int(norm / tau * 255.0 + 0.5)
 	
-func byte_a_angulo(rot_byte: int) -> float:
+func byte_a_angulo(rot_byte) -> float:
 	var tau = TAU
 	return (rot_byte / 255.0) * tau
 	
