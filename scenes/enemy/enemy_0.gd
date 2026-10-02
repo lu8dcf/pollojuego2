@@ -66,15 +66,15 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 
 @export var geometry: MeshInstance3D
 
-var shader_muerte = ShaderMaterial.new()
 
+var shader_muerte: ShaderMaterial = null  #  ShaderMaterial
 
 var material_original: Material
 var material_rojo: StandardMaterial3D
 
 
 func _ready():
-	shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
+	#shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
  
 	material_rojo = StandardMaterial3D.new()
 	material_rojo.albedo_color = Color.RED
