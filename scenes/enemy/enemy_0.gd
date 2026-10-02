@@ -74,10 +74,7 @@ var material_rojo: StandardMaterial3D
 
 
 func _ready():
-	#shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
-	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
-	shader_muerte = ShaderMaterial.new()
-	shader_muerte.shader = shader
+	
 	
 	material_rojo = StandardMaterial3D.new()
 	material_rojo.albedo_color = Color.RED
@@ -168,19 +165,26 @@ func recibir_dano(dano: int):
 		#await animation_player.animation_finished
 		is_hurt = false
 		
+@rpc("authority", "call_local", "reliable")		
 func flash_rojo():
-	
 	geometry.material_override = material_rojo
 	await get_tree().create_timer(0.2).timeout
 	geometry.material_override = material_original
-	
-func morir():
+
+@rpc("authority", "call_local", "reliable")		
+func flash_claro():
+	#shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
+	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
+	shader_muerte = ShaderMaterial.new()
+	shader_muerte.shader = shader
 	#Global.update_score_for(source)
 	geometry.set_surface_override_material(0, shader_muerte)
+	
+func morir():
+	flash_claro()
 	is_dying = true
 	#animation_player.play("Death01")
 	#await animation_player.animation_finished
-	
 	animacion_muerte()
 	# queue_free()
 	
@@ -232,7 +236,6 @@ func cambios():
 		animation_player.play("caminar_bicho")
 
 func _physics_process(delta: float) -> void:
-	
 	var rotacion_actual = modelo.rotation.y		
 	# Cuando SE RECIBE el valor  el valor:
 	var angulo_recibido = byte_a_angulo(rot_byte)
