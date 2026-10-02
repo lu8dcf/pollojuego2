@@ -20,6 +20,7 @@ collision_mask = 10
 script = ExtResource("1_ckbog")
 
 [node name="Ball" parent="." unique_id=1248059213 instance=ExtResource("2_ckbog")]
+visible = false
 
 [node name="tiempoVida" type="Timer" parent="." unique_id=1022337294]
 wait_time = 5.0
