@@ -22,25 +22,27 @@ signal partida_iniciada
 func _ready() -> void:
 	add_to_group("lobby")
 	
-	#if Network:
-		#Network.tube_client.session_created.connect(_on_session_created)
+	if GlobalJuego.un_jugador:
+		_inicilizar_un_jugador()
+		return
 	
+	# APARTADO DE MULTIJUGADOR
 	multiplayer.peer_connected.connect(_on_jugador_conectado)
 	multiplayer.peer_disconnected.connect(_on_jugador_desconectado)
 	multiplayer.server_disconnected.connect(_on_host_desconectado_lobby)
 
 	es_host = multiplayer.is_server()
-	
-	if boton_empezar:
-		boton_empezar.visible = es_host  # solo el host ve el botón
-		if not boton_empezar.pressed.is_connected(_on_iniciar_partida_pressed):
-			boton_empezar.pressed.connect(_on_iniciar_partida_pressed)
-		boton_empezar.disabled = true
-		boton_empezar.cambiar_texto("Esperando jugadores...")
+	if not GlobalJuego.un_jugador:
+		if boton_empezar:
+			boton_empezar.visible = es_host  # solo el host ve el botón
+			if not boton_empezar.pressed.is_connected(_on_iniciar_partida_pressed):
+				boton_empezar.pressed.connect(_on_iniciar_partida_pressed)
+			boton_empezar.disabled = true
+			boton_empezar.cambiar_texto("Esperando jugadores...")
 	
 	mostrar_usuarios()
 	
-	if es_host:
+	if es_host :
 		_agregar_jugador_al_lobby(1, _obtener_nombre_jugador())
 		if not GlobalJuego.session_info.has(1):
 			GlobalJuego.session_info[1] = {
@@ -60,13 +62,40 @@ func _ready() -> void:
 	
 	lobby_inicializado = true
 
+# UN SOLO JUGADOR
+func _inicilizar_un_jugador() -> void:
+	es_host = true
+	
+	if boton_empezar:
+		label_estado.visible = false
+		boton_empezar.visible = true
+		boton_empezar.disabled = false
+		boton_empezar.cambiar_texto("Comenzar Partida")
+		boton_empezar.modulate  =Color.GREEN
+		if not boton_empezar.pressed.is_connected(_on_iniciar_partida_pressed):
+			boton_empezar.pressed.connect(_on_iniciar_partida_pressed)
+			
+	label_id.hide()
+	label_ip.hide()
+	label_puerto.hide()
+	
+	# agregar al jugador local
+	_agregar_jugador_al_lobby(1, _obtener_nombre_jugador())
+	if not GlobalJuego.session_info.has(1):
+		GlobalJuego.session_info[1] = {
+			"score": 0,
+			"username": _obtener_nombre_jugador(),
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"personaje": 1,
+			"ping": 0,
+			"inventario": [],
+			"armas_actuales": []
+		}
+	
+	lobby_inicializado = true
+
 func _obtener_nombre_jugador() -> String:
-	if GlobalJuego.nombre_jugador != "":
-		return GlobalJuego.nombre_jugador
-	elif es_host:
-		return "Host"
-	else:
-		return "Jugador " + str(multiplayer.get_unique_id())
+	return GlobalJuego.nombre_jugador
 
 func mostrar_usuarios():
 	label_id.hide()
@@ -95,30 +124,6 @@ func mostrar_usuarios():
 				if label_ip: label_ip.text = ""
 				if label_puerto: label_puerto.text = ""
 				
-
-func _on_session_created(): # capaz lo quito
-	es_host = true
-	
-	if boton_empezar:
-		boton_empezar.visible = true
-		boton_empezar.disabled = true
-		boton_empezar.cambiar_texto("Esperando jugadores...")
-	
-	if not jugadores_en_lobby.has(1):
-		_agregar_jugador_al_lobby(1, _obtener_nombre_jugador())
-	
-	if not GlobalJuego.session_info.has(1):
-		GlobalJuego.session_info[1] = {
-			"score": 0,
-			"username": _obtener_nombre_jugador(),
-			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje":1,
-			"ping":0,
-			"inventario":[],
-			"armas_actuales":[]
-		}
-	
-	lobby_inicializado = true
 
 func _on_jugador_conectado(peer_id: int): #245698
 	
@@ -280,7 +285,7 @@ func _verificar_todos_listos():
 func _actualizar_estado_lobby():
 	var num_jugadores = jugadores_en_lobby.size()
 	
-	if label_estado:
+	if label_estado and not GlobalJuego.un_jugador:
 		if es_host:
 			var listos = 0
 			for peer_id in jugadores_en_lobby.keys():
@@ -298,7 +303,12 @@ func _actualizar_estado_lobby():
 			if boton_empezar:
 				boton_empezar.visible = false
 
-func _on_iniciar_partida_pressed():	
+func _on_iniciar_partida_pressed():
+	if GlobalJuego.un_jugador:
+		_comenzar_partida_un_jugador()
+		return
+		
+	
 	if es_host and jugadores_en_lobby.size() >= 2:
 		var todos_listos = true
 		for peer_id in jugadores_en_lobby.keys():
@@ -308,7 +318,7 @@ func _on_iniciar_partida_pressed():
 		
 		if todos_listos:
 			Network._iniciar_carga.rpc()
-
+	
 
 # avisar del cambio de personaje, cuando un usuario cambia su eprsonaje, avisa al host para que todos actualicen
 func notificar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
@@ -364,7 +374,16 @@ func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_a
 	# a futuro
 	## guardar armas que se estan usando, suelen ser 2, lista de dos armas
 	
-
+func _comenzar_partida_un_jugador():
+	if partida_iniciada_flag:
+		return
+	partida_iniciada_flag = true
+	
+	partida_iniciada.emit()
+	hide()
+	
+	
+	
 func _comenzar_partida():
 	if partida_iniciada_flag:
 		return

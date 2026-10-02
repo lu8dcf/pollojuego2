@@ -570,6 +570,23 @@ scale = Vector2(1.9211432, 1.031997)
 mouse_filter = 2
 metadata/_edit_use_anchors_ = true
 
+[node name="Label" type="Label" parent="Control" unique_id=1410488280]
+layout_mode = 0
+offset_left = 617.0
+offset_top = 585.0
+offset_right = 675.0
+offset_bottom = 608.0
+text = "GRÁFICOS BAJOS"
+label_settings = ExtResource("3_wb0q5")
+
+[node name="CheckButton" type="CheckButton" parent="Control" unique_id=1966479403]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 668.0
+offset_top = 602.0
+offset_right = 712.0
+offset_bottom = 634.0
+
 [node name="MundoTemporal" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
 unique_name_in_owner = true
 
