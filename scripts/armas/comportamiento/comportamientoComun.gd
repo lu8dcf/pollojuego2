@@ -1,4 +1,4 @@
 extends comportamientoArma
 class_name comportamientoComun
 
-@export var bala : PackedScene = preload("uid://d0hnrx2eowpsn")
+@export var bala : PackedScene = preload("res://scenes/bala/balaComun.tscn")
