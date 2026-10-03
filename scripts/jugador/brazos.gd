@@ -27,7 +27,7 @@ func _input(event: InputEvent) -> void:
 	if(Input.is_key_pressed(KEY_L)):
 		#var arma = crear_armas_derecho.crear_arma(1)
 		#equipar_arma(1)
-		solicitar_equipar_arma(3)
+		solicitar_equipar_arma(2)
 		#solicitar_equipar_arma(3)
 
 func obtener_arma(mano: Manos) -> Node:

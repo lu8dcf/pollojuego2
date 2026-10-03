@@ -78,7 +78,7 @@ func flash_rojo():
 func mirar_hacia(direction: Vector3, delta: float) -> void:
 	if direction.length_squared() < 0.001:
 		return
-	var angulo := atan2(direction.x,direction.z) + PI #este pi es para invertir la vuelta
+	var angulo := atan2(direction.x,direction.z) #este pi es para invertir la vuelta
 	self.rotation.y = lerp_angle(self.rotation.y,angulo,delta * 10.0)
 
 func reproducir_animacion(nombre: StringName) -> void:

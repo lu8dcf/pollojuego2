@@ -7,7 +7,7 @@ class_name comportamientoExplosiva
 
 @export var tiempo_espoleta : float
 
-@export var bala : PackedScene = preload("uid://b635l88o7cpj4")
+@export var bala : PackedScene = preload("res://scenes/bala/balaExplosiva.tscn")
 
 
 func get_tiempoEspoleta() -> float:

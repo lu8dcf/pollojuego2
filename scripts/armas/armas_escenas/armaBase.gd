@@ -143,14 +143,15 @@ func _on_buscar_objetivo_timeout() -> void:
 	actualizar_objetivo()
 	
 func crear_bala(posicion: Vector3, direccion: Vector3) -> void:
-	var nueva_bala = balaArma.instantiate()
-	nueva_bala.set_multiplayer_authority(1)
-	containerBalas.add_child(nueva_bala, true)
-	nueva_bala.iniciar(
-		datos.comportamiento,
-		posicion,
-		direccion
-	)
+	if(balaArma != null):
+		var nueva_bala = balaArma.instantiate()
+		nueva_bala.set_multiplayer_authority(1)
+		containerBalas.add_child(nueva_bala, true)
+		nueva_bala.iniciar(
+			datos.comportamiento,
+			posicion,
+			direccion
+		)
 
 #--------------------------------------------------------------------------------SERVIDOR
 
