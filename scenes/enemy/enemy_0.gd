@@ -262,6 +262,10 @@ func _physics_process(delta: float) -> void:
 			
 		
 		estado.PERSIGUE: #seek
+			if not _jugador_valido():
+				estado_actual = estado.WANDER
+				jugador = null
+				return
 			var distancia = Vector2(
 				jugador.global_position.x - global_position.x,
 				jugador.global_position.z - global_position.z
@@ -297,6 +301,10 @@ func _physics_process(delta: float) -> void:
 			
 	
 		estado.FLEE:
+			if not _jugador_valido():
+				estado_actual = estado.WANDER
+				jugador = null
+				return
 			# Si se aleja lo suficiente, volver a WANDER
 			if flee.esta_a_salvo(global_position, jugador.global_position):
 				estado_actual = estado.WANDER
@@ -342,6 +350,9 @@ func _physics_process(delta: float) -> void:
 	
 	move_and_slide()
 	
+
+func _jugador_valido() -> bool:
+	return jugador != null and is_instance_valid(jugador)
 
 # angulo_objetivo está en radianes, entre -PI y PI (o 0..2TAU, da igual)
 func angulo_a_byte(angulo: float) -> int:
@@ -403,6 +414,9 @@ func _on_vision_body_entered(body: Node3D) -> void:
 func _on_vision_body_exited(_body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
+	if _body == jugador:
+		jugador = null
+		
 	if tipo==1 and estado_actual==estado.PERSIGUE:
 		estado_actual=estado.WANDER
 
@@ -443,5 +457,7 @@ func _on_bigote_body_exited(_body: Node3D) -> void:
 func _on_danio_area_entered(_area: Area3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
-	
+	estado_actual = estado.INACTIVO
+	puede_moverse = false
+	jugador = null
 	queue_free()

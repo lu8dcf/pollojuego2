@@ -9,7 +9,7 @@ const TARGET = preload("uid://b8go34qeye00a")
 
 func _ready() -> void:
 	
-	Global.contenedor_spawn = contenedor_spawn
+	GlobalJuego.contenedor_spawn = contenedor_spawn
 
 	GlobalSignal.agrega_enemigo.connect(agrega_enemigo)
 
