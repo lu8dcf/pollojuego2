@@ -364,7 +364,42 @@ func _on_timer_salvar_timeout() -> void:
 	var objetivo_id := int(objetivo_actual.name)
 	pedir_salvar(objetivo_id)
 	cambiar_estado(Estado.OLEADA)
+#--------------------------------------------------------------------------DANIO
+
+func recibir_dano(dano: int):
+	if not is_multiplayer_authority():
+		return
+	var vida_actual = salud - dano
+	flash_rojo.rpc(get_multiplayer_authority())  # aviso a todos que brille
+	if vida_actual <= 0:
+			morir()
+	else:
+		salud = vida_actual
+		
+
+		
+@rpc("any_peer", "call_local")		
+func flash_rojo(mi_peer:int):
+	#if(mi_peer == multiplayer.get_remote_sender_id()):
+	pollo.flash_rojo()
+	await get_tree().create_timer(0.2).timeout
+
+@rpc("any_peer", "call_local", "reliable")
+func flash_claro():
+	#shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
+	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
+	#shader_muerte = ShaderMaterial.new()
+	#shader_muerte.shader = shader
+	##Global.update_score_for(source)
+	#geometry.set_surface_override_material(0, shader_muerte)
 	
+func morir():
+	flash_claro.rpc()
+	#muerto = true
+	#animation_player.play("Death01")
+	#await animation_player.animation_finished
+	#animacion_muerte()
+	# queue_free()
 
 #------------------------------------------------------------------------SERVIDOR
 
@@ -412,12 +447,16 @@ func morir_rpc(jugador_id: int) -> void:
 func estado_caido_rpc() -> void:
 	timer_caido.start()
 
-func morir():
-	print("jugador ha muerto!")
+#func morir():
+	#print("jugador ha muerto!")
 #-------------------------------------------------------------------SALVADOO
 func polloSalvado():
 	timer_caido.stop()
 	cambiar_estado(Estado.OLEADA)
+
+
+#generar funcion danio, grupo enemigo, preguntar si es en capa2
+
 
 #identifico el rpoblema como que no cambia el estado correctamente en el servidor DEL CLIENTE (en el host anda bien
 #--------------------------------------------------------------------debuggPrint

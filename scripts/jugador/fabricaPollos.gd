@@ -16,6 +16,7 @@ const POLLOS := {
 	TipoPollo.BLANCO: {
 		"modelo": preload("res://assets/modelos/pollos/pollo_1.fbx"),
 		"habilidad": preload("res://scenes/habilidad/habilidadDash.tscn"),
+		#salud, velocidad
 	},
 
 	TipoPollo.LENTES: {

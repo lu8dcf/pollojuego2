@@ -738,7 +738,7 @@ func _jugador_listo_rpc(peer_id: int) -> void:
 	_marcar_jugador_listo(peer_id)
 
 @rpc("authority", "call_local", "reliable")
-func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
+func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3):
 	
 	var mundo = obtener_mundo_actual()
 	if not mundo:

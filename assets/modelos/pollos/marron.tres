@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cv7a4p1vspjeb"]
+
+[resource]
+resource_name = "marron"
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.5759482, 0.33146304, 0.07580385, 1)
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 0.0

@@ -6,6 +6,11 @@ var jugador: Jugador
 var habilidad: Habilidad
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var modelo : Node3D
+@onready var geometry
+var meshes: Array[MeshInstance3D] = []
+
+var material_original: Material
+var material_rojo: StandardMaterial3D
 
 func inicializar(p_jugador: Jugador,p_modelo: Node3D,p_habilidad: Habilidad) -> void:
 
@@ -17,6 +22,16 @@ func inicializar(p_jugador: Jugador,p_modelo: Node3D,p_habilidad: Habilidad) -> 
 	add_child(habilidad)
 
 	habilidad.iniciar(jugador)
+
+
+func _ready():
+	for nodo in find_children("*", "MeshInstance3D", true, false):
+		var mesh := nodo as MeshInstance3D
+		
+		var material := mesh.get_active_material(0)
+		
+		if material is ShaderMaterial:
+			mesh.material_override = material.duplicate()
 
 
 
@@ -47,8 +62,19 @@ func solicitar_habilidad() -> void:
 @rpc("any_peer", "reliable")
 func ejecutar_habilidad() -> void:
 	habilidad.usar()
+	
+func flash_rojo():
+	var meshes = modelo.find_children("*", "MeshInstance3D", true, false)
+	for mesh in meshes:
+		var original = mesh.get_surface_override_material(0)
+		var rojo := StandardMaterial3D.new()
+		rojo.albedo_color = Color.RED
+		mesh.set_surface_override_material(0, rojo)
+		await get_tree().create_timer(0.2).timeout
+		mesh.set_surface_override_material(0, original)
 
-
+	
+	
 func mirar_hacia(direction: Vector3, delta: float) -> void:
 	if direction.length_squared() < 0.001:
 		return
