@@ -23,7 +23,7 @@ var animation_player : AnimationPlayer
 
 @export var tipo: int = 1 # tipo d enemigo
 @export var animacion_ataque=false
-var is_hurt := false
+var recibe_dano := false
 var is_dying := false
 var jugador: Node3D = null
 
@@ -153,6 +153,8 @@ func tipo_enemigo():
 func recibir_dano(dano: int):
 	if not multiplayer.is_server():
 		return
+	if not recibe_dano:
+		return
 	var vida_actual = health - dano
 	flash_rojo.rpc()  # aviso a todos que brille
 	if vida_actual <= 0:
@@ -160,10 +162,7 @@ func recibir_dano(dano: int):
 	else:
 		health = vida_actual
 		
-		is_hurt = true
-		#animation_player.play("Hit_Chest")
-		#await animation_player.animation_finished
-		is_hurt = false
+		
 		
 @rpc("authority", "call_local")		
 func flash_rojo():
@@ -188,45 +187,23 @@ func morir():
 	animacion_muerte()
 	# queue_free()
 	
-func take_damage(damage: int, source: int):
-	var next_health = health - damage
-	
-	var player_to_notify: Jugador
-	for current_player in get_tree().get_nodes_in_group('Jugadores'):
-		if current_player.name == str(source):
-			player_to_notify = current_player
-			break
-	
-	if not player_to_notify:
-		return
-	
-	if next_health <= 0:
-		player_to_notify.register_hit.rpc_id(source, true)
-		
-	else:
-		health = next_health
-		player_to_notify.register_hit.rpc_id(source)
-		is_hurt = true
-		#animation_player.play("Hit_Chest")
-		#await animation_player.animation_finished
-		is_hurt = false
-		
+
+@rpc("authority", "call_local", "reliable")				
 func animacion_muerte():
 	
 	geometry.material_override = shader_muerte
-	#gravity_scale = 0
-			
 	var tween = create_tween()
-	tween.set_parallel(true)
+	#tween.set_parallel(true)
 	
 	# Subir y rotar lentamente
 	#tween.tween_property(self, "global_position:y", global_position.y + 10 ,3)
 	#tween.tween_property(self, "rotation:y", rotation.y + 10, 2)  # Girar mientras sube
-	tween.tween_property(self, "scale", Vector3(0.01,0.01,0.01), 1.5)
+	tween.tween_property(self, "scale", Vector3(0.01,0.01,0.01), 1.5)  # achicarlo al morir
 		
 	await tween.finished
 		
 	queue_free()
+
 
 
 func cambios():
@@ -247,7 +224,7 @@ func _physics_process(delta: float) -> void:
 		return
 	
 
-	if is_dying or is_hurt: # si esta atacando no cambia el movimiento
+	if is_dying: # si esta atacando no cambia el movimiento
 		return
 
 	# Add the gravity.
@@ -349,9 +326,7 @@ func _physics_process(delta: float) -> void:
 		# Ejemplo de uso antes de enviar por RPC / sincronizador:
 		rot_byte = angulo_a_byte(angulo_objetivo)
 			# envías rot_byte (un solo byte o un int pequeño)	
-		
-		
-		
+			
 		
 	# Aplicar velocidad al CharacterBody3D
 	velocity.x = velocidad_actual.x
@@ -405,6 +380,7 @@ func mostrar_cruz(): # titila la cruz
 	tween.tween_callback(func():
 			puede_moverse = true # permino que se empiece a movere
 			set_collision_mask_value(4, true))  # Agrego las pareces de colision
+	recibe_dano = true # cuando aparece puede recibir danio
 
 # player entra al area de vision
 func _on_vision_body_entered(body: Node3D) -> void: 
