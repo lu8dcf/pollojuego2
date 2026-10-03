@@ -150,7 +150,8 @@ func crear_bala(posicion: Vector3, direccion: Vector3) -> void:
 		nueva_bala.iniciar(
 			datos.comportamiento,
 			posicion,
-			direccion
+			direccion,
+			datos.danio
 		)
 
 #--------------------------------------------------------------------------------SERVIDOR

@@ -15,19 +15,19 @@ enum Manos {
 }
 var ultima_mano: Manos = Manos.IZQUIERDA
 
-#func _ready() -> void:
+func _ready() -> void:
+	solicitar_equipar_arma(3)
 	##var arma = crear_armas_derecho.crear_arma(1)
 	#equipar_arma(2)
 	#equipar_arma(1)
 	#await get_tree().create_timer(3).timeout
 	#equipar_arma(3)
 
-@warning_ignore("unused_parameter")
-func _input(event: InputEvent) -> void:
-	if(Input.is_key_pressed(KEY_L)):
+#@warning_ignore("unused_parameter")
+#func _input(event: InputEvent) -> void:
+#	if(Input.is_key_pressed(KEY_L)):
 		#var arma = crear_armas_derecho.crear_arma(1)
 		#equipar_arma(1)
-		solicitar_equipar_arma(2)
 		#solicitar_equipar_arma(3)
 
 func obtener_arma(mano: Manos) -> Node:
