@@ -424,7 +424,7 @@ func _on_vision_body_entered(body: Node3D) -> void:
 		estado_actual=estado.PERSIGUE	
 
 
-func _on_vision_body_exited(body: Node3D) -> void:
+func _on_vision_body_exited(_body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
 	if tipo==1 and estado_actual==estado.PERSIGUE:

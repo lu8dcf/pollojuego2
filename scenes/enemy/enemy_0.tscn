@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b8go34qeye00a"]
 
-[ext_resource type="Script" path="res://scenes/enemy/enemy_0.gd" id="1_qypkf"]
+[ext_resource type="Script" uid="uid://ce82pcvnetebn" path="res://scenes/enemy/enemy_0.gd" id="1_qypkf"]
 [ext_resource type="Script" uid="uid://cgurjt66va6fc" path="res://scenes/enemy/movimiento/wander.gd" id="2_20j7o"]
 [ext_resource type="Script" uid="uid://l7d3wjko47fj" path="res://scenes/enemy/movimiento/flee.gd" id="3_l1is7"]
 [ext_resource type="Script" uid="uid://df8j34qa1nbmy" path="res://scenes/enemy/movimiento/evasion.gd" id="4_levhw"]
