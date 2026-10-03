@@ -90,7 +90,7 @@ func ocultar()->void:
 # ------------------------------------------------------------
 # MOSTRAR ERROR
 # ------------------------------------------------------------
-func mostrar_error(mensaje:String,titulo:String = "Error") -> void:
+func mostrar_error(mensaje1:String,titulo:String = "Error") -> void:
 	# Ocultar todo lo de carga
 	animated_sprite_2d.visible = false
 	label_cargando.visible = false
@@ -102,5 +102,5 @@ func mostrar_error(mensaje:String,titulo:String = "Error") -> void:
 	# Mostrar el panel de error
 	panel_error.visible = true
 	label_titulo_error.text = titulo
-	label_info_error.text = mensaje
+	label_info_error.text = mensaje1
 	
