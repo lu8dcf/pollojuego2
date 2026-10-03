@@ -36,6 +36,7 @@ var personajes : Dictionary ={
 	3: [2,0,2],
 	4: [0,3,1],
 	5: [2,0,1],
+	6: [0,0,2],
 	
 }
 @onready var vida: TextureRect = $HabilidadesPersonaje/HBoxHabilidadesPersonaje/Vida
@@ -60,7 +61,8 @@ var nombres_personajes:Dictionary={
 	2:"zuly",
 	3:"pinky",
 	4:"iku",
-	5:"claudio"
+	5:"claudio",
+	6:"ricachow"
 }
 
 var nombres_armas:Dictionary={
