@@ -18,7 +18,7 @@ extends Panel
 @onready var sprite_personaje: AnimatedSprite2D = %SpritePersonaje
 @onready var h_box_habilidades_personaje: HBoxContainer = %HBoxHabilidadesPersonaje
 var id_personaje:int=1
-var cant_personajes:int = 5
+var cant_personajes:int = 6
 var indice_personaje :int = 1
 var peer_id: int = 0
 
