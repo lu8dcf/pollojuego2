@@ -28,7 +28,7 @@ func _input(event: InputEvent) -> void:
 		#var arma = crear_armas_derecho.crear_arma(1)
 		#equipar_arma(1)
 		solicitar_equipar_arma(3)
-		solicitar_equipar_arma(3)
+		#solicitar_equipar_arma(3)
 
 func obtener_arma(mano: Manos) -> Node:
 	if mano == Manos.IZQUIERDA:
@@ -70,14 +70,14 @@ func solicitar_equipar_arma(id_arma: int) -> void:
 	var mano = ultima_mano
 
 	if multiplayer.is_server():
-		# el servidor es uno de los jugadores
+		# El servidor también puede ser un jugador.
 		avisar_arma_equipada.rpc(
 			multiplayer.get_unique_id(),
 			mano,
-			id_arma
+			id_arma,
 		)
 	else:
-		# le pide al servidor que avise a todos
+		# Le pedimos al servidor que procese el equipamiento.
 		solicitar_equipar_arma_rpc.rpc_id(
 			1,
 			mano,
@@ -87,13 +87,14 @@ func solicitar_equipar_arma(id_arma: int) -> void:
 
 @rpc("any_peer", "reliable")
 func solicitar_equipar_arma_rpc(mano: Manos, id_arma: int) -> void:
-	if !multiplayer.is_server():
+	if not multiplayer.is_server():
 		return
-	var peer_id := multiplayer.get_remote_sender_id()
 
 
-	# Avisamos a todos los jugadores:
-	# "el jugador peer_id equipó id_arma en esta mano".
+	var peer_id = multiplayer.get_remote_sender_id()
+
+
+	# El servidor decide quién está equipando el arma.
 	avisar_arma_equipada.rpc(
 		peer_id,
 		mano,

@@ -33,7 +33,7 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 func _ready() -> void:
 	add_to_group("bala")
 	top_level = true
-	textureBullet.visible=true
+	#textureBullet.visible=true
 
 func _process(_delta: float) -> void:
 	if(inicio):
@@ -52,7 +52,7 @@ func _physics_process(delta: float) -> void:
 func balaComun():
 	inicio = false
 	#TEST------------------------------------
-	textureBullet.visible = true
+	#textureBullet.visible = true
 	#fin Test
 	
 	#areaComun.visible = true

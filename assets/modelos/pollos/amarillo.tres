@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cec8vs0guw0sv"]
+
+[resource]
+resource_name = "amarillo"
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.91771555, 0.67152375, 0.21561989, 1)
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 0.0
