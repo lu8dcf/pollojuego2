@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dftv6sxn5s6i0"]
+
+[ext_resource type="ArrayMesh" uid="uid://d0e641ga6ouiy" path="res://assets/modelos/barraVida/vidaverde.obj" id="1_h4utg"]
+[ext_resource type="Material" uid="uid://bv002atuwwjyt" path="res://assets/modelos/barraVida/material_verde.tres" id="2_uekf0"]
+
+[node name="barraVerde" type="MeshInstance3D" unique_id=1608620586]
+mesh = ExtResource("1_h4utg")
+surface_material_override/0 = ExtResource("2_uekf0")

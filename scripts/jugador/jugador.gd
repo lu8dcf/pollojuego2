@@ -33,6 +33,7 @@ AYUDANDO
 
 var ultimoEstado : Estado = Estado.OLEADA
 var salud := 100
+var salud_maxima = 100
 var objetivo_actual: Node = null
 
 #DASH
@@ -220,7 +221,7 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 #-----------------------------------------------------------------------------DASH
 
 func iniciar_dash() -> void:
-	direccion_dash = -pollo.global_transform.basis.z
+	direccion_dash = pollo.global_transform.basis.z
 	direccion_dash = direccion_dash.normalized()
 	tiempo_dash = DASH_DURATION
 	cambiar_estado(Estado.DASH)
@@ -372,10 +373,10 @@ func recibir_dano(dano: int):
 	var vida_actual = salud - dano
 	flash_rojo.rpc(get_multiplayer_authority())  # aviso a todos que brille
 	if vida_actual <= 0:
-			morir()
-	else:
-		salud = vida_actual
-		
+			morir_rpc.rpc(int(name))
+	salud = vida_actual
+	var porcentaje = float(salud) / salud_maxima
+	$barraVida.bajarVida(porcentaje)
 
 		
 @rpc("any_peer", "call_local")		
@@ -393,13 +394,6 @@ func flash_claro():
 	##Global.update_score_for(source)
 	#geometry.set_surface_override_material(0, shader_muerte)
 	
-func morir():
-	flash_claro.rpc()
-	#muerto = true
-	#animation_player.play("Death01")
-	#await animation_player.animation_finished
-	#animacion_muerte()
-	# queue_free()
 
 #------------------------------------------------------------------------SERVIDOR
 
@@ -447,8 +441,15 @@ func morir_rpc(jugador_id: int) -> void:
 func estado_caido_rpc() -> void:
 	timer_caido.start()
 
-#func morir():
-	#print("jugador ha muerto!")
+func morir():
+	print("jugador ha muerto!")
+	#flash_claro.rpc()
+	
+	#muerto = true
+	#animation_player.play("Death01")
+	#await animation_player.animation_finished
+	#animacion_muerte()
+	# queue_free()
 #-------------------------------------------------------------------SALVADOO
 func polloSalvado():
 	timer_caido.stop()

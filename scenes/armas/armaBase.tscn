@@ -4,15 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://c23nf7t55y5ta" path="res://scenes/armas/testArrow/test_arma.tscn" id="2_q77go"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_xu1fw"]
-properties/0/path = NodePath(".:visible")
+properties/0/path = NodePath(".:rotation")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath("Sprite3D:visible")
-properties/1/spawn = true
-properties/1/replication_mode = 2
-properties/2/path = NodePath(".:rotation")
-properties/2/spawn = true
-properties/2/replication_mode = 2
 
 [node name="ArmaBase" type="Node3D" unique_id=88539004]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
