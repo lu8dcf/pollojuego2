@@ -51,10 +51,10 @@ var COLORS: Array[Color] =[ # colores de la barra de vida
 ]
 
 func _ready() -> void:
-	if OS.has_feature("mobile") or DisplayServer.is_touchscreen_available():
+	if OS.has_feature("mobile") :
 		await get_tree().process_frame 
 		var instancia_panel_ui_movil = PANEL_UI_MOVIL.instantiate()
-		get_tree().add_child(instancia_panel_ui_movil)
+		get_tree().root.add_child(instancia_panel_ui_movil)
 		menu.show()
 		
 	else:
