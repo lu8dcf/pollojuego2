@@ -74,6 +74,7 @@ var material_rojo: StandardMaterial3D
 
 
 func _ready():
+	
 	# Areas de colision
 	cargar_materiales()
 	cargar_modelo()
@@ -368,6 +369,7 @@ func byte_a_angulo(rot_byte) -> float:
 	
 
 func mostrar_cruz(): # titila la cruz 
+	$CollisionShape3D.disabled = true  # no recibe daño
 	var tween = create_tween()
 	ver_cruz = false # solo parpadela la primera vez
 		#  ciclo de parpadeo 3 veces
@@ -391,7 +393,8 @@ func mostrar_cruz(): # titila la cruz
 	tween.tween_callback(func():
 			puede_moverse = true # permino que se empiece a movere
 			set_collision_mask_value(4, true))  # Agrego las pareces de colision
-
+	$CollisionShape3D.disabled = false  # aca puede recibir daño
+	
 # player entra al area de vision
 func _on_vision_body_entered(body: Node3D) -> void: 
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
