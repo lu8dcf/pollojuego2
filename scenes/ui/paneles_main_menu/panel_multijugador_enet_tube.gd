@@ -2,7 +2,7 @@ extends PanelContainer
 # panel multijugador enet_tube
 
 
-# Sub-paneles
+# subpaneles
 @onready var sub_panel_online: Control = %PanelMultijugador
 @onready var sub_panel_local: Control = %PanelMultijugadorEnet
 
@@ -11,7 +11,7 @@ extends PanelContainer
 @onready var boton_local: TextureButton = %BotonLocal
 #@onready var boton_volver: Button = %BotonVolver
 
-# Online (Tube)
+# online tube
 @onready var edit_nombre_tube: LineEdit = %EditNombreTube
 @onready var edit_sesion: LineEdit = %EditSesion
 @onready var boton_unirse_tube: Button = %BotonUnirseTube
@@ -23,26 +23,32 @@ extends PanelContainer
 @onready var edit_nombre_enet: LineEdit = %EditNombreEnet
 @onready var boton_unirse_lan: Button = %BotonUnirseEnet
 @onready var boton_crear_lan: Button = %BotonCrearPartidaEnet
+# solo en caso de ser web, esconder modo enet
+@onready var label_web: Label = %LabelWeb
+@onready var h_box_container: HBoxContainer = %HBoxContainer
 
 func _ready() -> void:
-	# Sub-paneles ocultos por defecto
 	sub_panel_online.visible = false
 	sub_panel_local.visible = false
 	
-	# Botones de modo
+	label_web.visible = false
+	if OS.has_feature("web"):
+		label_web.visible= true
+		h_box_container.visible=false
+	# botones de modo
 	boton_online.pressed.connect(_mostrar_online)
 	boton_local.pressed.connect(_mostrar_local)
 	#boton_volver.pressed.connect(func(): solicitar_volver.emit())
 	
 	# Online
 	boton_unirse_tube.disabled = true
-	edit_sesion.text_changed.connect(func(t): boton_unirse_tube.disabled = t.strip_edges() == "")
-	#edit_sesion.text_changed.connect(func(t):t.to_upper())
+	edit_sesion.text_changed.connect(_on_sesion_text_changed)
+
 	boton_unirse_tube.pressed.connect(_on_unirse_tube)
 	if not boton_crear_tube.pressed.is_connected(_on_crear_tube):
 		boton_crear_tube.pressed.connect(_on_crear_tube)
 	
-	# Local
+	# parte local
 	boton_unirse_lan.disabled = true
 	edit_ip.text_changed.connect(_validar_lan)
 	edit_puerto.text_changed.connect(_validar_lan)
@@ -67,6 +73,15 @@ func _nombre_actual_tube() -> String:
 	var nombre_azar = obtener_nombre_azar()
 	
 	return GlobalJuego.nombre_jugador if GlobalJuego.nombre_jugador != "" else nombre_azar
+
+
+func _on_sesion_text_changed(texto:String)->void:
+	var mayus = texto.to_upper()
+	if mayus != texto:
+		var caret := edit_sesion.caret_column
+		edit_sesion.text = mayus
+		edit_sesion.caret_column = caret
+	boton_unirse_tube.disabled = mayus.strip_edges() == ""
 
 
 

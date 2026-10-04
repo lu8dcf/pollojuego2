@@ -26,6 +26,8 @@ var paneles_usuarios:Dictionary = {}
 # PANEL DE INFO DE CONTROLES + ping
 @onready var label_ping: Label = %LabelPing
 
+# panel de ui mobile
+const PANEL_UI_MOVIL = preload("uid://wsf5ahon4ims")
 
 # tiempo
 @onready var label_tiempo: Label = %LabelTiempo
@@ -49,9 +51,12 @@ var COLORS: Array[Color] =[ # colores de la barra de vida
 ]
 
 func _ready() -> void:
-	if OS.has_feature("mobile"):
+	if OS.has_feature("mobile") :
 		await get_tree().process_frame 
+		var instancia_panel_ui_movil = PANEL_UI_MOVIL.instantiate()
+		get_tree().root.add_child(instancia_panel_ui_movil)
 		menu.show()
+		
 	else:
 		menu.hide() # los botones de salir y pausa
 		

@@ -7,11 +7,11 @@ script/source = "extends Node3D
 @onready var tiempo = $tiempoEntreDisparo
 var datos: Arma
 
-
-
-func atacar():
-	await get_tree().create_timer(datos.comportamiento.tiempo_espoleta).timeout
-	print(\"boom!\")
+#
+#
+#func atacar():
+	#await get_tree().create_timer(datos.comportamiento.tiempo_espoleta).timeout
+	#print(\"boom!\")
 "
 
 [node name="armaExplosiva" type="Node3D" unique_id=643862236]

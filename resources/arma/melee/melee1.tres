@@ -13,6 +13,7 @@ metadata/_custom_type_script = "uid://jotbeoqr0ybl"
 script = ExtResource("1_cpshx")
 id = 1
 nombre = "mm"
+danio = 3.0
 sprite = ExtResource("4_lt6ua")
 tiempoDeAtaque = 1.0
 comportamiento = SubResource("Resource_lt6ua")
