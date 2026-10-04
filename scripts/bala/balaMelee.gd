@@ -8,19 +8,21 @@ var posicionInicio
 var avanza = false
 var direccion
 var inicio = false
+var danioBala
 
 # solo melee
 @onready var areaMelee = $area_melee
 
 var ya_eliminada: bool = false
 
-func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3) -> void:
+func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio) -> void:
 	if comp == null:
 		return
 
 	global_position = posicion_inicial
 	posicionInicio = posicion_inicial
 	tipoComportamiento = comp
+	danioBala = danio
 	direccion = direccion_inicial.normalized()
 	inicio = true
 

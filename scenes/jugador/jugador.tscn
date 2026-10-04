@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cp8eo8oyp07v8" path="res://scenes/camara3d/camara_rig.tscn" id="2_6htac"]
 [ext_resource type="PackedScene" uid="uid://bbb4xo85dnq0r" path="res://scenes/pollos/fabricaPollos.tscn" id="6_6htac"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_h4t55"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_f0vko"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_6bcbl"]
 properties/0/path = NodePath("Nameplate:text")
@@ -27,12 +27,12 @@ height = 0.31140137
 [node name="character" type="CharacterBody3D" unique_id=997961619]
 process_mode = 1
 collision_layer = 4
-collision_mask = 11
+collision_mask = 15
 script = ExtResource("1_ueyq7")
 
 [node name="definiFormaCharacter" type="CollisionShape3D" parent="." unique_id=1655711619]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48251265, 0)
-shape = SubResource("BoxShape3D_h4t55")
+shape = SubResource("SphereShape3D_f0vko")
 
 [node name="brazos" parent="." unique_id=50839711 instance=ExtResource("2_1d7gi")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
