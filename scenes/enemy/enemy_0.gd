@@ -1,10 +1,9 @@
 extends CharacterBody3D
 class_name EnemigoBase
 
-@export var health := 30
-# @export var animation_player: AnimationPlayer
-
-#@onready var crystal_timer: Timer = $Timer
+# Caracteristicas del bicho
+@export var vida := 30  # vida del bicho
+var dano = 10 # daño que hace al jugador
 
 # IA
 var puede_moverse = false
@@ -13,7 +12,7 @@ var puede_moverse = false
 var ver_cruz = true
 @onready var cruz: MeshInstance3D = $cruz
 #Componentes
-var movimiento_especifico = preload("res://scenes/enemy/movimiento/movimiento.tscn")
+#var movimiento_especifico = preload("res://scenes/enemy/movimiento/movimiento.tscn")
 
 # Modelo
 var ver_modelo = false
@@ -23,22 +22,22 @@ var animation_player : AnimationPlayer
 
 @export var tipo: int = 1 # tipo d enemigo
 @export var animacion_ataque=false
-var is_hurt := false
+
 var is_dying := false
 var jugador: Node3D = null
 
 # datos de movimiento
-@export var velocidad_base: float = 2
+@export var velocidad_base: float = 2.0
 @export var velocidad_giro: float = 8.0
 var velocidad: float = velocidad_base # velocidad actual
 var direccion_actual: Vector3 = Vector3.FORWARD
+
+# tipos de comportamientos
 @onready var wander: Wander = $Wander
 @onready var flee: Flee = $Flee
 @onready var evasion= $Evasion
 var evadir_obstaculo= false
 var velocidad_deseada := Vector3.ZERO # velocidad de evasion
-
-
 var velocidad_actual: Vector3 = Vector3.ZERO
 var direccion: Vector3  = Vector3.ZERO
 
@@ -47,10 +46,10 @@ var estado_actual: estado = estado.INACTIVO
 var estado_anterior: estado = estado.INACTIVO
 # posibles estados
 enum estado {
-	INACTIVO,
-	WANDER,
-	PERSIGUE,
-	FLEE
+	INACTIVO,  # congelado
+	WANDER,    # camina aleatoriamente
+	PERSIGUE,  # persigue a un jugador
+	FLEE       # escapa del jugador
 	
 }
 
@@ -61,46 +60,44 @@ var posicionado = false  # cuando se encuentre correctamente en el piso sin toca
 # seek persigue
 @export var distancia_frenado: float =5.0     # A qué distancia empieza a frenar
 @export var distancia_llegada: float = 1.5   # A qué distancia se detiene
-@export var rot_byte = 0
+@export var rot_byte = 0 # valor del angulo menos presiso para pasarlo por lan
 @onready var marcapaso: Timer = $Marcapaso
 
+
+
+
+# cambios de los colores
 @export var geometry: MeshInstance3D
-
-
 var shader_muerte: ShaderMaterial = null  #  ShaderMaterial
-
 var material_original: Material
 var material_rojo: StandardMaterial3D
 
 
 func _ready():
-	
-	
+	# Areas de colision
+	cargar_materiales()
+	cargar_modelo()
+	#cargar_movimiento()
+	add_to_group('enemy')
+	tipo_enemigo()
+	cargar_pullups()
+	#jugador = get_tree().get_first_node_in_group("Jugadores")
+	# Esperar un frame para que el NavigationServer se inicialice
+	await get_tree().physics_frame
+	marcapaso.timeout.connect(cambios)
+		
+func cargar_materiales():
 	material_rojo = StandardMaterial3D.new()
 	material_rojo.albedo_color = Color.RED
 	# Si querés que se “ilumine”, podés subir emissive:
 	material_rojo.emission_enabled = true
 	material_rojo.emission = Color.RED
-	material_rojo.emission_energy_multiplier = 2.0 
-	# Areas de colision
+	material_rojo.emission_energy_multiplier = 2.0 	
 
-	cargar_modelo()
-	cargar_movimiento()
-	add_to_group('enemy')
-	tipo_enemigo()
-	#jugador = get_tree().get_first_node_in_group("Jugadores")
-	# Esperar un frame para que el NavigationServer se inicialice
-	await get_tree().physics_frame
-	marcapaso.timeout.connect(cambios)
-	
+func cargar_pullups():
+	pass
 
-	# CONFIGURAR MultiplayerSynchronizer correctamente
-	
-	
-	
-	
 func cargar_modelo(): # tipo de enemigo
-	
 	var escena_glb = load("res://scenes/enemy/enemigo_"+ str(tipo)+".tscn")
 	var instancia_glb = escena_glb.instantiate()
 	
@@ -122,12 +119,13 @@ func _find_animation_player(node: Node) -> AnimationPlayer: # agrega las animaci
 	return null	
 
 func cargar_movimiento():
-	var movimiento = movimiento_especifico.instantiate()
-	var movimiento_script = "res://scenes/enemy/movimiento/mov_"+str(tipo)+".gd"
-	var script = load(movimiento_script)
-	movimiento.set_script(script)
-	add_child(movimiento)
-	movimiento.owner = self  #  Establece el owner manualmente
+	pass
+	#var movimiento = movimiento_especifico.instantiate()
+	#var movimiento_script = "res://scenes/enemy/movimiento/mov_"+str(tipo)+".gd"
+	#var script = load(movimiento_script)
+	#movimiento.set_script(script)
+	#add_child(movimiento)
+	#movimiento.owner = self  #  Establece el owner manualmente
 
 func tipo_enemigo():
 	animation_player.play("caminar_bicho")
@@ -149,21 +147,27 @@ func tipo_enemigo():
 			estado_actual=estado.WANDER
 			geometry = $modelo/enemigo_4/saltamontes/Skeleton3D/Cubo_104
 	material_original = geometry.get_surface_override_material(0)
+	# Acceder a los datos por número
+	var datos = Enemigos.datos[tipo]
+
+	# Asignar parámetros
+	vida = datos["vida"]
+	velocidad_base = datos["velocidad"]
+	dano = datos["dano"]
+	
+	
 	
 func recibir_dano(dano: int):
 	if not multiplayer.is_server():
 		return
-	var vida_actual = health - dano
+	var vida_actual = vida - dano
 	flash_rojo.rpc()  # aviso a todos que brille
 	if vida_actual <= 0:
-			morir()
+			morir.rpc()
 	else:
-		health = vida_actual
+		vida = vida_actual
 		
-		is_hurt = true
-		#animation_player.play("Hit_Chest")
-		#await animation_player.animation_finished
-		is_hurt = false
+		
 		
 @rpc("authority", "call_local")		
 func flash_rojo():
@@ -171,53 +175,19 @@ func flash_rojo():
 	await get_tree().create_timer(0.2).timeout
 	geometry.material_override = material_original
 
+	
+
 @rpc("authority", "call_local", "reliable")		
-func flash_claro():
-	#shader_muerte = preload("res://assets/modelos/shader/muerte.gdshader")
+func morir():
+	$CollisionShape3D.disabled = true  # elimino la collision
 	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
 	shader_muerte = ShaderMaterial.new()
 	shader_muerte.shader = shader
-	#Global.update_score_for(source)
 	geometry.set_surface_override_material(0, shader_muerte)
-	
-func morir():
-	flash_claro.rpc()
-	is_dying = true
-	#animation_player.play("Death01")
-	#await animation_player.animation_finished
-	animacion_muerte()
-	# queue_free()
-	
-func take_damage(damage: int, source: int):
-	var next_health = health - damage
-	
-	var player_to_notify: Jugador
-	for current_player in get_tree().get_nodes_in_group('Jugadores'):
-		if current_player.name == str(source):
-			player_to_notify = current_player
-			break
-	
-	if not player_to_notify:
-		return
-	
-	if next_health <= 0:
-		player_to_notify.register_hit.rpc_id(source, true)
-		
-	else:
-		health = next_health
-		player_to_notify.register_hit.rpc_id(source)
-		is_hurt = true
-		#animation_player.play("Hit_Chest")
-		#await animation_player.animation_finished
-		is_hurt = false
-		
-func animacion_muerte():
-	
 	geometry.material_override = shader_muerte
-	#gravity_scale = 0
-			
+				
 	var tween = create_tween()
-	tween.set_parallel(true)
+	#tween.set_parallel(true)
 	
 	# Subir y rotar lentamente
 	#tween.tween_property(self, "global_position:y", global_position.y + 10 ,3)
@@ -227,6 +197,7 @@ func animacion_muerte():
 	await tween.finished
 		
 	queue_free()
+	
 
 
 func cambios():
@@ -238,6 +209,7 @@ func cambios():
 func _physics_process(delta: float) -> void:
 	var rotacion_actual = modelo.rotation.y		
 	# Cuando SE RECIBE el valor  el valor:
+	
 	var angulo_recibido = byte_a_angulo(rot_byte)
 
 		#  interpolando localmente:
@@ -247,7 +219,7 @@ func _physics_process(delta: float) -> void:
 		return
 	
 
-	if is_dying or is_hurt: # si esta atacando no cambia el movimiento
+	if is_dying: # si esta atacando no cambia el movimiento
 		return
 
 	# Add the gravity.
@@ -388,6 +360,9 @@ func angulo_a_byte(angulo: float) -> int:
 	return int(norm / tau * 255.0 + 0.5)
 	
 func byte_a_angulo(rot_byte) -> float:
+	if rot_byte == null:
+		return 0.0  # o el valor por defecto que quieras
+	
 	var tau = TAU
 	return (rot_byte / 255.0) * tau
 	
