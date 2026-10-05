@@ -17,6 +17,7 @@ var objetivo_actual: Node3D
 var balaArma 
 
 var datos: Arma
+var jugadorPadre
 
 func _ready() -> void:
 	top_level = true #esto es para que cuando el padre rote, este nodo no
@@ -28,12 +29,11 @@ func _ready() -> void:
 	if(datos.comportamiento.bala != null):
 		balaArma = datos.comportamiento.bala
 	
-	#aplico la textura del arma
-	#sprite=datos.sprite
-	
 	#ahora como es una packescene solo lo añado de hijo
 	if(datos.sprite != null):
 		add_child(datos.sprite.instantiate())
+		
+
 
 func _physics_process(delta):
 	global_position = get_parent().global_position
@@ -117,8 +117,11 @@ func disparo():
 	var direccion = objetivo.global_position - puntero.global_position
 	direccion.y = 0
 	direccion = direccion.normalized()
-
-	#var tipo_bala = datos.comportamiento.tipo_bala
+	
+	
+	#jugadorPadre = GlobalJuego._obtener_jugador(multiplayer.get_unique_id())
+	#if jugadorPadre == null or not jugadorPadre.puede_disparar():
+		#return
 
 	if multiplayer.is_server():
 		## Si este ArmaBase está en el servidor,

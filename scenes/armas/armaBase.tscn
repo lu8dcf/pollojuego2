@@ -26,6 +26,7 @@ autostart = true
 replication_config = SubResource("SceneReplicationConfig_xu1fw")
 
 [node name="testArma" parent="." unique_id=111605971 instance=ExtResource("2_q77go")]
+visible = false
 
 [node name="buscarObjetivo" type="Timer" parent="." unique_id=424682024]
 wait_time = 0.1
