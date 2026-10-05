@@ -73,7 +73,7 @@ func eliminarBala():
 	queue_free()
 
 
-func _on_area_comun_body_entered(body: Node3D) -> void:
+func _on_area_comun_body_entered(_body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
 		return
 		

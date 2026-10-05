@@ -92,6 +92,6 @@ func _on_area_explosion_area_entered(area: Area3D) -> void:
 		explosion()
 	pass # Replace with function body.
 
-func _on_area_explosion_body_entered(body: Node3D) -> void:
+func _on_area_explosion_body_entered(_body: Node3D) -> void:
 	explosion()
 	pass # Replace with function body.

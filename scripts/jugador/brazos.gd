@@ -32,7 +32,7 @@ func obtener_arma(mano: Manos) -> Node:
 	return null
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _unhandled_input(_event: InputEvent) -> void:
 	#solo el duenio local de este personaje puede cambiar sus armas
 	if not is_multiplayer_authority():
 		return

@@ -82,7 +82,7 @@ func _on_tiempo_vida_timeout() -> void:
 	eliminarBala()
 
 
-func _on_area_melee_body_entered(body: Node3D) -> void:
+func _on_area_melee_body_entered(_body: Node3D) -> void:
 	if not multiplayer.is_server():
 		return
 

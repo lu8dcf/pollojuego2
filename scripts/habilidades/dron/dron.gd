@@ -147,12 +147,12 @@ func mirarObjetivo(delta):
 func buscarObjetivoMasCercano():
 	var listaEnemigos = GlobalJuego.spawn_container.get_children()
 	var mas_cercano: Node3D = null
-	var distancia_minima: float = INF
+	var distancia_minima2: float = INF
 	
 	for obj in listaEnemigos:
 		var distancia = global_position.distance_to(obj.global_position)
-		if distancia < distancia_minima:
-			distancia_minima = distancia
+		if distancia < distancia_minima2:
+			distancia_minima2 = distancia
 			mas_cercano = obj
 	if mas_cercano == null:
 		return null

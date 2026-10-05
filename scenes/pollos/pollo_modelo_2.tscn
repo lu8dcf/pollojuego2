@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d3hcbh33du41q"]
 
-[ext_resource type="PackedScene" uid="uid://rj6ih07jx6bu" path="res://assets/modelos/pollos/pollo_2.fbx" id="1_741o7"]
+[ext_resource type="PackedScene"  path="res://assets/modelos/pollos/pollo_2.fbx" id="1_741o7"]
 
 [node name="pollo_2" unique_id=963777208 instance=ExtResource("1_741o7")]
 

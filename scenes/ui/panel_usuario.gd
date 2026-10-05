@@ -27,7 +27,7 @@ func configurar(id: int, salud: int, salud_max: int, personaje: int):
 	_actualizar_vida(salud_actual)
 	
 
-func _reproducir_personaje(id: int) -> void:
+func _reproducir_personaje(_id: int) -> void:
 	if sprite_personaje:
 	#	sprite_personaje.play("idle" + str(id))
 	# Si usas TextureRect en lugar de AnimatedSprite2D:

@@ -71,7 +71,7 @@ func _ready() -> void:
 	
 	multiplayer.peer_disconnected.connect(_on_jugador_desconectado)
 	multiplayer.server_disconnected.connect(_on_server_desconectado)
-	var es_host = multiplayer.is_server()
+	#var es_host = multiplayer.is_server()
 	
 	if GlobalSignal.has_signal("pausa_cambiada"):
 		GlobalSignal.pausa_cambiada.connect(_on_pausa_cambiada)
@@ -184,7 +184,7 @@ func _actualizar_paneles_aliados(info:Dictionary)-> void:
 				panel.queue_free()
 			paneles_usuarios.erase(peer_id)
 
-func _crear_panel_aliado(peer_id: int, nombre: String, salud: int, salud_max: int, personaje: int) -> void:
+func _crear_panel_aliado(peer_id: int, _nombre: String, salud: int, salud_max: int, personaje: int) -> void:
 	var panel = PANEL_USUARIO.instantiate()
 	lista_usuarios.add_child(panel) # agregarlo antes de configurar
 	await  get_tree().process_frame
@@ -229,14 +229,14 @@ func _mostrar_daño(peer_id: int, cantidad: int):
 		print("Recibiste ", cantidad, " de daño")
 
 # ===== SEÑALES DE FUNCIONES =====
-func _on_jugador_recibio_daño(peer_id: int, cantidad: int):
+func _on_jugador_recibio_daño(peer_id: int, _cantidad: int):
 	# Refrescar el panel de ese jugador específico
 	if paneles_usuarios.has(peer_id):
 		var info = GlobalJuego.session_info.get(peer_id, {})
 		var nueva_salud = info.get("salud", GlobalJuego.SALUD_DEFAULT)
 		paneles_usuarios[peer_id].actualizar_salud(nueva_salud)
 
-func _on_salud_jugador_cambiada(nueva_salud: int):
+func _on_salud_jugador_cambiada(_nueva_salud: int):
 	# Este es del jugador local, pero por si acaso refrescamos todos
 	_actualizar_paneles_aliados(GlobalJuego.session_info)
 

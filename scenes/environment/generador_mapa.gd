@@ -152,7 +152,9 @@ func _calcular_datos_mapa() -> Dictionary:
 	var mapa: Dictionary = {}
 	var total_casillas: int = ancho * largo
 	var minimo_requerido: int = int(total_casillas * porcentaje_relleno)
-	var centro: Vector2i = Vector2i(int(ancho / 2), int(largo / 2))
+	var ancho_entero = int(ancho / 2.0)
+	var largo_entero = int(largo / 2.0)
+	var centro: Vector2i = Vector2i(ancho_entero, largo_entero)
 
 	var umbral: float = 0.05
 	var intento_seed: int = semilla_mapa
