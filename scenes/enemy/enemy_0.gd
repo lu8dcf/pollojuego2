@@ -407,6 +407,12 @@ func _on_vision_body_entered(body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
 	jugador = body
+	if body.is_in_group("Jugadores"):
+		# Aplicar daño al enemigo
+		if body.has_method("esta_vivo"):
+			#body.recibir_dano(dano)
+			if !body.esta_vivo():  # asugan el nodo que recibira daño
+				return
 	if tipo==1 and estado_actual==estado.WANDER:
 		estado_actual=estado.PERSIGUE
 	
@@ -423,6 +429,7 @@ func _on_vision_body_entered(body: Node3D) -> void:
 func _on_vision_body_exited(_body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
+	
 	if _body == jugador:
 		jugador = null
 		
