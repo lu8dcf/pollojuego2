@@ -29,9 +29,10 @@ func configurar(id: int, salud: int, salud_max: int, personaje: int):
 
 func _reproducir_personaje(id: int) -> void:
 	if sprite_personaje:
-		sprite_personaje.play("idle" + str(id))
+	#	sprite_personaje.play("idle" + str(id))
 	# Si usas TextureRect en lugar de AnimatedSprite2D:
 	# sprite_personaje.texture = load("res://personajes/sapo_" + str(id) + ".png")
+		pass
 
 func actualizar_salud(nueva_salud: int) -> void:
 	salud_actual = nueva_salud

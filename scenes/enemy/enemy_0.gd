@@ -161,10 +161,10 @@ func tipo_enemigo():
 	
 	
 	
-func recibir_dano(dano: int):
+func recibir_dano(danio):
 	if not multiplayer.is_server():
 		return
-	var vida_actual = vida - dano
+	var vida_actual = vida - danio
 	flash_rojo.rpc()  # aviso a todos que brille
 	if vida_actual <= 0:
 			morir.rpc()
@@ -367,12 +367,12 @@ func angulo_a_byte(angulo: float) -> int:
 	# Mapa a [0, 255]
 	return int(norm / tau * 255.0 + 0.5)
 	
-func byte_a_angulo(rot_byte) -> float:
-	if rot_byte == null:
+func byte_a_angulo(rot_byte2) -> float:
+	if rot_byte2 == null:
 		return 0.0  # o el valor por defecto que quieras
 	
 	var tau = TAU
-	return (rot_byte / 255.0) * tau
+	return (rot_byte2 / 255.0) * tau
 	
 
 func mostrar_cruz(): # titila la cruz 
