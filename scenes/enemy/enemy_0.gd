@@ -72,6 +72,9 @@ var shader_muerte: ShaderMaterial = null  #  ShaderMaterial
 var material_original: Material
 var material_rojo: StandardMaterial3D
 
+# funciones para hacer daño
+var hace_dano= false
+var jugador_dano: Node3D = null
 
 func _ready():
 	
@@ -206,6 +209,10 @@ func cambios():
 		animation_player.play("ataque_bicho")
 	else:
 		animation_player.play("caminar_bicho")
+	
+	if hace_dano:
+		jugador_dano.recibir_dano(dano)
+	
 
 func _physics_process(delta: float) -> void:
 	var rotacion_actual = modelo.rotation.y		
@@ -439,20 +446,33 @@ func _on_bigote_area_exited(_area: Area3D) -> void:
 	evadir_obstaculo=false
 	evasion._verificar_salida()
 
-func _on_bigote_body_entered(_body: Node3D) -> void:
+func _on_bigote_body_entered(body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
 	if !posicionado:
 		queue_free()
-	evadir_obstaculo=true
-	evasion._activar_evasion()
+	if body.is_in_group("Jugadores"):
+		# Aplicar daño al enemigo
+		if body.has_method("recibir_dano"):
+			#body.recibir_dano(dano)
+			jugador_dano = body  # asugan el nodo que recibira daño
+			hace_dano = true
+	else:		
+		evadir_obstaculo=true
+		evasion._activar_evasion()
 	
 
-func _on_bigote_body_exited(_body: Node3D) -> void:
+func _on_bigote_body_exited(body: Node3D) -> void:
 	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
 		return
-	evadir_obstaculo=false
-	evasion._verificar_salida()
+	
+	if body.is_in_group("Jugadores"):
+		# Aplicar daño al enemigo
+		if body.has_method("recibir_dano"):
+			hace_dano = false
+	else:		
+		evadir_obstaculo=false
+		evasion._verificar_salida()
 
 
 
