@@ -94,28 +94,26 @@ func solicitar_equipar_arma_rpc(mano: Manos, id_arma: int) -> void:
 	var peer_id = multiplayer.get_remote_sender_id()
 
 
-	# El servidor decide quién está equipando el arma.
+	# El servidor decide equipar el arma.
 	avisar_arma_equipada.rpc(
 		peer_id,
 		mano,
 		id_arma
 	)
-
+#
 
 @rpc("any_peer", "call_local", "reliable")
 func avisar_arma_equipada(
 	peer_id: int,
 	mano: Manos,
-	id_arma: int
-) -> void:
+	id_arma: int) -> void:
 
 	# Buscamos al Jugador al que pertenece este Brazo.
 	var jugador = get_parent()
 
-	# Comprobamos que este Brazo pertenece al jugador
-	# que realmente equipó el arma.
-	if jugador.get_multiplayer_authority() != peer_id:
-		return
+	#compuebo que son los mismos
+	#if jugador.get_multiplayer_authority() != peer_id:
+		#return
 
 	# Este es el Brazo correcto.
 	ultima_mano = mano
