@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://c1yny3sauy8yu"]
+[gd_scene format=3 uid="uid://djb3auc8xeur2"]
 
-[ext_resource type="Texture2D" uid="uid://dab2wodnessni" path="res://assets/kenney_prototype-textures/PNG/Red/texture_08.png" id="1_jnxa0"]
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_25a7t"]
+load_path = "res://.godot/imported/texture_08.png-5cb608f2a5939ffc202f2f80993b7ef0.s3tc.ctex"
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sblyl"]
-albedo_texture = ExtResource("1_jnxa0")
+albedo_texture = SubResource("CompressedTexture2D_25a7t")
 uv1_triplanar = true
 
 [sub_resource type="SphereMesh" id="SphereMesh_ono7e"]

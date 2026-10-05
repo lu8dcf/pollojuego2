@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://bn35a81cocpjo"]
 
-[ext_resource type="Script" uid="uid://bs6lmgk8w2gtn" path="res://scenes/main/main_game.gd" id="1_exxld"]
+[sub_resource type="GDScript" id="GDScript_j8nob"]
+script/source = "extends Node2D
+"
 
 [node name="MainGame" type="Node2D" unique_id=587176983]
-script = ExtResource("1_exxld")
+script = SubResource("GDScript_j8nob")
