@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b635l88o7cpj4"]
 
-[ext_resource type="Script" uid="uid://baiexyo3qc1be" path="res://scripts/bala/balaExplosiva.gd" id="1_8udgy"]
+[ext_resource type="Script"  path="res://scripts/bala/balaExplosiva.gd" id="1_8udgy"]
 [ext_resource type="PackedScene" uid="uid://nn1iqeojrstb" path="res://scenes/bala/balaExplosiba_modelo.tscn" id="2_8udgy"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_c4ikp"]

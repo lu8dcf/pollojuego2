@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://e6voal8m8oud"]
 
-[ext_resource type="PackedScene" uid="uid://dm11qdphcqssb" path="res://assets/modelos/balas/bala.fbx" id="1_8vlsf"]
+[ext_resource type="PackedScene"  path="res://assets/modelos/balas/bala.fbx" id="1_8vlsf"]
 
 [sub_resource type="Animation" id="Animation_8vlsf"]
 length = 0.001

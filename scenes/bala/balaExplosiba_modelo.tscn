@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://nn1iqeojrstb"]
 
-[ext_resource type="PackedScene" uid="uid://b5vmppry5kuxs" path="res://assets/modelos/balas/explosiva.fbx" id="1_b34cg"]
+[ext_resource type="PackedScene"  path="res://assets/modelos/balas/explosiva.fbx" id="1_b34cg"]
 
 [sub_resource type="Animation" id="Animation_b34cg"]
 length = 0.001

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dmk64w66uhmkc"]
 
-[ext_resource type="Script" uid="uid://svdsefgt0rv3" path="res://scripts/bala/balaMelee.gd" id="1_h7sch"]
+[ext_resource type="Script"  path="res://scripts/bala/balaMelee.gd" id="1_h7sch"]
 [ext_resource type="Texture2D" uid="uid://df4owisch7ucy" path="res://icon.svg" id="2_fpisl"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_4kfjo"]

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d0hnrx2eowpsn"]
 
-[ext_resource type="Script" uid="uid://b5nlexba6mjke" path="res://scripts/bala/balaComun.gd" id="1_ckbog"]
+[ext_resource type="Script"  path="res://scripts/bala/balaComun.gd" id="1_ckbog"]
 [ext_resource type="PackedScene" uid="uid://e6voal8m8oud" path="res://scenes/bala/bala_modelo.tscn" id="2_ckbog"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_tdw23"]
