@@ -7,7 +7,7 @@ var semilla_mapa: int = 123456
 var carga_mapa_simple:bool=true
 
 # ===== INVENTARIO GLOBAL =====
-var inventario_jugador = [null, null, null, null, null, null] # inventario de maximo 6 slots
+var inventario_jugador = [1, 2, 3, null, null, null] # inventario de maximo 6 slots
 
 # ===== SELECCIÓN DE PERSONAJE =====
 var polloBasico = "res://scenes/pollos/pollo_modelo_1.tscn"

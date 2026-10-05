@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://b3ppn1gh31u66"]
+
+[ext_resource type="Script" uid="uid://6ge6c4olsebx" path="res://scripts/barraVida/barraVida.gd" id="1_rqo6b"]
+[ext_resource type="PackedScene" uid="uid://dftv6sxn5s6i0" path="res://scenes/barraVida/barra_verde.tscn" id="2_d83qr"]
+[ext_resource type="PackedScene" uid="uid://dmiex4iixh7hs" path="res://scenes/barraVida/barra_rojo.tscn" id="3_s0sfy"]
+
+[node name="Node3D" type="Node3D" unique_id=1686766715]
+visible = false
+script = ExtResource("1_rqo6b")
+
+[node name="barraVerde" parent="." unique_id=1608620586 instance=ExtResource("2_d83qr")]
+
+[node name="barraRoja" parent="." unique_id=1005940814 instance=ExtResource("3_s0sfy")]

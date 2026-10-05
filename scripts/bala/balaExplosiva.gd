@@ -11,14 +11,15 @@ var direccion
 
 var inicio = false
 
+var danioBala 
 #solo explosiva
 @onready var areaExplosiva = $area_explosion
 
 #TEST
-@onready var textureBullet = $pollo_1
+@onready var textureBullet =$explosiva
 
 
-func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3) -> void:
+func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio: int) -> void:
 
 	if comp == null: #si por alguna razon no tiene comportamiento, vuelve
 		return
@@ -26,12 +27,14 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 	global_position = posicion_inicial
 	posicionInicio = posicion_inicial
 	tipoComportamiento = comp
+	danioBala = danio
 	direccion = direccion_inicial.normalized()
 	inicio = true
 
 	
 func _ready() -> void:
 	top_level = true
+	
 	textureBullet.visible=true
 	#balaExplosiva()
 
@@ -50,11 +53,10 @@ func balaExplosiva():
 	inicio = false
 	avanza = true
 
-	#TEST------------------------------------
 	textureBullet.visible = true
 	#fin Test
 	
-	var tiempoEspoleta = tipoComportamiento.tiempo_espoleta
+	var tiempoEspoleta = tipoComportamiento.tiempo_espoleta #pongo el tiempo definido en el arma
 	await get_tree().create_timer(tiempoEspoleta).timeout
 	explosion()
 	
@@ -66,12 +68,10 @@ func explosion():
 	areaExplosiva.visible = true
 	var cuerpos_en_area = areaExplosiva.get_overlapping_bodies()
 	if(cuerpos_en_area != null):
-		print("en la explosion me llevo a :")
-	else:
-		print("vacio")
-	#for cuerpo in cuerpos_en_area:
-		#if cuerpo.is_in_group("enemies") and cuerpo.has_method("take_damage"):
-			#cuerpo.take_damage(damage * GlobalItem.potenciando_danio_arma)
+		for cuerpo in cuerpos_en_area:
+			if(cuerpo.is_in_group("enemy") and cuerpo.has_method("recibir_dano")):
+				print(cuerpo)
+				cuerpo.recibir_dano(danioBala)
 	await get_tree().create_timer(0.5).timeout
 	eliminarBala()
 
@@ -88,9 +88,10 @@ func eliminarBala():
 func _on_area_explosion_area_entered(area: Area3D) -> void:
 	if(area.get_collision_layer_value(4)):
 		eliminarBala()
+	if(area.is_in_group("enemy")):
+		explosion()
 	pass # Replace with function body.
 
-
-func _on_impacto_previo_area_entered(_area: Area3D) -> void:
+func _on_area_explosion_body_entered(body: Node3D) -> void:
 	explosion()
 	pass # Replace with function body.

@@ -10,7 +10,7 @@ height = 0.21520996
 properties/0/path = NodePath(".:global_position")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath("pollo_1:visible")
+properties/1/path = NodePath("explosiva:visible")
 properties/1/spawn = true
 properties/1/replication_mode = 2
 
@@ -22,6 +22,7 @@ collision_mask = 72
 script = ExtResource("1_8udgy")
 
 [node name="explosiva" parent="." unique_id=896676526 instance=ExtResource("2_8udgy")]
+visible = false
 
 [node name="area_explosion" type="Area3D" parent="." unique_id=1832871902]
 visible = false
@@ -47,4 +48,5 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 shape = SubResource("SphereShape3D_8w0r3")
 
 [connection signal="area_entered" from="area_explosion" to="." method="_on_area_explosion_area_entered"]
+[connection signal="body_entered" from="area_explosion" to="." method="_on_area_explosion_body_entered"]
 [connection signal="area_entered" from="impactoPrevio" to="." method="_on_impacto_previo_area_entered"]
