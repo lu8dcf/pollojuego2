@@ -3,12 +3,12 @@ extends CanvasLayer
 @onready var joystick: Joystick = %Joystick
 
 func _ready() -> void:
-	if OS.has_feature("mobile"):
+	if DisplayServer.is_touchscreen_available():
 		layer = 100
-		await get_tree().process_frame 
+		visible = true
+		await get_tree().process_frame
 		GlobalSignal.enviar_joystick.emit(joystick)
 	else:
-		layer=1
-		hide()
-		pass
+		layer = 1
+		visible = false
 		

@@ -1,0 +1,98 @@
+[gd_scene format=3 uid="uid://nn1iqeojrstb"]
+
+[ext_resource type="PackedScene"  path="res://assets/modelos/balas/explosiva.fbx" id="1_b34cg"]
+
+[sub_resource type="Animation" id="Animation_b34cg"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("..:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(4.3711385e-08, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_jqv6y"]
+resource_name = "idle_bala"
+length = 3.0000000000000004
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("..:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 6.2831855), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_yeq03"]
+_data = {
+&"RESET": SubResource("Animation_b34cg"),
+&"idle_bala_explosiva": SubResource("Animation_jqv6y")
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o3p61"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_color = Color(0.84288025, 0.16626558, 0, 1)
+emission_enabled = true
+emission = Color(0.90125626, 0.15596479, 0.15081155, 1)
+emission_energy_multiplier = 0.0
+grow_amount = 0.545
+
+[sub_resource type="BoxMesh" id="BoxMesh_dklp6"]
+material = SubResource("StandardMaterial3D_o3p61")
+size = Vector3(0.1, 0.1, 0.1)
+
+[sub_resource type="Curve" id="Curve_0minr"]
+_data = [Vector2(0, 0.2977528), 0.0, 0.0, 0, 0, Vector2(0.7830189, 0.7251462), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Gradient" id="Gradient_wjt8m"]
+offsets = PackedFloat32Array(0.11557789, 0.8442211, 0.9271357, 0.99246234, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 0.067839205, 0.067839205, 0.067839205, 1, 0.061590873, 0.061590873, 0.061590873, 1, 0, 0, 0, 1)
+
+[sub_resource type="Gradient" id="Gradient_k021t"]
+offsets = PackedFloat32Array(0, 0.45477387, 0.99246234)
+colors = PackedColorArray(0.46325237, 0.13675621, 0, 1, 0.5501762, 0.37801585, 0.08298027, 1, 0.82608986, 0, 0.23127168, 1)
+
+[node name="explosiva" unique_id=896676526 instance=ExtResource("1_b34cg")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="0" unique_id=921086519]
+root_node = NodePath("../Cilindro_002/CPUParticles3D")
+libraries/ = SubResource("AnimationLibrary_yeq03")
+autoplay = &"idle_bala_explosiva"
+
+[node name="Cilindro_002" parent="." index="1" unique_id=1517366835]
+transform = Transform3D(5.724086, 0, 0, 0, 5.724086, -2.502077e-07, 0, 2.502077e-07, 5.724086, 0, 0, 0)
+
+[node name="CPUParticles3D" type="CPUParticles3D" parent="Cilindro_002" index="0" unique_id=1721128704]
+transform = Transform3D(0.17470041, 0, 0, 0, 0.17470041, 7.636397e-09, 0, -7.636397e-09, 0.17470041, 0, -1.2772385e-09, -0.029219812)
+amount = 42
+lifetime = 1.73
+speed_scale = 2.17
+lifetime_randomness = 1.0
+mesh = SubResource("BoxMesh_dklp6")
+emission_shape = 1
+emission_sphere_radius = 0.05
+direction = Vector3(0, 0, -1)
+spread = 18.7
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.1
+initial_velocity_max = 1.0
+angle_min = -720.0
+angle_max = 720.0
+scale_amount_min = 0.1
+scale_amount_max = 1.5
+scale_amount_curve = SubResource("Curve_0minr")
+color_ramp = SubResource("Gradient_wjt8m")
+color_initial_ramp = SubResource("Gradient_k021t")

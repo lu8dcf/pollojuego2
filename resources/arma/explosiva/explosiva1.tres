@@ -3,11 +3,10 @@
 [ext_resource type="Script" uid="uid://b0h5wuf4brlk1" path="res://scripts/armas/comportamiento/comportamientoExplosivo.gd" id="1_4juux"]
 [ext_resource type="Script" uid="uid://ckltpinun1cgl" path="res://scripts/armas/arma.gd" id="1_h7l8e"]
 [ext_resource type="PackedScene" uid="uid://b635l88o7cpj4" path="res://scenes/bala/balaExplosiva.tscn" id="1_wlq20"]
+[ext_resource type="PackedScene" uid="uid://c23nf7t55y5ta" path="res://scenes/armas/testArrow/test_arma.tscn" id="4_fnbjd"]
 
-[sub_resource type="Resource" id="Resource_m28bd"]
+[sub_resource type="Resource" id="Resource_lt6ua"]
 script = ExtResource("1_4juux")
-rango_explosivo = 6
-danio_explosion = 10.0
 tiempo_espoleta = 4.0
 metadata/_custom_type_script = "uid://b0h5wuf4brlk1"
 
@@ -16,7 +15,8 @@ script = ExtResource("1_h7l8e")
 id = 2
 nombre = "ee"
 danio = 5.0
+sprite = ExtResource("4_fnbjd")
 tiempoDeAtaque = 4
 tipo = 2
-comportamiento = SubResource("Resource_m28bd")
+comportamiento = SubResource("Resource_lt6ua")
 metadata/_custom_type_script = "uid://ckltpinun1cgl"

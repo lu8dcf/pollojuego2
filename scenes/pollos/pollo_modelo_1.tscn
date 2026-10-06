@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://6dr1scr4fnwt"]
 
-[ext_resource type="PackedScene" uid="uid://bskyk4ur6lr8m" path="res://assets/modelos/pollos/pollo_1.fbx" id="1_mnqw3"]
+[ext_resource type="PackedScene"  path="res://assets/modelos/pollos/pollo_1.fbx" id="1_mnqw3"]
 
 [node name="pollo_1" unique_id=1188442573 instance=ExtResource("1_mnqw3")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)

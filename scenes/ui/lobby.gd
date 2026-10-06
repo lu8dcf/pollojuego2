@@ -132,7 +132,7 @@ func _on_jugador_conectado(peer_id: int): #245698
 	
 	await get_tree().create_timer(1.5).timeout
 	
-	if jugadores_en_lobby.size() >= 4:
+	if jugadores_en_lobby.size() > 4:
 		Network._error_lobby_lleno.rpc_id(peer_id)
 		# desconectar al cliente después de un momento
 		await get_tree().create_timer(0.5).timeout

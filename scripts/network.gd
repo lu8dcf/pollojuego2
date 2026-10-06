@@ -383,10 +383,24 @@ func crear_todos_los_jugadores(): #SOLO EL HOST llama a esta función
 	if not mundo:
 		return
 	
-	# Crear jugadores localmente Y notificar a los clientes
-	for peer_id in GlobalJuego.session_info.keys():
+	# calcular posiciones en base 
+	var peer_ids = GlobalJuego.session_info.keys()
+	var total = peer_ids.size()
+	
+	for i in range(total):
+		var peer_id = peer_ids[i]
 		var username = GlobalJuego.session_info[peer_id].get("username", "Jugador " + str(peer_id))
-		var posicion = Vector3(randf_range(15.0, 20.0), 1.0, randf_range(15.0, 20.0))
+		
+		# ← Obtener posición desde el mundo procedural
+		var posicion: Vector3
+		if mundo.has_method("obtener_posicion_spawn"):
+			posicion = mundo.obtener_posicion_spawn(i, total)
+		else:
+			# Fallback: posición por defecto
+			posicion = Vector3(30, 5, 30)
+		
+		print("[NETWORK] Spawneando jugador ", peer_id, " en ", posicion)
+		
 		# Crear localmente
 		crear_jugador_en_mundo(mundo, peer_id, username, posicion)
 		
@@ -590,6 +604,11 @@ func iniciar_carga_sincronizada(lista_peer_ids: Array) -> void:
 	for id in lista_peer_ids:
 		jugadores_listos[id] = false
 	
+	if multiplayer.is_server():
+		GlobalJuego.semilla_mapa = randi()
+		_replicar_semilla.rpc(GlobalJuego.semilla_mapa)
+		await  get_tree().create_timer(0.3).timeout
+	
 	# Mostrar pantalla de carga
 	_mostrar_pantalla_carga(lista_peer_ids)
 	
@@ -719,7 +738,7 @@ func _jugador_listo_rpc(peer_id: int) -> void:
 	_marcar_jugador_listo(peer_id)
 
 @rpc("authority", "call_local", "reliable")
-func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
+func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3):
 	
 	var mundo = obtener_mundo_actual()
 	if not mundo:
@@ -736,15 +755,10 @@ func spawnear_jugador_rpc(peer_id: int, nombre: String, posicion: Vector3):
 
 	mundo.add_child(jugador, true)
 	
-	#var nameplate = jugador.get_node_or_null("Nameplate")
-	#if nameplate:
-		#nameplate.text = nombre
-	
-#
-#func clean_up_signals():
-	#multiplayer.peer_connected.disconnect(add_player) 
-	#multiplayer.peer_disconnected.disconnect(eliminar_jugador)
-	#multiplayer.connected_to_server.disconnect(on_connected_to_server)
+@rpc("authority","call_local","reliable")
+func _replicar_semilla(semilla:int)->void:
+	print("la semialla es: ", semilla)
+	GlobalJuego.semilla_mapa = semilla
 
 func _exit_tree() -> void:
 	if tube_enabled:

@@ -7,7 +7,7 @@ var semilla_mapa: int = 123456
 var carga_mapa_simple:bool=true
 
 # ===== INVENTARIO GLOBAL =====
-var inventario_jugador = [null, null, null, null, null, null] # inventario de maximo 6 slots
+var inventario_jugador = [1, 2, 3, null, null, null] # inventario de maximo 6 slots
 
 # ===== SELECCIÓN DE PERSONAJE =====
 var polloBasico = "res://scenes/pollos/pollo_modelo_1.tscn"
@@ -43,7 +43,7 @@ var mapa_z_max = 72
 
 #enemigos
 var cant_tipo_enemigos = 4 # maxima cantidad de tipos de eenmigos
-var cant_enemigos = 100 # Cantidad de enemigos en la oleada siempr activos
+var cant_enemigos = 30  # Cantidad de enemigos en la oleada siempr activos
 
 func _ready():
 	# estas son señales de red 

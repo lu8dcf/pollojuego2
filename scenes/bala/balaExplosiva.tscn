@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b635l88o7cpj4"]
 
-[ext_resource type="Script" uid="uid://baiexyo3qc1be" path="res://scripts/bala/balaExplosiva.gd" id="1_8udgy"]
-[ext_resource type="PackedScene" uid="uid://6dr1scr4fnwt" path="res://scenes/pollos/pollo_modelo_1.tscn" id="2_osb2g"]
+[ext_resource type="Script"  path="res://scripts/bala/balaExplosiva.gd" id="1_8udgy"]
+[ext_resource type="PackedScene" uid="uid://nn1iqeojrstb" path="res://scenes/bala/balaExplosiba_modelo.tscn" id="2_8udgy"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_c4ikp"]
 height = 0.21520996
@@ -10,7 +10,7 @@ height = 0.21520996
 properties/0/path = NodePath(".:global_position")
 properties/0/spawn = true
 properties/0/replication_mode = 2
-properties/1/path = NodePath("pollo_1:visible")
+properties/1/path = NodePath("explosiva:visible")
 properties/1/spawn = true
 properties/1/replication_mode = 2
 
@@ -21,8 +21,8 @@ collision_layer = 16
 collision_mask = 72
 script = ExtResource("1_8udgy")
 
-[node name="pollo_1" parent="." unique_id=1188442573 instance=ExtResource("2_osb2g")]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, -0.25, 0)
+[node name="explosiva" parent="." unique_id=896676526 instance=ExtResource("2_8udgy")]
+visible = false
 
 [node name="area_explosion" type="Area3D" parent="." unique_id=1832871902]
 visible = false
@@ -48,4 +48,5 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 shape = SubResource("SphereShape3D_8w0r3")
 
 [connection signal="area_entered" from="area_explosion" to="." method="_on_area_explosion_area_entered"]
+[connection signal="body_entered" from="area_explosion" to="." method="_on_area_explosion_body_entered"]
 [connection signal="area_entered" from="impactoPrevio" to="." method="_on_impacto_previo_area_entered"]

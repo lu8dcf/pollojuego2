@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://br3b2oublpvrj"]
+
+[resource]
+resource_name = "dorado"
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.9064694, 0.6751314, 0.19830641, 1)
+metallic = 1.0
+roughness = 0.45
+emission_enabled = true
