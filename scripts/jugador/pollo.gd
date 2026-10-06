@@ -1,7 +1,7 @@
 class_name Pollo
 extends Node3D
 
-var jugador: Jugador
+var jugador
 
 var habilidad: Habilidad
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -11,6 +11,7 @@ var habilidad: Habilidad
 
 var material_original: Material
 var material_rojo: StandardMaterial3D
+var nodoAnimacion
 
 func inicializar(p_jugador: Jugador,p_modelo: Node3D,p_habilidad: Habilidad) -> void:
 
@@ -32,7 +33,7 @@ func _ready():
 		
 		if material is ShaderMaterial:
 			mesh.material_override = material.duplicate()
-
+	nodoAnimacion = modelo.find_child("AnimationPlayer")
 
 
 func usar_habilidad() -> void:
@@ -58,6 +59,8 @@ func solicitar_habilidad() -> void:
 	# Ordeno al cliente que la ejecute
 	ejecutar_habilidad.rpc_id(peer_id)
 
+func cambiarAnimacion(animacion: String):
+	nodoAnimacion.play(animacion)
 
 @rpc("any_peer", "reliable")
 func ejecutar_habilidad() -> void:
@@ -76,15 +79,15 @@ func flash_rojo():
 	var rojo := StandardMaterial3D.new()
 	rojo.albedo_color = Color.RED
 	
-	# 1. Guardamos el estado y aplicamos el rojo
+	#estado actual y aplicamos el rojo
 	for mesh in meshes:
 		materiales_originales.append(mesh.get_surface_override_material(0))
 		mesh.set_surface_override_material(0, rojo)
 	
-	# 2. Esperamos los 0.2 segundos una sola vez
+	# 0.2 segundos una sola vez
 	await get_tree().create_timer(0.2).timeout
 	
-	# 3. Restauramos limpiando el override correctamente
+	#limpio el override correctamente
 	for i in range(meshes.size()):
 		if is_instance_valid(meshes[i]):
 			if materiales_originales[i] == null:

@@ -6,6 +6,9 @@ enum TipoPollo {
 	BLANCO,
 	LENTES,
 	MARRON,
+	ROSA,
+	AZUL,
+	DORADO
 }
 
 
@@ -36,7 +39,27 @@ const POLLOS := {
 		"velocidad": 4.0,
 		"resistencia": 0.6
 	},
-
+	TipoPollo.ROSA: {
+		"modelo": preload("res://scenes/pollos/pollo_modelo_4.tscn"),
+		"habilidad": preload("res://scenes/habilidad/habilidadDash.tscn"),
+		"salud_maxima": 100, 
+		"velocidad": 5.0,
+		"resistencia": 0.2 #porcentaje del 0 al 1
+	},
+	TipoPollo.AZUL: {
+		"modelo": preload("res://scenes/pollos/pollo_modelo_5.tscn"),
+		"habilidad": preload("res://scenes/habilidad/habilidadDash.tscn"),
+		"salud_maxima": 100, 
+		"velocidad": 5.0,
+		"resistencia": 0.2 #porcentaje del 0 al 1
+	},
+	TipoPollo.DORADO: {
+		"modelo": preload("res://scenes/pollos/pollo_modelo_6.tscn"),
+		"habilidad": preload("res://scenes/habilidad/habilidadDash.tscn"),
+		"salud_maxima": 100, 
+		"velocidad": 5.0,
+		"resistencia": 0.2 #porcentaje del 0 al 1
+	},
 }
 
 # obtener datos numericos

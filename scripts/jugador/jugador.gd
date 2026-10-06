@@ -5,6 +5,8 @@ class_name Jugador
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 @export var sensitivity: float = 0.002
 
+@onready var mi_peer_id: int = get_multiplayer_authority()
+
 const SPEED := 5.0
 const JUMP_VELOCITY := 4.5
 
@@ -22,7 +24,7 @@ var joystick: Joystick = null
 @onready var timer_caido: Timer = $timer_caido
 @onready var timer_salvar: Timer = $timer_salvar
 
-var pollo
+var pollo = null
 
 enum Estado {
 OLEADA,
@@ -59,37 +61,38 @@ func _enter_tree() -> void:
 		set_multiplayer_authority(id)
 
 
-#@rpc("authority", "call_local", "reliable")
-#func crear_pollo_en_red(tipo_elegido: int) -> void:
-	#var tipo_pollo_enum = tipo_elegido as PolloFactory.TipoPollo
-	#
-	##como es funcion static, puedo acceder a los datos que necesito
-	#var datos_pollo = PolloFactory.obtener_datos(tipo_pollo_enum) 
-	#
-	##me copio los datos que me interesa
-	#if not datos_pollo.is_empty():
-		#self.salud_maxima = datos_pollo.get("salud_maxima")
-		#self.salud = self.salud_maxima
-		#self.velocidad = datos_pollo.get("velocidad")
-		#self.resistencia = datos_pollo.get("resistencia")
-	#
-	##saco nodos viejos
-	#for child in get_children():
-		#if child is Pollo:
-			#child.queue_free()
-#
-	##instancio el nodo pollo (visual y habilidad)
-	#pollo = PolloFactory.crear(tipo_pollo_enum, self)
-	#
-	## le asigno la autoridad
-	#add_child(pollo)
-	#pollo.set_multiplayer_authority(get_multiplayer_authority(), true)
-	#add_to_group("Jugadores")
+@rpc("authority", "call_local", "reliable")
+func crear_pollo_en_red(tipo_elegido: int) -> void:
+	var tipo_pollo_enum = tipo_elegido as PolloFactory.TipoPollo
+	
+	#como es funcion static, puedo acceder a los datos que necesito
+	var datos_pollo = PolloFactory.obtener_datos(tipo_pollo_enum) 
+	
+	#me copio los datos que me interesa
+	if not datos_pollo.is_empty():
+		self.salud_maxima = datos_pollo.get("salud_maxima")
+		self.salud = self.salud_maxima
+		self.velocidad = datos_pollo.get("velocidad")
+		self.resistencia = datos_pollo.get("resistencia")
+	
+	#saco nodos viejos
+	for child in get_children():
+		if child is Pollo:
+			child.queue_free()
+
+	#instancio el nodo pollo (visual y habilidad)
+	pollo = PolloFactory.crear(tipo_pollo_enum, self)
+	
+	# le asigno la autoridad
+	add_child(pollo)
+	pollo.set_multiplayer_authority(get_multiplayer_authority(), true)
+	add_to_group("Jugadores")
 
 func _ready() -> void:
-	pollo = $FabricaPollos.crear($FabricaPollos.TipoPollo.BLANCO, self) #si queres poner otras habilidades: LENTES = dron, MARRON = escudo, BLANCO = dash
-	add_child(pollo) #eSTO debe recibir ya un nodo pollo elegido
-	pollo.set_multiplayer_authority(get_multiplayer_authority(), true) #para que el pollo tenga el mismo nivel de auoridad que el padre
+	if(pollo == null):
+		pollo = $FabricaPollos.crear($FabricaPollos.TipoPollo.BLANCO, self) #si queres poner otras habilidades: LENTES = dron, MARRON = escudo, BLANCO = dash
+		add_child(pollo) #eSTO debe recibir ya un nodo pollo elegido
+		pollo.set_multiplayer_authority(get_multiplayer_authority(), true) #para que el pollo tenga el mismo nivel de auoridad que el padre
 	add_to_group("Jugadores")
 	nameplate.text = name
 	player_ui.hide()
@@ -200,13 +203,14 @@ func puede_interactuar() -> bool:
 	return estadoActual == Estado.OLEADA
 	
 func puede_recibir_danio():
-	return estadoActual == Estado.OLEADA
+	return estadoActual in [Estado.OLEADA, Estado.AYUDANDO]
 
 func puede_cambiar_arma():
 	return estadoActual == Estado.OLEADA
+	
 func esta_vivo() -> bool:
 	return estadoActual != Estado.MUERTE
-
+	#return not estadoActual in [Estado.MUERTE, Estado.CAIDO]
 #---------------------------------------------------------------ENTRAR ESTADOS
 
 func entrar_caido() -> void:
@@ -240,9 +244,47 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 		return
 	ultimoEstado = estadoActual
 	estadoActual = nuevo_estado
-	match nuevo_estado:
+	# proceso el cambio directo si somos server
+	if multiplayer.is_server():
+		servidor_procesar_cambio_estado(nuevo_estado)
+	else:
+		# Si somos un Cliente, le pido al Servidor
+		solicitar_cambio_estado_rpc.rpc_id(1, nuevo_estado)
+
+@rpc("any_peer", "reliable")
+func solicitar_cambio_estado_rpc(nuevo_estado: int) -> void:
+	if not multiplayer.is_server():
+		return
+		
+	# Compruebo que el cliente que envio el RPC sea el duenio de este personaje
+	if multiplayer.get_remote_sender_id() != mi_peer_id:
+		return
+		
+	servidor_procesar_cambio_estado(nuevo_estado as Estado)
+
+
+#El servidor aplica el cambio y lo comparte
+func servidor_procesar_cambio_estado(nuevo_estado: Estado) -> void:
+	sincronizar_estado_en_red.rpc(nuevo_estado)
+
+
+#sincronizo con los demas nodos
+@rpc("any_peer", "call_local", "reliable")
+func sincronizar_estado_en_red(nuevo_estado: int) -> void:
+	#SOLO el Servidor tiene permitido ejecutar la logica
+	if not multiplayer.is_server():
+		# Si un cliente recibe esto desde la red, verifica si quien lo envio fue el Servidor
+		if multiplayer.get_remote_sender_id() != 1:
+			return
+	var estado_anterior = estadoActual
+	ultimoEstado = estado_anterior
+	estadoActual = nuevo_estado as Estado
+	
+	#ejecuto
+	match estadoActual:
 		Estado.CAIDO:
 			entrar_caido()
+			pollo.cambiarAnimacion("esqueleto de pollo1|muerte")
 		Estado.MUERTE:
 			entrar_muerte()
 		Estado.OLEADA:
@@ -251,6 +293,7 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 			entrar_tienda()
 		Estado.DASH:
 			entrar_dash()
+			pollo.cambiarAnimacion("esqueleto de pollo1|rodar")
 		Estado.AYUDANDO:
 			entrar_ayudando()
 
@@ -343,7 +386,9 @@ func procesar_movimiento(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x,0,SPEED)
 		velocity.z = move_toward(velocity.z,0,SPEED)
-
+	
+	if(velocity != Vector3.ZERO):
+		pollo.cambiarAnimacion("esqueleto de pollo1|caminar")
 	move_and_slide()
 
 #------------------------------------------------------------------------PROCESAR
@@ -408,11 +453,11 @@ func _on_timer_salvar_timeout() -> void:
 func recibir_dano(dano: int):
 	if not multiplayer.is_server():
 		return
-	if( puede_recibir_danio()):
+	if(puede_recibir_danio()):
 		var vida_actual = salud - dano
 		#flash_rojo.rpc(get_multiplayer_authority())  # aviso a todos que brille
 		if vida_actual <= 0:
-				cambiar_estado(Estado.CAIDO)
+			cambiar_estado(Estado.CAIDO)
 		salud = vida_actual
 		sincronizar_salud_y_efecto.rpc(salud)
 
