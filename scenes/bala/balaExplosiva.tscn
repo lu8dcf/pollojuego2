@@ -1,10 +1,9 @@
 [gd_scene format=3 uid="uid://b635l88o7cpj4"]
 
-[ext_resource type="Script"  path="res://scripts/bala/balaExplosiva.gd" id="1_8udgy"]
+[ext_resource type="Script" uid="uid://baiexyo3qc1be" path="res://scripts/bala/balaExplosiva.gd" id="1_8udgy"]
 [ext_resource type="PackedScene" uid="uid://nn1iqeojrstb" path="res://scenes/bala/balaExplosiba_modelo.tscn" id="2_8udgy"]
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_c4ikp"]
-height = 0.21520996
+[sub_resource type="SphereShape3D" id="SphereShape3D_0wskc"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_gvbmg"]
 properties/0/path = NodePath(".:global_position")
@@ -14,7 +13,8 @@ properties/1/path = NodePath("explosiva:visible")
 properties/1/spawn = true
 properties/1/replication_mode = 2
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_8w0r3"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_sugfe"]
+radius = 0.22944674
 
 [node name="balaExplosiva" type="Area3D" unique_id=1972517349]
 collision_layer = 16
@@ -25,28 +25,20 @@ script = ExtResource("1_8udgy")
 visible = false
 
 [node name="area_explosion" type="Area3D" parent="." unique_id=1832871902]
-visible = false
 collision_layer = 16
-collision_mask = 72
+collision_mask = 2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="area_explosion" unique_id=1600623139]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.09454346, 0)
-shape = SubResource("CylinderShape3D_c4ikp")
-
-[node name="tiempoVida" type="Timer" parent="." unique_id=1806793463]
-wait_time = 5.0
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -0.011737466, 0)
+shape = SubResource("SphereShape3D_0wskc")
+debug_color = Color(0.8156863, 0.14509805, 0.78039217, 0.9137255)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1675147379]
 replication_config = SubResource("SceneReplicationConfig_gvbmg")
 
-[node name="impactoPrevio" type="Area3D" parent="." unique_id=1046520105]
-collision_layer = 16
-collision_mask = 10
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=793220646]
+shape = SubResource("SphereShape3D_sugfe")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="impactoPrevio" unique_id=1667292952]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
-shape = SubResource("SphereShape3D_8w0r3")
-
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="area_entered" from="area_explosion" to="." method="_on_area_explosion_area_entered"]
 [connection signal="body_entered" from="area_explosion" to="." method="_on_area_explosion_body_entered"]
-[connection signal="area_entered" from="impactoPrevio" to="." method="_on_impacto_previo_area_entered"]
