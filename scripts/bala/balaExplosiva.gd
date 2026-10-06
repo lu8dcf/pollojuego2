@@ -1,7 +1,7 @@
 extends Node3D
 
 var tipoComportamiento = comportamientoArma
-@onready var tiempoDeVida = $tiempoVida
+
 var posicionInicio
 
 #explosiva
@@ -77,6 +77,8 @@ func explosion():
 
 #-----------------------------------------------------------------------------comun y explosiva
 func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
+	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
+		return
 	eliminarBala()
 	
 func eliminarBala():
@@ -95,3 +97,13 @@ func _on_area_explosion_area_entered(area: Area3D) -> void:
 func _on_area_explosion_body_entered(_body: Node3D) -> void:
 	explosion()
 	pass # Replace with function body.
+
+
+func _on_body_entered(body: Node3D) -> void:
+	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
+		return
+	if body.is_in_group("enemy"):
+		# Aplicar daño al enemigo
+		if body.has_method("recibir_dano"):
+			body.recibir_dano(danioBala)
+			queue_free()
