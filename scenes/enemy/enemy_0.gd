@@ -81,7 +81,6 @@ func _ready():
 	# Areas de colision
 	cargar_materiales()
 	cargar_modelo()
-	#cargar_movimiento()
 	add_to_group('enemy')
 	tipo_enemigo()
 	cargar_pullups()
@@ -121,15 +120,6 @@ func _find_animation_player(node: Node) -> AnimationPlayer: # agrega las animaci
 		if found:
 			return found
 	return null	
-
-func cargar_movimiento():
-	pass
-	#var movimiento = movimiento_especifico.instantiate()
-	#var movimiento_script = "res://scenes/enemy/movimiento/mov_"+str(tipo)+".gd"
-	#var script = load(movimiento_script)
-	#movimiento.set_script(script)
-	#add_child(movimiento)
-	#movimiento.owner = self  #  Establece el owner manualmente
 
 func tipo_enemigo():
 	animation_player.play("caminar_bicho")
