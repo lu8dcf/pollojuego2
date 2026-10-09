@@ -12,7 +12,6 @@ extends Panel
 # botones de eleccion de personaje o armas
 @onready var arma_eleccion: TextureButton = %ArmaEleccion
 @onready var personaje_eleccion: TextureButton = %PersonajeEleccion
-@onready var sprite_seleccion: AnimatedSprite2D = %SpriteSeleccion
 
 # personaje
 @onready var sprite_personaje: AnimatedSprite2D = %SpritePersonaje
@@ -59,10 +58,10 @@ var armas : Dictionary ={
 var nombres_personajes:Dictionary={
 	1:"arturo",
 	2:"zuly",
-	3:"pinky",
-	4:"iku",
-	5:"claudio",
-	6:"ricachow"
+	3:"ricardo",
+	4:"violeta",
+	5:"patroclo",
+	6:"walter"
 }
 
 var nombres_armas:Dictionary={
@@ -147,13 +146,12 @@ func conectar_verificar_botones() -> void:
 	# primero mostrar el perosnaje y despues las armas
 	sprite_personaje.visible = true
 	sprite_arma.visible = false
-	sprite_seleccion.visible = false
 	
 func se_selecciona_personajes() -> void:
 	
 	sprite_personaje.visible = true
 	sprite_arma.visible = false
-	sprite_seleccion.visible = false
+	
 	if h_box_habilidades_arma:
 		h_box_habilidades_arma.visible = false
 	if h_box_habilidades_personaje:
@@ -163,7 +161,7 @@ func se_selecciona_personajes() -> void:
 func se_selecciona_armas() -> void:
 	sprite_personaje.visible = false
 	sprite_arma.visible = true
-	sprite_seleccion.visible = false
+	
 	if h_box_habilidades_arma:
 		h_box_habilidades_arma.visible = es_mi_panel
 	if h_box_habilidades_personaje:
@@ -201,7 +199,6 @@ func cambiar_personaje_arma(direccion:int):
 		if lobby and lobby.has_method("notificar_cambio_personaje_arma"):
 			lobby.notificar_cambio_personaje_arma(peer_id, id_personaje,id_arma)
 
-	
 
 func _reproducir_personaje(id):
 	if id==0:

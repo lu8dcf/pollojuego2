@@ -492,12 +492,7 @@ func _volver_al_menu_por_desconexion_host():
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = null
 	
-	
-	
-	# Mostrar mensaje al jugador (opcional)
-	# mostrar_mensaje_desconexion("El host se ha desconectado")
-	
-	# Volver al menú principal
+	# volver al menú principal
 	await get_tree().create_timer(0.5).timeout
 	get_tree().reload_current_scene()
 
@@ -626,6 +621,7 @@ func _mostrar_pantalla_carga(lista_peer_ids: Array) -> void:
 func _cargar_mundo_local() -> void: # cada usuario carga su mundo
 	
 	# precargar recursos pesados
+	
 	var recursos_a_precargar = [
 		"uid://yubh30707eb7",  # mundo
 		"uid://bc1ek0bvbgna2",  # jugador
@@ -835,6 +831,46 @@ func _replicar_ping(peer_id: int, ping: int) -> void:
 		GlobalJuego.session_info[peer_id]["ping"] = ping
 		# Emitir señal para que la UI se actualice
 		GlobalSignal.sesion_actualizada.emit(GlobalJuego.session_info)
+
+# ------------------------------------------------------------
+# CHAT DEL LOBBY
+# ------------------------------------------------------------
+# un cliente pide enviar un mensaje al chat
+# se usa any_peer para que cualquiera pueda mandar, reliable porque importa que llegue
+@rpc("any_peer","call_local","reliable")
+func _enviar_mensaje_chat(texto:String) ->void:
+	# si no estamos en el lobby, ignorar
+	if not en_lobby:
+		return
+	#averiguar quien envio el msj
+	var emisor_id := multiplayer.get_remote_sender_id()
+	if emisor_id == 0:
+		emisor_id = multiplayer.get_unique_id()
+	
+	# armar el msj con el nombre del usaurio
+	var nombre := "Sistema"
+	if GlobalJuego.session_info.has(emisor_id):
+		nombre = GlobalJuego.session_info[emisor_id].get("username","Jugador"+str(emisor_id))
+	# solo el host rebora el msj para todos
+	
+	_replicar_mensaje_chat(nombre,texto,false)
+	
+	
+@rpc("authority","call_local","reliable")
+func _replicar_mensaje_chat(nombre:String,texto:String,es_sistema:bool)->void:
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if lobby and lobby.has_method("_recibir_mensaje_chat"):
+		lobby._recibir_mensaje_chat(nombre,texto,es_sistema)
+
+# funcion para mandar msj de sistema, no es un rpc porque el host lo llama directo y este se repkica
+func host_mensaje_sistema(texto:String)->void:
+	if not multiplayer.is_server():
+		return
+	_replicar_mensaje_chat("HOST",texto,true)
+
+	
+	
+
 
 # ------------------------------------------------------------
 # PAUSA MULTIJUGADOR

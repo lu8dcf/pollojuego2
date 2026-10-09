@@ -11,11 +11,24 @@ const PANEL_JUGADOR = preload("uid://b4gmxx0tqmgc4")
 @onready var label_ip: Label = %LabelIp
 @onready var label_puerto: Label = %LabelPuerto
 
+# chat
+@onready var chat_input: TextEdit = %ChatInput
+@onready var chat_historial: RichTextLabel = %ChatHistorial
+@onready var chat_enviar: Button = %ChatEnviar
+
+
 
 var jugadores_en_lobby: Dictionary = {}  # peer_id -> {nombre: String, panel: Node, listo: bool}
 var es_host: bool = false
 var lobby_inicializado: bool = false
 var partida_iniciada_flag: bool = false
+
+# para saber que pollo esta ya seleccionado
+var pollos_asignados: Dictionary = {}
+
+# conjunto inverso para saber rapido si un pollo ya esta tomado
+# pollo_id -> peer_id
+var pollos_tomados: Dictionary = {}
 
 signal partida_iniciada
 
@@ -61,7 +74,13 @@ func _ready() -> void:
 		_enviar_mi_info_al_host()
 	
 	lobby_inicializado = true
-
+	if GlobalJuego.un_jugador:
+		chat_input.visible = false
+		chat_enviar.visible = false
+		
+	if chat_enviar and not GlobalJuego.un_jugador:
+		chat_enviar.pressed.connect(_on_chat_enviar_pressed)
+	
 # UN SOLO JUGADOR
 func _inicilizar_un_jugador() -> void:
 	es_host = true
@@ -329,6 +348,12 @@ func _on_iniciar_partida_pressed():
 			Network._iniciar_carga.rpc()
 	
 
+# ============================================================
+# SELECCION DE POLLO 
+# ============================================================
+func seleccionar_pollo(id_pollo:int) ->void:
+	pass
+
 # avisar del cambio de personaje, cuando un usuario cambia su eprsonaje, avisa al host para que todos actualicen
 func notificar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
 	_procesar_cambio_personaje_arma(peer_id_jugador,id_personaje,id_arma) # primero procesar localmente
@@ -356,7 +381,7 @@ func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_a
 			"score": 0,
 			"username": "Jugador " + str(peer_id_jugador),
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje": id_personaje,
+			"personaje": (id_personaje-1),
 			"ping": 0,
 			"inventario": [id_arma],  # primera arma
 			"armas_actuales":[id_arma,0], # si es cero es que no hay arma en esa mano
@@ -364,7 +389,7 @@ func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_a
 		}
 	else:
 		var info_peer = GlobalJuego.session_info[peer_id_jugador] # obtener la data del usuario
-		info_peer["personaje"] = id_personaje
+		info_peer["personaje"] = (id_personaje-1)
 		
 		# agregar arma al inventario si no está ya
 		var armas_actuales :Array = info_peer.get("armas_actuales",[1,0])
@@ -405,6 +430,38 @@ func _comenzar_partida():
 	# Emitir señal SOLAMENTE
 	partida_iniciada.emit()
 	hide()
+
+
+# ============================================================
+# CHAT 
+# ============================================================
+func _on_chat_enviar_pressed()->void:
+	
+	if not chat_input:
+		return
+	var texto := chat_input.text.strip_edges()
+	if texto == "":
+		return
+
+	chat_input.text = ""
+	
+	# mandamos por rpc (el host lo reemite a todos)
+	Network._enviar_mensaje_chat.rpc(texto)
+
+func _recibir_mensaje_chat(nombre: String, texto: String, es_sistema: bool) -> void:
+	if not chat_historial:
+		return
+	var color_nombre = "#ffd166"  # amarillo para host
+	var color_texto := "#ffffff"
+	
+	if es_sistema:
+		color_nombre = "#ff5555" # rojo para avisos
+		color_texto = "#ff8888"
+	elif nombre =="HOST":
+		color_nombre = "#ffd166"
+	chat_historial.append_text("[color=%s]%s:[/color] [color=%s]%s[/color]\n" % [
+		color_nombre, nombre, color_texto, texto
+	])
 
 
 func _on_regresar_boton_pressed() -> void:
