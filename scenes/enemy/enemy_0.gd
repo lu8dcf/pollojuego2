@@ -84,8 +84,6 @@ func _ready():
 	add_to_group('enemy')
 	tipo_enemigo()
 	cargar_pullups()
-	#jugador = get_tree().get_first_node_in_group("Jugadores")
-	# Esperar un frame para que el NavigationServer se inicialice
 	await get_tree().physics_frame
 	marcapaso.timeout.connect(cambios)
 		
@@ -98,7 +96,10 @@ func cargar_materiales():
 	material_rojo.emission_energy_multiplier = 2.0 	
 
 func cargar_pullups():
-	pass
+	var n = randi_range(0, 10)
+	
+		
+	
 
 func cargar_modelo(): # tipo de enemigo
 	var escena_glb = load("res://scenes/enemy/enemigo_"+ str(tipo)+".tscn")
