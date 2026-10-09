@@ -15,7 +15,25 @@ const PANEL_JUGADOR = preload("uid://b4gmxx0tqmgc4")
 @onready var chat_input: TextEdit = %ChatInput
 @onready var chat_historial: RichTextLabel = %ChatHistorial
 @onready var chat_enviar: Button = %ChatEnviar
+ # paleta de colores para los peers. se elige por hash del peer_id
+# para que sea deterministica: mismo peer = mismo color en todos los clientes.
+const COLORES_PEER: Array[Color] = [
+	Color("#ff6b6b"),  # rojo
+	Color("#4ecdc4"),  # turquesa
+	Color("#ffe66d"),  # amarillo
+	Color("#a29bfe"),  # violeta
+	Color("#55efc4"),  # verde menta
+	Color("#fd79a8"),  # rosa
+	Color("#74b9ff"),  # celeste
+	Color("#fab1a0"),  # salmon
+]
 
+# color del host (peer_id == 1) siempre destacado
+const COLOR_HOST := Color("#ffd166")
+# color de los mensajes de sistema
+const COLOR_SISTEMA := Color("#ff5555")
+# color del texto en si (el cuerpo del mensaje)
+const COLOR_TEXTO := Color("#e0e0e0")
 
 
 var jugadores_en_lobby: Dictionary = {}  # peer_id -> {nombre: String, panel: Node, listo: bool}
@@ -435,6 +453,16 @@ func _comenzar_partida():
 # ============================================================
 # CHAT 
 # ============================================================
+# devuelve un color estable para un peer_id dado.
+# el host siempre usa COLOR_HOST; el resto rota por la paleta.
+func _color_para_peer(peer_id:int)->Color:
+	if peer_id == 1:
+		return COLOR_HOST
+		 # indice estable basado en el peer_id (no en el orden de la lista)
+	var indice:int = abs(peer_id)%COLORES_PEER.size()
+	return COLORES_PEER[indice]
+
+
 func _on_chat_enviar_pressed()->void:
 	
 	if not chat_input:

@@ -847,26 +847,24 @@ func _enviar_mensaje_chat(texto:String) ->void:
 	if emisor_id == 0:
 		emisor_id = multiplayer.get_unique_id()
 	
-	# armar el msj con el nombre del usaurio
-	var nombre := "Sistema"
-	if GlobalJuego.session_info.has(emisor_id):
-		nombre = GlobalJuego.session_info[emisor_id].get("username","Jugador"+str(emisor_id))
-	# solo el host rebora el msj para todos
 	
-	_replicar_mensaje_chat(nombre,texto,false)
+	_replicar_mensaje_chat(emisor_id,texto,false)
 	
 	
 @rpc("authority","call_local","reliable")
-func _replicar_mensaje_chat(nombre:String,texto:String,es_sistema:bool)->void:
+func _replicar_mensaje_chat(peer_id:int,texto:String,es_sistema:bool)->void:
 	var lobby = get_tree().get_first_node_in_group("lobby")
 	if lobby and lobby.has_method("_recibir_mensaje_chat"):
-		lobby._recibir_mensaje_chat(nombre,texto,es_sistema)
+		lobby._recibir_mensaje_chat(peer_id,texto,es_sistema)
 
 # funcion para mandar msj de sistema, no es un rpc porque el host lo llama directo y este se repkica
+# helper para mensajes del sistema (avisos del host).
+# no es rpc: lo llama el host directo y este lo replica.
+# usamos peer_id = 0 como "sistema".
 func host_mensaje_sistema(texto:String)->void:
 	if not multiplayer.is_server():
 		return
-	_replicar_mensaje_chat("HOST",texto,true)
+	_replicar_mensaje_chat(0,texto,true)
 
 	
 	
