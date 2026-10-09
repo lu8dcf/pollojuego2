@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://dg6hg5ln4lacb" path="res://scenes/ui/panel_jugador.gd" id="1_w18h1"]
 [ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_wo01u"]
 [ext_resource type="Texture2D" uid="uid://bhhw8ihihl4ib" path="res://assets/ui/lobby/personajes/idle1.png" id="3_x6hcr"]
-[ext_resource type="Texture2D" uid="uid://dxvba16ob4txj" path="res://assets/ui/lobby/selccion_sheet.png" id="4_atqr2"]
 [ext_resource type="Texture2D" uid="uid://bhsw7bb8gny5f" path="res://assets/ui/lobby/personajes/idle2.png" id="4_jpjro"]
 [ext_resource type="Texture2D" uid="uid://c31q5hfwsb75k" path="res://assets/ui/lobby/personajes/idle3.png" id="5_7rgl2"]
 [ext_resource type="Texture2D" uid="uid://crbrs4ib5uc28" path="res://assets/ui/lobby/personajes/idle4.png" id="6_bmp6k"]
@@ -69,56 +68,6 @@ region = Rect2(200, 328, 48, 48)
 [sub_resource type="AtlasTexture" id="AtlasTexture_b5x2r"]
 atlas = ExtResource("8_bmp6k")
 region = Rect2(264, 328, 48, 48)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gyjd6"]
-atlas = ExtResource("4_atqr2")
-region = Rect2(0, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_h5sui"]
-atlas = ExtResource("4_atqr2")
-region = Rect2(128, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_a5r5q"]
-atlas = ExtResource("4_atqr2")
-region = Rect2(256, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_lc556"]
-atlas = ExtResource("4_atqr2")
-region = Rect2(384, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_6xdmq"]
-atlas = ExtResource("4_atqr2")
-region = Rect2(512, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_a5ern"]
-atlas = ExtResource("4_atqr2")
-region = Rect2(640, 0, 128, 128)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_c2doj"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_gyjd6")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_h5sui")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_a5r5q")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_lc556")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_6xdmq")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_a5ern")
-}],
-"loop": 1,
-"name": &"seleccion",
-"speed": 5.0
-}]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5glau"]
 atlas = ExtResource("3_x6hcr")
@@ -637,7 +586,9 @@ atlas = ExtResource("8_bmp6k")
 region = Rect2(72, 712, 48, 48)
 
 [node name="Jugador1" type="Panel" unique_id=748620973]
-custom_minimum_size = Vector2(250, 400)
+custom_minimum_size = Vector2(250, 350)
+offset_right = 250.0
+offset_bottom = 350.0
 script = ExtResource("1_w18h1")
 
 [node name="NombreUsuario" type="Label" parent="." unique_id=1218786579]
@@ -714,14 +665,6 @@ offset_right = 98.0
 offset_bottom = 48.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="SpriteSeleccion" type="AnimatedSprite2D" parent="ContenedorPersonaje" unique_id=1526114277]
-unique_name_in_owner = true
-visible = false
-position = Vector2(85, 55.000004)
-scale = Vector2(1.4375, 1.234375)
-sprite_frames = SubResource("SpriteFrames_c2doj")
-animation = &"seleccion"
 
 [node name="SpritePersonaje" type="AnimatedSprite2D" parent="ContenedorPersonaje" unique_id=1191032090]
 unique_name_in_owner = true
