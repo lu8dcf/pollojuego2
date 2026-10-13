@@ -63,7 +63,7 @@ func _enter_tree() -> void:
 
 @rpc("authority", "call_local", "reliable")
 func crear_pollo_en_red(tipo_elegido: int) -> void:
-	var tipo_pollo_enum = tipo_elegido as PolloFactory.TipoPollo
+	var tipo_pollo_enum :PolloFactory.TipoPollo = tipo_elegido
 	
 	#como es funcion static, puedo acceder a los datos que necesito
 	var datos_pollo = PolloFactory.obtener_datos(tipo_pollo_enum) 
@@ -82,6 +82,10 @@ func crear_pollo_en_red(tipo_elegido: int) -> void:
 
 	#instancio el nodo pollo (visual y habilidad)
 	pollo = PolloFactory.crear(tipo_pollo_enum, self)
+	
+	if pollo == null:
+		push_warning("PolloFactory.crear devolvio null para tipo: %d" % tipo_elegido)
+		return
 	
 	# le asigno la autoridad
 	add_child(pollo)

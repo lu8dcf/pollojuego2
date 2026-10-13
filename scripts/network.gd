@@ -307,7 +307,31 @@ func _replicar_estado_listo(peer_id_jugador: int, estado: bool):
 	if not lobby:
 		return
 	lobby._procesar_estado_listo(peer_id_jugador, estado)
+
+
+# ACTUALIZAR Y SINCRONIZAR CAMBIO DE ARMA Y PEROSNAJE
+
+@rpc("any_peer","reliable")
+func _solicitar_cambio_pollo(peer_id:int, id_pollo:int)->void:
+	if not multiplayer.is_server():
+		return
 	
+	# el host verifica si el emisor es el correcto
+	var emisor:= multiplayer.get_remote_sender_id()
+	if emisor != peer_id:
+		return
+		
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if lobby and lobby.has_method("_procesar_cambio_pollo"):
+		lobby._procesar_cambio_pollo(peer_id,id_pollo)
+
+@rpc("authority","call_local","reliable")
+func _replicar_cambio_pollo(peer_id:int,id_pollo:int) ->void:
+	var lobby = get_tree().get_first_node_in_group("lobby")
+	if lobby and lobby.has_method("_aplicar_cambio_pollo"):
+		lobby._aplicar_cambio_pollo(peer_id, id_pollo)
+
+
 
 @rpc("any_peer", "call_local", "reliable")
 func _sincronizar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
@@ -332,7 +356,7 @@ func _iniciar_carga():
 	
 	# Liberar el lobby
 	if lobby and is_instance_valid(lobby):
-		await get_tree().create_timer(1.0).timeout
+		#await get_tree().create_timer(1.0).timeout
 		lobby.queue_free()
 
 
@@ -341,6 +365,41 @@ func _iniciar_partida():
 	var lobby = get_tree().get_first_node_in_group("lobby")
 	if lobby:
 		lobby._comenzar_partida()
+
+func iniciar_partida_un_jugador() ->void:
+	en_lobby = false
+	GlobalJuego.semilla_mapa = randi()
+	# cargamos el mundo (reusa tu funcion existente)
+	await _cargar_mundo_local_single()
+	
+	# creamos al jugador 1 con el pollo elegido
+	var mundo = obtener_mundo_actual()
+	if mundo:
+		var info: Dictionary = GlobalJuego.session_info[1]
+		var username: String = info.get("username", "Jugador 1")
+		var id_pollo: int = info.get("personaje", 0)
+		
+		var posicion := Vector3(30, 5, 30)
+		if mundo.has_method("obtener_posicion_spawn"):
+			posicion = mundo.obtener_posicion_spawn(0, 1)
+		
+		crear_jugador_en_mundo(mundo, 1, username, posicion, id_pollo)
+
+
+# version simplificada de _cargar_mundo_local sin pantalla de carga ni notificar_listo
+func _cargar_mundo_local_single() -> void:
+	var MUNDO = load("uid://yubh30707eb7")
+	
+	var mundo_existente = obtener_mundo_actual()
+	if not mundo_existente:
+		var nuevo_mundo = MUNDO.instantiate()
+		nuevo_mundo.name = "Mundo"
+		nuevo_mundo.add_to_group("mundo")
+		get_tree().current_scene.add_child(nuevo_mundo)
+		
+		# esperamos dos frames para que el mundo termine de inicializarse
+		await get_tree().process_frame
+		await get_tree().process_frame
 
 # ------------------------------------------------------------
 # ESTADO LISTO DE PANEL JUGADOR
@@ -389,9 +448,12 @@ func crear_todos_los_jugadores(): #SOLO EL HOST llama a esta función
 	
 	for i in range(total):
 		var peer_id = peer_ids[i]
-		var username = GlobalJuego.session_info[peer_id].get("username", "Jugador " + str(peer_id))
+		var info_peer: Dictionary = GlobalJuego.session_info[peer_id]
+		var username: String = info_peer.get("username", "Jugador " + str(peer_id))
+		var id_pollo: int = info_peer.get("personaje", 0)
 		
-		# ← Obtener posición desde el mundo procedural
+		# obtener posicion desde el mundo procedural
+		# posicion jugadores
 		var posicion: Vector3
 		if mundo.has_method("obtener_posicion_spawn"):
 			posicion = mundo.obtener_posicion_spawn(i, total)
@@ -399,15 +461,14 @@ func crear_todos_los_jugadores(): #SOLO EL HOST llama a esta función
 			# Fallback: posición por defecto
 			posicion = Vector3(30, 5, 30)
 		
-		print("[NETWORK] Spawneando jugador ", peer_id, " en ", posicion)
 		
 		# Crear localmente
-		crear_jugador_en_mundo(mundo, peer_id, username, posicion)
+		crear_jugador_en_mundo(mundo, peer_id, username, posicion,id_pollo)
 		
 		# Notificar a todos los clientes
-		spawnear_jugador_rpc.rpc(peer_id, username, posicion)
+		spawnear_jugador_rpc.rpc(peer_id, username, posicion,id_pollo)
 
-func crear_jugador_en_mundo(mundo: Node, peer_id: int, username: String, posicion: Vector3):
+func crear_jugador_en_mundo(mundo: Node, peer_id: int, username: String, posicion: Vector3,id_pollo:int):
 	
 	for child in mundo.get_children():
 		if child.name == str(peer_id): #si el jugador ya existe n el mundo, no se debe crear
@@ -423,6 +484,12 @@ func crear_jugador_en_mundo(mundo: Node, peer_id: int, username: String, posicio
 	var nameplate = jugador.get_node_or_null("Nameplate") # aca se configura el nombre
 	if nameplate:
 		nameplate.text = username
+	
+	if jugador.has_method("crear_pollo_en_red"):
+		jugador.crear_pollo_en_red(id_pollo)
+	else:
+		push_warning("el jugador no tiene crear_pollo_en_red()")
+
 	
 	
 func obtener_mundo_actual() -> Node:
@@ -474,9 +541,7 @@ func _on_peer_disconnected_partida(peer_id: int):
 	eliminar_jugador(peer_id)
 
 func _on_server_disconnected():
-	"""Se llama cuando se pierde la conexión con el servidor (host)"""
-	
-	# Solo los clientes deben reaccionar
+	# cunado se pierde la conexion
 	if multiplayer.is_server():
 		return
 	
@@ -734,7 +799,7 @@ func _jugador_listo_rpc(peer_id: int) -> void:
 	_marcar_jugador_listo(peer_id)
 
 @rpc("authority", "call_local", "reliable")
-func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3):
+func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3,id_pollo:int):
 	
 	var mundo = obtener_mundo_actual()
 	if not mundo:
@@ -751,6 +816,11 @@ func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3):
 
 	mundo.add_child(jugador, true)
 	
+	# se crea el pollo elegido en cada cliente
+	if jugador.has_method("crear_pollo_en_red"):
+		jugador.crear_pollo_en_red(id_pollo)
+		
+		
 @rpc("authority","call_local","reliable")
 func _replicar_semilla(semilla:int)->void:
 	print("la semialla es: ", semilla)

@@ -183,7 +183,8 @@ func cambiar_personaje_arma(direccion:int):
 		var lobby = get_tree().get_first_node_in_group("lobby")
 		if lobby and lobby.has_method("notificar_cambio_personaje_arma"):
 			lobby.notificar_cambio_personaje_arma(peer_id, id_personaje,id_arma)
-
+		if lobby and lobby.has_method("seleccionar_pollo"):
+			lobby.seleccionar_pollo(id_personaje)
 		
 	elif sprite_arma.visible:
 		id_arma += direccion
@@ -344,6 +345,7 @@ func marcar_listo():
 		estoy_listo_boton.cambiar_texto("¡Listo!")
 	_habilitar_deshabilitar_botones(esta_listo)
 	_actualizar_indicador()
+	
 	# Emitir señal para notificar al lobby
 	Network._notificar_estado_listo.rpc(peer_id, true)
 

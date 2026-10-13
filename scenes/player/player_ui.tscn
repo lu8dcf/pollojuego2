@@ -67,6 +67,15 @@ region = Rect2(448, 576, 64, 64)
 process_mode = 3
 script = ExtResource("1_m6sn8")
 
+[node name="LabelFPS" type="Label" parent="." unique_id=165403976]
+unique_name_in_owner = true
+offset_right = 94.0
+offset_bottom = 20.0
+text = "fps:"
+label_settings = ExtResource("4_mo8vb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Menu" type="Control" parent="." unique_id=102514064]
 unique_name_in_owner = true
 layout_mode = 3

@@ -353,24 +353,120 @@ func _on_iniciar_partida_pressed():
 	if GlobalJuego.un_jugador:
 		_comenzar_partida_un_jugador()
 		return
-		
 	
-	if es_host and jugadores_en_lobby.size() >= 2:
-		var todos_listos = true
-		for peer_id in jugadores_en_lobby.keys():
-			if not jugadores_en_lobby[peer_id].get("listo", false):
-				todos_listos = false
-				break
+	if not es_host:
+		return
 		
-		if todos_listos:
-			Network._iniciar_carga.rpc()
+	if jugadores_en_lobby.size() < 2:
+		Network.host_mensaje_sistema("Se necesitan al menos 2 jugadores para empezar.")
+		return
+	# verificar listos
+	var todos_listos = true
+	for peer_id in jugadores_en_lobby.keys():
+		if not jugadores_en_lobby[peer_id].get("listo", false):
+			todos_listos = false
+			break
+	
+	if not todos_listos:
+		Network.host_mensaje_sistema("Todavia hay jugadores que no están listos.")
+		return
+	
+	# verificar pollos unicos
+	var chequeo:=_verificar_pollos_unicos()
+	if not chequeo["validos"]:
+		# armar msj claro para los repetidos
+		var nombres_pollos :=["arturo","zuly","ricardo","violeta","patroclo","walter"]
+		var lista_str :=""
+		for id_rep in chequeo["repetidos"]:
+			var nombre_p:="desconocido"# nombre del pollo
+			if id_rep>0 and id_rep<nombres_pollos.size():
+				nombre_p = nombres_pollos[id_rep]
+			lista_str += nombre_p+" "
+		Network.host_mensaje_sistema("No se puede iniciar: hay pollos repetidos (%s). Cambien su seleccion." % lista_str.strip_edges())
+		return
+	#si sale todo bien se arranca
+	Network._iniciar_carga.rpc()
+	
+
 	
 
 # ============================================================
 # SELECCION DE POLLO 
 # ============================================================
 func seleccionar_pollo(id_pollo:int) ->void:
-	pass
+	var mi_id := 1
+	if multiplayer.has_multiplayer_peer():
+		mi_id = multiplayer.get_unique_id()
+		
+	# actualizar local
+	if not GlobalJuego.session_info.has(mi_id):
+		GlobalJuego.session_info[mi_id] = {
+			"score": 0,
+			"username": _obtener_nombre_jugador(),
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"personaje": id_pollo,
+			"ping": 0,
+			"inventario": [],
+			"armas_actuales": [0, 0],
+			"listo": true
+		}
+	else:
+		GlobalJuego.session_info[mi_id]["personaje"] = id_pollo
+	print("en seleccionar pollo, pollo elegido: ", id_pollo)
+	if not multiplayer.has_multiplayer_peer():
+		return
+	
+	# si hay red avisar al host
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		Network._solicitar_cambio_pollo.rpc_id(1,mi_id,id_pollo)
+	elif multiplayer.is_server():
+		_procesar_cambio_pollo(mi_id,id_pollo) # el host procesa directo el pollo
+
+func _procesar_cambio_pollo(peer_id: int, id_pollo:int) ->void:
+	if not GlobalJuego.session_info.has(peer_id):
+		return
+	GlobalJuego.session_info[peer_id]["personaje"] = id_pollo
+	
+	if jugadores_en_lobby.has(peer_id):
+		var info = jugadores_en_lobby[peer_id]
+		info["personaje"] = id_pollo
+		jugadores_en_lobby[peer_id] = info
+		var panel = info.get("panel")
+		if panel and panel.has_method("actualizar_personaje_remoto"):
+			panel.actualizar_personaje_remoto(id_pollo)
+		
+	Network._replicar_cambio_pollo.rpc(peer_id,id_pollo)
+	
+# se llama a aesta funcion desde network cuando el cliente decide actualizar, el host envia esto a todos parque actualicen el pollo
+func _aplicar_cambio_pollo(peer_id:int, id_pollo:int)-> void:
+	if GlobalJuego.session_info.has(peer_id):
+		GlobalJuego.session_info[peer_id]["personaje"] = id_pollo
+	if jugadores_en_lobby.has(peer_id):
+		var info = jugadores_en_lobby[peer_id]
+		info["personaje"] = id_pollo
+		jugadores_en_lobby[peer_id] = info
+		var panel = info.get("panel")
+		if panel and panel.has_method("actualizar_personaje_remoto"):
+			panel.actualizar_personaje_remoto(id_pollo)
+
+func _verificar_pollos_unicos()->Dictionary:
+	var vistos :={} # id_pollo y peer id que lo eligio, para avisarle
+	var repetidos :=[] # lista de pollos repetidos, id_pollo
+	for peer_id in jugadores_en_lobby.keys():
+		var id_pollo:int = GlobalJuego.session_info.get(peer_id,{}).get("personaje",-1)
+		if  id_pollo<0:
+			continue
+		if vistos.has(id_pollo):
+			repetidos.append(id_pollo)
+		else:
+			vistos[id_pollo] = peer_id
+	return{
+		"validos":repetidos.is_empty(),
+		"repetidos":repetidos
+	}
+	
+	
+	
 
 # avisar del cambio de personaje, cuando un usuario cambia su eprsonaje, avisa al host para que todos actualicen
 func notificar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_arma:int):
@@ -433,6 +529,8 @@ func _comenzar_partida_un_jugador():
 	
 	partida_iniciada.emit()
 	hide()
+	
+	await  Network.iniciar_partida_un_jugador()
 	
 	
 	

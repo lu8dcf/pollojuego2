@@ -4,6 +4,10 @@ class_name PlayerUI
 
 @onready var menu: Control = %Menu
 
+# LABEL DE FPS
+@onready var label_fps: Label = %LabelFPS
+
+
 # PANEL ARRIBA DERECHA - MENU Y SALIR
 @onready var boton_pausa: TextureButton = %BotonPausa
 @onready var boton_salir: TextureButton = %BotonSalir # para salir del servidor
@@ -118,6 +122,9 @@ func _ready() -> void:
 	_actualizar_paneles_aliados(GlobalJuego.session_info)
 	
 	process_mode = Node.PROCESS_MODE_ALWAYS # ESTO HARA QUE SIGA PROCESANDO EL CANVAS LAYER, NO SE QUE TAN BUENO SEA
+
+func _process(delta: float) -> void:
+	label_fps.text = "FPS: %d" % Engine.get_frames_per_second()
 
 
 # ===== SI ES MOBILE =====
