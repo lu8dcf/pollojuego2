@@ -168,8 +168,6 @@ func _on_empezar_un_jugador() -> void:
 	get_tree().current_scene.add_child(nuevo_mundo)
 	await get_tree().process_frame
 	
-	if nuevo_mundo.has_method("partida_unsolojugador"):
-		nuevo_mundo.partida_unsolojugador()
 	
 	_crear_jugador_local(nuevo_mundo)
 	hide()
@@ -185,8 +183,6 @@ func _crear_mundo_un_jugador():
 	get_tree().current_scene.add_child(nuevo_mundo)
 	await get_tree().process_frame
 	
-	if nuevo_mundo.has_method("partida_unsolojugador"):
-		nuevo_mundo.partida_unsolojugador()
 	
 	_crear_jugador_local(nuevo_mundo)
 	_limpiar_lobby()

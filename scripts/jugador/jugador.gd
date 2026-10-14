@@ -74,7 +74,7 @@ func crear_pollo_en_red(tipo_elegido: int) -> void:
 		self.salud = self.salud_maxima
 		self.velocidad = datos_pollo.get("velocidad")
 		self.resistencia = datos_pollo.get("resistencia")
-	
+	print("El pollo elegido que llega a jugador.gd es: ", tipo_elegido, "y el enum es: ", tipo_pollo_enum)
 	#saco nodos viejos
 	for child in get_children():
 		if child is Pollo:
@@ -93,14 +93,15 @@ func crear_pollo_en_red(tipo_elegido: int) -> void:
 	add_to_group("Jugadores")
 
 func _ready() -> void:
-	if(pollo == null):
-		pollo = $FabricaPollos.crear($FabricaPollos.TipoPollo.BLANCO, self) #si queres poner otras habilidades: LENTES = dron, MARRON = escudo, BLANCO = dash
-		add_child(pollo) #eSTO debe recibir ya un nodo pollo elegido
-		pollo.set_multiplayer_authority(get_multiplayer_authority(), true) #para que el pollo tenga el mismo nivel de auoridad que el padre
+	#if(pollo == null):
+		#pollo = $FabricaPollos.crear($FabricaPollos.TipoPollo.BLANCO, self) #si queres poner otras habilidades: LENTES = dron, MARRON = escudo, BLANCO = dash
+		#add_child(pollo) #eSTO debe recibir ya un nodo pollo elegido
+		#pollo.set_multiplayer_authority(get_multiplayer_authority(), true) #para que el pollo tenga el mismo nivel de auoridad que el padre
 	add_to_group("Jugadores")
 	nameplate.text = name
 	player_ui.hide()
-	GlobalSignal.enviar_joystick.connect(recibir_joystick) # para obtener el joystick
+	if not GlobalSignal.enviar_joystick.is_connected(recibir_joystick):
+		GlobalSignal.enviar_joystick.connect(recibir_joystick)# para obtener el joystick
 	if GlobalJuego.un_jugador:
 		# MODO UN JUGADOR
 		await get_tree().process_frame
@@ -110,7 +111,7 @@ func _ready() -> void:
 		return
 	
 	# MODO MULTIJUGADOR
-	if !GlobalJuego.un_jugador:
+	if not GlobalJuego.un_jugador:
 		if not is_multiplayer_authority():
 			if camera_3d:
 				camera_3d.current = false
@@ -123,18 +124,7 @@ func _ready() -> void:
 			camera_3d.current = true
 		ready_client_visuals()
 
-	#GlobalSignal.enviar_joystick.connect(recibir_joystick) #comprobar esto
-	#if not is_multiplayer_authority():
-	#	if camera_3d:
-	#		camera_3d.current = false
-	#	player_ui.hide()
-	#	set_process(false)
-	#	return
-
-	#await get_tree().process_frame
-	#if camera_3d:
-	#	camera_3d.current = true
-	#ready_client_visuals() #hasta aca
+	
 
 
 
@@ -166,6 +156,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	
 	if not is_multiplayer_authority():
+		return
+	if pollo == null:
 		return
 		
 	if Input.is_action_just_pressed("habilidad"): # K
@@ -333,6 +325,8 @@ func _physics_process(delta: float) -> void:
 		#return 
 	
 	if not is_multiplayer_authority():
+		return
+	if pollo == null:
 		return
 	match estadoActual:
 		Estado.OLEADA:

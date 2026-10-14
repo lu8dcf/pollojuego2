@@ -191,7 +191,7 @@ unique_name_in_owner = true
 position = Vector2(20, 16)
 scale = Vector2(0.2734375, 0.2734375)
 sprite_frames = SubResource("SpriteFrames_k1rfm")
-animation = &"idle5"
+animation = &"idle1"
 
 [node name="Aro" type="NinePatchRect" parent="VBoxContainer/ContenedorPersonaje" unique_id=362344443]
 unique_name_in_owner = true

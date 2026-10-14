@@ -487,6 +487,7 @@ func crear_jugador_en_mundo(mundo: Node, peer_id: int, username: String, posicio
 	
 	if jugador.has_method("crear_pollo_en_red"):
 		jugador.crear_pollo_en_red(id_pollo)
+		print("se crea el pollo en red: ", id_pollo)
 	else:
 		push_warning("el jugador no tiene crear_pollo_en_red()")
 
