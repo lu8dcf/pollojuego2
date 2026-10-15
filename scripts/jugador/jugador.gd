@@ -24,6 +24,8 @@ var joystick: Joystick = null
 @onready var timer_caido: Timer = $timer_caido
 @onready var timer_salvar: Timer = $timer_salvar
 
+@onready var barraVida = %barraVida
+
 var pollo = null
 
 enum Estado {
@@ -507,11 +509,11 @@ func aplicar_salud_local(nueva_salud: int,nueva_salud_maxima: int,mostrar_efecto
 	if salud_maxima > 0:
 		porcentaje = float(salud) / float(salud_maxima)
 
-	if has_node("barraVida"):
-		$barraVida.bajarVida(porcentaje)
+	if barraVida != null:
+		barraVida.bajarVida(porcentaje)
 
 		# esta barra solamente se muestra al propietario.
-		$barraVida.visible = \
+		barraVida.visible = \
 			GlobalJuego.un_jugador \
 			or is_multiplayer_authority()
 

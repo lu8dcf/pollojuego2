@@ -39,6 +39,10 @@ replication_config = SubResource("SceneReplicationConfig_gvbmg")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=793220646]
 shape = SubResource("SphereShape3D_sugfe")
 
+[node name="captarExplosion" type="Timer" parent="." unique_id=1600472248]
+wait_time = 0.5
+
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="area_entered" from="area_explosion" to="." method="_on_area_explosion_area_entered"]
 [connection signal="body_entered" from="area_explosion" to="." method="_on_area_explosion_body_entered"]
+[connection signal="timeout" from="captarExplosion" to="." method="_on_captar_explosion_timeout"]

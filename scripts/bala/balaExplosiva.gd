@@ -14,6 +14,8 @@ var inicio = false
 var danioBala 
 #solo explosiva
 @onready var areaExplosiva = $area_explosion
+@onready var tiempo = $captarExplosion
+
 
 #TEST
 @onready var textureBullet =$explosiva
@@ -72,8 +74,7 @@ func explosion():
 			if(cuerpo.is_in_group("enemy") and cuerpo.has_method("recibir_dano")):
 				print(cuerpo)
 				cuerpo.recibir_dano(danioBala)
-	await get_tree().create_timer(0.5).timeout
-	eliminarBala()
+	tiempo.start()
 
 #-----------------------------------------------------------------------------comun y explosiva
 func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
@@ -107,3 +108,8 @@ func _on_body_entered(body: Node3D) -> void:
 		if body.has_method("recibir_dano"):
 			body.recibir_dano(danioBala)
 			queue_free()
+
+
+func _on_captar_explosion_timeout() -> void:
+	eliminarBala()
+	pass # Replace with function body.
