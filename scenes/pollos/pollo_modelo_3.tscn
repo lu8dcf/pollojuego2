@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://b1g7cfaakwfds"]
 
-[ext_resource type="PackedScene" path="res://assets/modelos/pollos/pollo_3.fbx" id="1_2mipi"]
+[ext_resource type="PackedScene" uid="uid://dopi3yg8e6alj" path="res://assets/modelos/pollos/pollo_3.fbx" id="1_2mipi"]
 
 [node name="pollo_3" unique_id=1607541757 instance=ExtResource("1_2mipi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
-[node name="Skeleton3D" parent="esqueleto de pollo1" parent_id_path=PackedInt32Array(1626135284) index="0" unique_id=1958948748]
+[node name="Skeleton3D" parent="esqueleto de pollo1" parent_id_path=PackedInt32Array(1830276179) index="0" unique_id=525730129]
 bones/0/rotation = Quaternion(0.50000006, -0.49999994, -0.5, 0.5)
 bones/1/position = Vector3(7.105427e-17, -1.14699326e-10, -0.0015378322)
 bones/1/rotation = Quaternion(0.95248675, 0.30457994, 1.2114262e-07, 1.0106224e-07)

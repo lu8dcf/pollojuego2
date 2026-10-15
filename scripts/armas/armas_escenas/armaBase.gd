@@ -32,12 +32,14 @@ func _ready() -> void:
 	#ahora como es una packescene solo lo añado de hijo
 	if(datos.sprite != null):
 		add_child(datos.sprite.instantiate())
+	
+	jugadorPadre = GlobalJuego._obtener_jugador(multiplayer.get_unique_id())
+	
 		
 
 
 func _physics_process(delta):
 	global_position = get_parent().global_position
-
 	if objetivo != null and is_instance_valid(objetivo):
 		mirarObjetivo(delta)
 
@@ -120,8 +122,8 @@ func disparo():
 	
 	
 	#jugadorPadre = GlobalJuego._obtener_jugador(multiplayer.get_unique_id())
-	#if jugadorPadre == null or not jugadorPadre.puede_disparar():
-		#return
+	if jugadorPadre == null or not jugadorPadre.puede_disparar():
+		return
 
 	if multiplayer.is_server():
 		## Si este ArmaBase está en el servidor,

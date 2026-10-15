@@ -24,7 +24,7 @@ var joystick: Joystick = null
 @onready var timer_caido: Timer = $timer_caido
 @onready var timer_salvar: Timer = $timer_salvar
 
-@onready var barraVida = %barraVida
+@onready var barraVida = $barraVida
 
 var pollo = null
 
@@ -305,6 +305,8 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 			entrar_muerte()
 		Estado.OLEADA:
 			entrar_oleada()
+			pollo.cambiarAnimacion("caminar")
+			pollo.cambiarAnimacion("esqueleto de pollo1|caminar")
 		Estado.TIENDA:
 			entrar_tienda()
 		Estado.DASH:
@@ -599,7 +601,7 @@ func polloSalvado():
 		return
 	cambiar_estado(Estado.OLEADA)
 	#salud = salud_maxima
-	#$barraVida.reiniciar_barra()
+	barraVida.reiniciar_barra()
 	var peer_id := int(name)
 
 	Network.actualizar_salud_jugador(peer_id,salud_maxima,salud_maxima,false)
