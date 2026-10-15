@@ -60,7 +60,8 @@ func solicitar_habilidad() -> void:
 	ejecutar_habilidad.rpc_id(peer_id)
 
 func cambiarAnimacion(animacion: String):
-	nodoAnimacion.play(animacion)
+	if( nodoAnimacion!= null && nodoAnimacion.has_animation(animacion)):
+		nodoAnimacion.play(animacion)
 
 @rpc("any_peer", "reliable")
 func ejecutar_habilidad() -> void:
