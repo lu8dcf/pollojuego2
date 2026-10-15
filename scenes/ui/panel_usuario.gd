@@ -14,6 +14,30 @@ const COLOR_MEDIO := Color(0.95, 0.85, 0.1)   # amarillo
 const COLOR_BAJO := Color(0.9, 0.15, 0.15)    # rojo
 
 
+func _ready() -> void:
+	if not GlobalSignal.salud_jugador_actualizada.is_connected(_on_salud_jugador_actualizada):
+		GlobalSignal.salud_jugador_actualizada.connect(_on_salud_jugador_actualizada)
+	
+	if not GlobalSignal.datos_pollo_actualizados.is_connected(_on_datos_pollo_actualizados):
+		GlobalSignal.datos_pollo_actualizados.connect(_on_datos_pollo_actualizados)
+
+func _on_salud_jugador_actualizada(id:int,nueva_salud:int,nueva_salud_maxima:int)->void:
+	if id != peer_id: # este panel solamente actualiza al jugador
+		return
+
+	salud_maxima = nueva_salud_maxima
+	actualizar_salud(nueva_salud)
+
+func _on_datos_pollo_actualizados(id: int,nuevo_personaje: int,nueva_salud: int,nueva_salud_maxima: int,_nueva_velocidad: float,_nueva_resistencia: float) -> void:
+	if id != peer_id:
+		return
+	salud_actual = nueva_salud
+	salud_maxima = nueva_salud_maxima
+
+	actualizar_personaje(nuevo_personaje)
+	_actualizar_vida(nueva_salud)
+		
+		
 func configurar(id: int, salud: int, salud_max: int, personaje: int):
 	peer_id = id
 	salud_actual = salud

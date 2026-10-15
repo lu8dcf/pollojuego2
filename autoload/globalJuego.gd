@@ -56,15 +56,19 @@ func _configurar_sesion():
 	var nombre_temp = "Jugador"
 	if GlobalJuego.nombre_jugador != "":
 		nombre_temp = GlobalJuego.nombre_jugador
-	
+	# PRIMERA CONFIGURACION DE SESSION INFO
 	session_info[1] = {
 		"score": 0,
 		"username": nombre_temp,
 		"salud": SALUD_DEFAULT,
-		"personaje":0,
-		"ping":0,
-		"inventario":[],
-		"armas_actuales":[]
+		"salud_maxima": SALUD_DEFAULT,
+		"velocidad": 5.0,
+		"resistencia": 0.0,
+		"personaje": 0,
+		"estado": Jugador.Estado.OLEADA,
+		"ping": 0,
+		"inventario": [],
+		"armas_actuales": []
 	}
 	#  veerificar que el peer esté listo antes de hacer RPC
 	if multiplayer.multiplayer_peer == null:
@@ -81,20 +85,23 @@ func _agregar_jugador(peer_id: int):
 	if jugador:
 		session_info[peer_id] = {
 			"score": 0,
-			"username": jugador.nameplate.text if jugador.nameplate else "Jugador " + str(peer_id),
+			"username": jugador.nameplate.text ,
 			"salud": SALUD_DEFAULT,
-			"personaje":0,
-			"ping":0,
-			"inventario":[],
-			"armas_actuales":[]
+			"salud_maxima": SALUD_DEFAULT,
+			"velocidad": 5.0,
+			"resistencia": 0.0,
+			"personaje": 0,
+			"estado": Jugador.Estado.OLEADA,
+			"ping": 0,
+			"inventario": [],
+			"armas_actuales": []
 		}
 		_replicar_session_info.rpc(session_info)
 		
-		# Emitir señal global de jugador conectado
+		# SE EMITE LA señal global de jugador conectado
 		GlobalSignal.jugador_conectado.emit(peer_id)
 
 func _eliminar_jugador(peer_id: int):
-	"""Elimina un jugador de la sesión"""
 	if session_info.has(peer_id):
 		session_info.erase(peer_id)
 		_replicar_session_info.rpc(session_info)
@@ -175,21 +182,20 @@ func _replicar_session_info(info: Dictionary):
 
 # ===== FUNCIONES PARA SINGLEPLAYER =====
 func configurar_singleplayer():
-	var nombre_temp = "Jugador Solo"
-	if GlobalJuego.nombre_jugador != "":
-		nombre_temp = GlobalJuego.nombre_jugador
-	
 	session_info.clear()
 	session_info[1] = {
 		"score": 0,
-		"username": nombre_temp,
+		"username": nombre_jugador,
 		"salud": SALUD_DEFAULT,
-		"personaje":0,
-		"ping":0,
-		"inventario":[],
-		"armas_actuales":[]
+		"salud_maxima": SALUD_DEFAULT,
+		"velocidad": 5.0,
+		"resistencia": 0.0,
+		"personaje": 0,
+		"estado": Jugador.Estado.OLEADA,
+		"ping": 0,
+		"inventario": [],
+		"armas_actuales": []
 	}
 	
-	# Emitir señal global
 	GlobalSignal.sesion_actualizada.emit(session_info)
 	

@@ -66,7 +66,7 @@ func _enter_tree() -> void:
 
 @rpc("authority", "call_local", "reliable")
 func crear_pollo_en_red(tipo_elegido: int) -> void:
-	var tipo_pollo_enum :PolloFactory.TipoPollo = tipo_elegido +1
+	var tipo_pollo_enum :PolloFactory.TipoPollo = tipo_elegido 
 	
 	#como es funcion static, puedo acceder a los datos que necesito
 	var datos_pollo = PolloFactory.obtener_datos(tipo_pollo_enum) 
@@ -77,6 +77,17 @@ func crear_pollo_en_red(tipo_elegido: int) -> void:
 		self.salud = self.salud_maxima
 		self.velocidad = datos_pollo.get("velocidad")
 		self.resistencia = datos_pollo.get("resistencia")
+	
+	var peer_id := int(name)
+	if GlobalJuego.un_jugador or multiplayer.is_server():
+		Network.registrar_datos_pollos(
+			peer_id,
+			tipo_elegido,
+			salud,
+			salud_maxima,
+			velocidad,
+			resistencia
+		)
 	#saco nodos viejos
 	for child in get_children():
 		if child is Pollo:
@@ -456,34 +467,64 @@ func _on_timer_salvar_timeout() -> void:
 #--------------------------------------------------------------------------DANIO
 
 func recibir_dano(dano: int):
-	if not multiplayer.is_server():
+	# solamente el host aplica daño.
+	if not GlobalJuego.un_jugador and not multiplayer.is_server():
 		return
-	if(puede_recibir_danio()):
-		var vida_actual = salud - dano
-		#flash_rojo.rpc(get_multiplayer_authority())  # aviso a todos que brille
-		if vida_actual <= 0:
-			cambiar_estado(Estado.CAIDO)
-		salud = vida_actual
-		sincronizar_salud_y_efecto.rpc(salud)
+	if not puede_recibir_danio():
+		return
 
-@rpc("any_peer", "call_local", "reliable")		
-func sincronizar_salud_y_efecto(nueva_salud: int):
-	#actualizo vida salud
+	if dano <= 0:
+		return
+
+	var nueva_salud = max(salud - dano,	0)
+
+	var peer_id := int(name)
+
+	Network.actualizar_salud_jugador(peer_id,nueva_salud,salud_maxima,true)
+
+	if nueva_salud <= 0:
+		cambiar_estado(Estado.CAIDO)
+
+
+
+func aplicar_salud_local(nueva_salud: int,nueva_salud_maxima: int,mostrar_efecto: bool) -> void:
 	salud = nueva_salud
-	
-	#flash rojo
-	if has_node("pollo"): 
+	salud_maxima = nueva_salud_maxima
+
+	if mostrar_efecto and is_instance_valid(pollo):
 		pollo.flash_rojo()
-		
-	#paso el porcentaje a l abarra para que baje
-	var porcentaje = float(nueva_salud) / salud_maxima
-	$barraVida.bajarVida(porcentaje)
-	
-	# Esto es para que se vea SOLO la barra propia
-	if is_multiplayer_authority():
-		$barraVida.visible = true
-	else:
-		$barraVida.visible = false
+
+	var porcentaje := 0.0
+
+	if salud_maxima > 0:
+		porcentaje = float(salud) / float(salud_maxima)
+
+	if has_node("barraVida"):
+		$barraVida.bajarVida(porcentaje)
+
+		# esta barra solamente se muestra al propietario.
+		$barraVida.visible = \
+			GlobalJuego.un_jugador \
+			or is_multiplayer_authority()
+
+#@rpc("any_peer", "call_local", "reliable")		
+#func sincronizar_salud_y_efecto(nueva_salud: int):
+	##actualizo vida salud
+	#salud = nueva_salud
+	#
+	##flash rojo
+	#if has_node("pollo"): 
+		#pollo.flash_rojo()
+		#
+	##paso el porcentaje a l abarra para que baje
+	#var porcentaje = float(nueva_salud) / salud_maxima
+	#$barraVida.bajarVida(porcentaje)
+	#
+	## Esto es para que se vea SOLO la barra propia
+	#if is_multiplayer_authority():
+		#$barraVida.visible = true
+	#else:
+		#$barraVida.visible = false
 
 #------------------------------------------------------------------------SERVIDOR
 
@@ -544,7 +585,11 @@ func morir():
 func polloSalvado():
 	if( timer_caido):
 		timer_caido.stop()
-	if multiplayer.is_server() or is_multiplayer_authority():
-		cambiar_estado(Estado.OLEADA)
-	salud = salud_maxima
-	$barraVida.reiniciar_barra()
+	if not GlobalJuego.un_jugador and not multiplayer.is_server():
+		return
+	cambiar_estado(Estado.OLEADA)
+	#salud = salud_maxima
+	#$barraVida.reiniciar_barra()
+	var peer_id := int(name)
+
+	Network.actualizar_salud_jugador(peer_id,salud_maxima,salud_maxima,false)

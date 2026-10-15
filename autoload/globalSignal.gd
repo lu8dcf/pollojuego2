@@ -79,12 +79,20 @@ signal objeto_eliminado(slot: int)
 
 # ===== SEÑALES DE SALUD =====
 @warning_ignore("unused_signal")
-signal salud_jugador_cambiada(nueva_salud: int)
-@warning_ignore("unused_signal")
 signal jugador_recibio_daño(peer_id: int, cantidad: int)
 @warning_ignore("unused_signal")
 signal jugador_muerto()
-
+@warning_ignore("unused_signal")
+signal salud_jugador_actualizada(peer_id: int,salud: int,salud_maxima: int)
+@warning_ignore("unused_signal") # se reciben datos completos de los pollos
+signal datos_pollo_actualizados(
+	peer_id: int,
+	personaje: int,
+	salud: int,
+	salud_maxima: int,
+	velocidad: float,
+	resistencia: float
+)
 # ===== SEÑALES DE EXPERIENCIA =====
 @warning_ignore("unused_signal")
 signal experiencia_jugador_cambiada(nueva_experiencia: int)

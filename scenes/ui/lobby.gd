@@ -573,7 +573,7 @@ func _on_chat_enviar_pressed()->void:
 	# mandamos por rpc (el host lo reemite a todos)
 	Network._enviar_mensaje_chat.rpc(texto)
 
-func _recibir_mensaje_chat(nombre: String, texto: String, es_sistema: bool) -> void:
+func _recibir_mensaje_chat(id:int,emisor_nombre:String, texto: String, es_sistema: bool) -> void:
 	if not chat_historial:
 		return
 	var color_nombre = "#ffd166"  # amarillo para host
@@ -582,10 +582,10 @@ func _recibir_mensaje_chat(nombre: String, texto: String, es_sistema: bool) -> v
 	if es_sistema:
 		color_nombre = "#ff5555" # rojo para avisos
 		color_texto = "#ff8888"
-	elif nombre =="HOST":
+	elif id ==1:
 		color_nombre = "#ffd166"
 	chat_historial.append_text("[color=%s]%s:[/color] [color=%s]%s[/color]\n" % [
-		color_nombre, nombre, color_texto, texto
+		color_nombre, emisor_nombre, color_texto, texto
 	])
 
 

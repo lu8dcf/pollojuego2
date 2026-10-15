@@ -847,6 +847,143 @@ func _exit_tree() -> void:
 
 #----------------------------------------------------- Interacciones Jugador
 
+# al crear al pollo, se guardan los datos nuevos
+func registrar_datos_pollos(peer_id:int, id_personaje:int,nueva_salud:int, nueva_salud_maxima:int,nueva_velocidad:float,nueva_resistencia:float)->void:
+	# solo el host debe saber lo de todos y los demas solo actualizan
+	if not GlobalJuego.un_jugador and not multiplayer.is_server():
+		return
+	var datos: Dictionary = GlobalJuego.session_info[peer_id]
+
+	datos["personaje"] = id_personaje
+	datos["salud"] = nueva_salud
+	datos["salud_maxima"] = nueva_salud_maxima
+	datos["velocidad"] = nueva_velocidad
+	datos["resistencia"] = nueva_resistencia
+	datos["estado"] = Jugador.Estado.OLEADA
+
+	GlobalJuego.session_info[peer_id] = datos
+
+	if GlobalJuego.un_jugador:
+		_aplicar_datos_pollo_localmente(
+			peer_id,
+			id_personaje,
+			nueva_salud,
+			nueva_salud_maxima,
+			nueva_velocidad,
+			nueva_resistencia
+		)
+	else:
+		replicar_datos_pollo.rpc(
+			peer_id,
+			id_personaje,
+			nueva_salud,
+			nueva_salud_maxima,
+			nueva_velocidad,
+			nueva_resistencia
+		)
+
+@rpc("authority","call_local","reliable")
+func replicar_datos_pollo(peer_id: int,	id_personaje: int,	nueva_salud: int,nueva_salud_maxima: int,nueva_velocidad: float,nueva_resistencia: float) -> void:
+	_aplicar_datos_pollo_localmente(
+		peer_id,
+		id_personaje,
+		nueva_salud,
+		nueva_salud_maxima,
+		nueva_velocidad,
+		nueva_resistencia
+	)
+
+func _aplicar_datos_pollo_localmente(peer_id: int,	id_personaje: int,	nueva_salud: int,nueva_salud_maxima: int,nueva_velocidad: float,nueva_resistencia: float) -> void:
+	if not GlobalJuego.session_info.has(peer_id):
+		GlobalJuego.session_info[peer_id] = {}
+
+	GlobalJuego.session_info[peer_id]["personaje"] = id_personaje
+	GlobalJuego.session_info[peer_id]["salud"] = nueva_salud
+	GlobalJuego.session_info[peer_id]["salud_maxima"] = \
+		nueva_salud_maxima
+	GlobalJuego.session_info[peer_id]["velocidad"] = \
+		nueva_velocidad
+	GlobalJuego.session_info[peer_id]["resistencia"] = \
+		nueva_resistencia
+
+	GlobalSignal.datos_pollo_actualizados.emit(
+		peer_id,
+		id_personaje,
+		nueva_salud,
+		nueva_salud_maxima,
+		nueva_velocidad,
+		nueva_resistencia
+	)
+
+	GlobalSignal.sesion_actualizada.emit(
+		GlobalJuego.session_info
+	)
+
+func actualizar_salud_jugador(peer_id:int, nueva_salud:int,nueva_salud_maxima:int,mostrar_efecto:bool=false)->void:
+	if not GlobalJuego.un_jugador and not multiplayer.is_server():
+		return
+	if not GlobalJuego.session_info.has(peer_id):
+		push_warning(
+			"No existe el jugador %d en session_info"
+			% peer_id
+		)
+		return
+
+	nueva_salud = clampi(
+		nueva_salud,
+		0,
+		nueva_salud_maxima
+	)
+
+	if GlobalJuego.un_jugador:
+		_aplicar_salud_localmente(
+			peer_id,
+			nueva_salud,
+			nueva_salud_maxima,
+			mostrar_efecto
+		)
+	else:
+		replicar_salud_jugador.rpc(
+			peer_id,
+			nueva_salud,
+			nueva_salud_maxima,
+			mostrar_efecto
+		)
+
+@rpc("authority", "call_local", "reliable")
+func replicar_salud_jugador(peer_id: int,nueva_salud: int,nueva_salud_maxima: int,mostrar_efecto: bool) -> void:
+	_aplicar_salud_localmente(
+		peer_id,
+		nueva_salud,
+		nueva_salud_maxima,
+		mostrar_efecto
+	)
+
+func _aplicar_salud_localmente(peer_id: int,nueva_salud: int,nueva_salud_maxima: int,mostrar_efecto: bool) -> void:
+	if not GlobalJuego.session_info.has(peer_id):
+		GlobalJuego.session_info[peer_id] = {}
+
+	GlobalJuego.session_info[peer_id]["salud"] = \
+		nueva_salud
+
+	GlobalJuego.session_info[peer_id]["salud_maxima"] = \
+		nueva_salud_maxima
+
+	var jugador := GlobalJuego._obtener_jugador(peer_id)
+
+	if jugador != null:
+		jugador.aplicar_salud_local(
+			nueva_salud,
+			nueva_salud_maxima,
+			mostrar_efecto
+		)
+
+	GlobalSignal.salud_jugador_actualizada.emit(
+		peer_id,
+		nueva_salud,
+		nueva_salud_maxima
+	)
+
 @rpc("any_peer", "reliable") #falta aca un call_local?
 func pedir_salvar_rpc(objetivo_id: int) -> void:
 	if not multiplayer.is_server():
@@ -925,20 +1062,23 @@ func _enviar_mensaje_chat(texto:String) ->void:
 	# si no estamos en el lobby, ignorar
 	if not en_lobby:
 		return
+	var emisor_nombre = "Anonimo"
 	#averiguar quien envio el msj
 	var emisor_id := multiplayer.get_remote_sender_id()
 	if emisor_id == 0:
 		emisor_id = multiplayer.get_unique_id()
+	if GlobalJuego.session_info.has(emisor_id):
+		emisor_nombre = GlobalJuego.session_info[emisor_id]["username"]
 	
 	
-	_replicar_mensaje_chat(emisor_id,texto,false)
+	_replicar_mensaje_chat(emisor_id,emisor_nombre,texto,false)
 	
 	
 @rpc("authority","call_local","reliable")
-func _replicar_mensaje_chat(peer_id:int,texto:String,es_sistema:bool)->void:
+func _replicar_mensaje_chat(peer_id:int,emisor_nombre:String,texto:String,es_sistema:bool)->void:
 	var lobby = get_tree().get_first_node_in_group("lobby")
 	if lobby and lobby.has_method("_recibir_mensaje_chat"):
-		lobby._recibir_mensaje_chat(peer_id,texto,es_sistema)
+		lobby._recibir_mensaje_chat(peer_id,emisor_nombre,texto,es_sistema)
 
 # funcion para mandar msj de sistema, no es un rpc porque el host lo llama directo y este se repkica
 # helper para mensajes del sistema (avisos del host).
@@ -947,7 +1087,7 @@ func _replicar_mensaje_chat(peer_id:int,texto:String,es_sistema:bool)->void:
 func host_mensaje_sistema(texto:String)->void:
 	if not multiplayer.is_server():
 		return
-	_replicar_mensaje_chat(0,texto,true)
+	_replicar_mensaje_chat(0,"",texto,true)
 
 	
 	
