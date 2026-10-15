@@ -169,14 +169,7 @@ func _on_empezar_un_jugador() -> void:
 	await get_tree().process_frame
 	
 	
-	_crear_jugador_local(nuevo_mundo)
 	hide()
-
-func _crear_jugador_local(mundo_instancia: Node3D) -> void:
-	var jugador = PLAYER.instantiate()
-	jugador.name = "1"
-	mundo_instancia.add_child(jugador)
-	jugador.global_position = Vector3(22, 2, 22)
 
 func _crear_mundo_un_jugador():
 	var nuevo_mundo = MUNDO.instantiate()
@@ -184,7 +177,6 @@ func _crear_mundo_un_jugador():
 	await get_tree().process_frame
 	
 	
-	_crear_jugador_local(nuevo_mundo)
 	_limpiar_lobby()
 
 # ------------------------------------------------------------

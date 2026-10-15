@@ -61,7 +61,7 @@ func _configurar_sesion():
 		"score": 0,
 		"username": nombre_temp,
 		"salud": SALUD_DEFAULT,
-		"personaje":1,
+		"personaje":0,
 		"ping":0,
 		"inventario":[],
 		"armas_actuales":[]
@@ -83,7 +83,7 @@ func _agregar_jugador(peer_id: int):
 			"score": 0,
 			"username": jugador.nameplate.text if jugador.nameplate else "Jugador " + str(peer_id),
 			"salud": SALUD_DEFAULT,
-			"personaje":1,
+			"personaje":0,
 			"ping":0,
 			"inventario":[],
 			"armas_actuales":[]
@@ -184,7 +184,7 @@ func configurar_singleplayer():
 		"score": 0,
 		"username": nombre_temp,
 		"salud": SALUD_DEFAULT,
-		"personaje":1,
+		"personaje":0,
 		"ping":0,
 		"inventario":[],
 		"armas_actuales":[]

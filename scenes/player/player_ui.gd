@@ -76,6 +76,8 @@ func _ready() -> void:
 	multiplayer.peer_disconnected.connect(_on_jugador_desconectado)
 	multiplayer.server_disconnected.connect(_on_server_desconectado)
 	#var es_host = multiplayer.is_server()
+	for i in GlobalJuego.session_info:
+		print("i: ",i, "Global: ", GlobalJuego.session_info[i])
 	
 	if GlobalSignal.has_signal("pausa_cambiada"):
 		GlobalSignal.pausa_cambiada.connect(_on_pausa_cambiada)
@@ -89,12 +91,6 @@ func _ready() -> void:
 		new_texture.gradient = gradient	
 
 	
-	#salud perosanje
-	barra_salud.max_value = GlobalJuego.salud_maxima
-	barra_salud.value = GlobalJuego.salud_jugador
-	# señales de salud
-	GlobalSignal.salud_jugador_cambiada.connect(_actualizar_barra_salud)
-	GlobalSignal.sesion_actualizada.connect(_actualizar_info_sesion)
 	GlobalSignal.jugador_recibio_daño.connect(_mostrar_daño)
 	#experiencia  perosanje
 	barra_experiencia.max_value = GlobalJuego.experiencia_maxima
@@ -111,11 +107,7 @@ func _ready() -> void:
 	GlobalSignal.mi_ping_actualizado.connect(_actualizar_mi_ping)
 	_actualizar_mi_ping(0)
 	
-	# Y para cuando la salud cambia:
-	if GlobalSignal.has_signal("salud_jugador_cambiada"):
-		GlobalSignal.salud_jugador_cambiada.connect(_on_salud_jugador_cambiada)
 	
-	_actualizar_barra_salud(GlobalJuego.salud_jugador)
 	
 	_verificar_si_es_mobile()
 	await get_tree().create_timer(0.5).timeout
@@ -172,7 +164,7 @@ func _actualizar_paneles_aliados(info:Dictionary)-> void:
 		var player_info = info[peer_id]
 		var nombre = player_info.get("username", "Jugador " + str(peer_id))
 		var salud = player_info.get("salud", GlobalJuego.SALUD_DEFAULT)
-		var personaje = player_info.get("personaje", 1)
+		var personaje = player_info.get("personaje", 0)
 		
 		if paneles_usuarios.has(peer_id): # si ya existe el usuario en los panelees, solo lo actualiza
 			var panel = paneles_usuarios[peer_id]
@@ -208,27 +200,10 @@ func _eliminar_panel_aliado0(peer_id) -> void:
 	paneles_usuarios.erase(peer_id) # seelimina el aliado que se desconecto
 
 
-func _actualizar_barra_salud(nueva_salud: int):
-	barra_salud.value = nueva_salud
-	etiqueta_salud.text = str(nueva_salud) + " / " + str(barra_salud.max_value)
-	
-	# cambiar color según la salud
-	if nueva_salud > barra_salud.max_value * 0.5:
-		barra_salud.modulate = Color.GREEN
-	elif nueva_salud > barra_salud.max_value * 0.25:
-		barra_salud.modulate = Color.YELLOW
-	else:
-		barra_salud.modulate = Color.RED
 
 func _actualizar_experiencia(nueva_exp:int):
 	barra_experiencia.value = nueva_exp
 
-func _actualizar_info_sesion(info: Dictionary):
-	var jugador_local_id = multiplayer.get_unique_id()
-	
-	if info.has(jugador_local_id):
-		var mi_info = info[jugador_local_id]
-		_actualizar_barra_salud(mi_info["salud"])
 
 func _mostrar_daño(peer_id: int, cantidad: int):
 	if peer_id == multiplayer.get_unique_id():

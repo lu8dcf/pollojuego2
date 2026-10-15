@@ -363,7 +363,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_qr633")
 }],
 "loop": 1,
-"name": &"idle1",
+"name": &"idle0",
 "speed": 5.0
 }, {
 "frames": [{
@@ -401,7 +401,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_rra44")
 }],
 "loop": 1,
-"name": &"idle2",
+"name": &"idle1",
 "speed": 5.0
 }, {
 "frames": [{
@@ -439,7 +439,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_y0olt")
 }],
 "loop": 1,
-"name": &"idle3",
+"name": &"idle2",
 "speed": 5.0
 }, {
 "frames": [{
@@ -477,7 +477,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_u5pqc")
 }],
 "loop": 1,
-"name": &"idle4",
+"name": &"idle3",
 "speed": 5.0
 }, {
 "frames": [{
@@ -515,7 +515,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_hs3hu")
 }],
 "loop": 1,
-"name": &"idle5",
+"name": &"idle4",
 "speed": 5.0
 }, {
 "frames": [{
@@ -553,7 +553,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_wk5t0")
 }],
 "loop": 1,
-"name": &"idle6",
+"name": &"idle5",
 "speed": 5.0
 }]
 
@@ -671,7 +671,7 @@ unique_name_in_owner = true
 position = Vector2(89, 38)
 scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_0rl2u")
-animation = &"idle6"
+animation = &"idle5"
 
 [node name="SpriteArma" type="AnimatedSprite2D" parent="ContenedorPersonaje" unique_id=1574071833]
 unique_name_in_owner = true

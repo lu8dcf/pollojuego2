@@ -265,7 +265,7 @@ func _solicitar_info_jugador():
 	if mi_info.is_empty():
 		mi_info = {
 			"username": GlobalJuego.nombre_jugador,
-			"personaje": 1,
+			"personaje": 0,
 			"listo": false,
 			"score": 0,
 			"salud": GlobalJuego.SALUD_DEFAULT,
@@ -478,19 +478,34 @@ func crear_jugador_en_mundo(mundo: Node, peer_id: int, username: String, posicio
 	jugador.position = posicion
 	jugador.set_multiplayer_authority(peer_id)
 	
+	if GlobalJuego.un_jugador:
+		jugador.set_multiplayer_authority(1)
+	else:
+		jugador.set_multiplayer_authority(peer_id)
+
 	mundo.add_child(jugador, true)
-	
 	
 	var nameplate = jugador.get_node_or_null("Nameplate") # aca se configura el nombre
 	if nameplate:
 		nameplate.text = username
 	
 	if jugador.has_method("crear_pollo_en_red"):
-		jugador.crear_pollo_en_red(id_pollo)
-		print("se crea el pollo en red: ", id_pollo)
-	else:
-		push_warning("el jugador no tiene crear_pollo_en_red()")
+		if GlobalJuego.un_jugador:
+			# Llamada local, sin RPC.
+			jugador.crear_pollo_en_red(id_pollo)
+		else:
+			# Conservá acá el mecanismo que ya te funciona
+			# correctamente en multijugador.
+			jugador.crear_pollo_en_red(id_pollo)
 
+		print(
+			"Se solicitó crear el pollo ",
+			id_pollo,
+			" para el jugador ",
+			jugador.name
+		)
+	else:
+		push_warning("El jugador no tiene crear_pollo_en_red()")
 	
 	
 func obtener_mundo_actual() -> Node:
@@ -762,7 +777,6 @@ func _comprobar_todos_listos() -> void:
 			break
 	
 	if todos_listos:
-		print("¡TODOS LISTOS! Arrancando partida...")
 		# Dar la orden de arrancar a todos
 		_arrancar_partida_rpc.rpc()
 		
@@ -771,7 +785,6 @@ func _comprobar_todos_listos() -> void:
 # ------------------------------------------------------------
 @rpc("authority", "call_local", "reliable")
 func _actualizar_estado_carga_rpc(peer_id: int) -> void:
-	"""Todos los clientes actualizan su pantalla de carga"""
 	if pantalla_carga_actual and is_instance_valid(pantalla_carga_actual):
 		pantalla_carga_actual.marcar_jugador_listo(peer_id)
 
@@ -792,11 +805,10 @@ func _arrancar_partida_rpc() -> void:
 		
 @rpc("any_peer","call_local", "reliable")
 func _jugador_listo_rpc(peer_id: int) -> void:
-	"""El host recibe el aviso de que un cliente terminó de cargar"""
 	if not multiplayer.is_server():
 		return
 	
-	print("Host recibió: jugador ", peer_id, " está listo")
+	#print("Host recibió: jugador ", peer_id, " está listo")
 	_marcar_jugador_listo(peer_id)
 
 @rpc("authority", "call_local", "reliable")
@@ -824,7 +836,7 @@ func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3,id_po
 		
 @rpc("authority","call_local","reliable")
 func _replicar_semilla(semilla:int)->void:
-	print("la semialla es: ", semilla)
+	#print("la semialla es: ", semilla)
 	GlobalJuego.semilla_mapa = semilla
 
 func _exit_tree() -> void:

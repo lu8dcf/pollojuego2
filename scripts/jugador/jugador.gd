@@ -54,16 +54,19 @@ func _enter_tree() -> void:
 	if GlobalJuego.un_jugador:
 		set_multiplayer_authority(1)
 		return
-	else:
-		var id = int(name)
-		if id <= 0:
-			id = 1
-		set_multiplayer_authority(id)
+
+	var id := int(name)
+
+	if id <= 0:
+		id = 1
+
+	set_multiplayer_authority(id)
+
 
 
 @rpc("authority", "call_local", "reliable")
 func crear_pollo_en_red(tipo_elegido: int) -> void:
-	var tipo_pollo_enum :PolloFactory.TipoPollo = tipo_elegido
+	var tipo_pollo_enum :PolloFactory.TipoPollo = tipo_elegido +1
 	
 	#como es funcion static, puedo acceder a los datos que necesito
 	var datos_pollo = PolloFactory.obtener_datos(tipo_pollo_enum) 
@@ -74,29 +77,33 @@ func crear_pollo_en_red(tipo_elegido: int) -> void:
 		self.salud = self.salud_maxima
 		self.velocidad = datos_pollo.get("velocidad")
 		self.resistencia = datos_pollo.get("resistencia")
-	print("El pollo elegido que llega a jugador.gd es: ", tipo_elegido, "y el enum es: ", tipo_pollo_enum)
 	#saco nodos viejos
 	for child in get_children():
 		if child is Pollo:
 			child.queue_free()
 
 	#instancio el nodo pollo (visual y habilidad)
-	pollo = PolloFactory.crear(tipo_pollo_enum, self)
-	
-	if pollo == null:
-		push_warning("PolloFactory.crear devolvio null para tipo: %d" % tipo_elegido)
+	var pollo_nuevo := PolloFactory.crear(tipo_pollo_enum, self)
+
+	if pollo_nuevo == null:
 		return
-	
-	# le asigno la autoridad
-	add_child(pollo)
-	pollo.set_multiplayer_authority(get_multiplayer_authority(), true)
-	add_to_group("Jugadores")
+
+	pollo_nuevo.name = "Pollo"
+
+	if GlobalJuego.un_jugador:
+		pollo_nuevo.set_multiplayer_authority(1, true)
+	else:
+		pollo_nuevo.set_multiplayer_authority(
+			get_multiplayer_authority(),
+			true
+		)
+
+	add_child(pollo_nuevo, true)
+	pollo = pollo_nuevo
+
 
 func _ready() -> void:
-	#if(pollo == null):
-		#pollo = $FabricaPollos.crear($FabricaPollos.TipoPollo.BLANCO, self) #si queres poner otras habilidades: LENTES = dron, MARRON = escudo, BLANCO = dash
-		#add_child(pollo) #eSTO debe recibir ya un nodo pollo elegido
-		#pollo.set_multiplayer_authority(get_multiplayer_authority(), true) #para que el pollo tenga el mismo nivel de auoridad que el padre
+	
 	add_to_group("Jugadores")
 	nameplate.text = name
 	player_ui.hide()

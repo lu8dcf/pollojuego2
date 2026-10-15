@@ -16,9 +16,9 @@ extends Panel
 # personaje
 @onready var sprite_personaje: AnimatedSprite2D = %SpritePersonaje
 @onready var h_box_habilidades_personaje: HBoxContainer = %HBoxHabilidadesPersonaje
-var id_personaje:int=1
-var cant_personajes:int = 6
-var indice_personaje :int = 1
+var id_personaje:int=0
+var cant_personajes:int = 5
+var indice_personaje :int = 0
 var peer_id: int = 0
 
 #armas
@@ -30,12 +30,12 @@ var indice_arma :int = 1
 
 # cada perosnjae tiene vida, ataque y defensa, 0 = nada, y 3 al maximo
 var personajes : Dictionary ={
-	1: [1,1,1],
-	2: [2,3,0],
-	3: [2,0,2],
-	4: [0,3,1],
-	5: [2,0,1],
-	6: [0,0,2],
+	0: [1,1,1],
+	1: [2,3,0],
+	2: [2,0,2],
+	3: [0,3,1],
+	4: [2,0,1],
+	5: [0,0,2],
 	
 }
 @onready var vida: TextureRect = $HabilidadesPersonaje/HBoxHabilidadesPersonaje/Vida
@@ -56,12 +56,12 @@ var armas : Dictionary ={
 # nombre del arma o del perosanje
 @onready var nombre_personaje_arma: Label = %NombrePersonajeArma
 var nombres_personajes:Dictionary={
-	1:"arturo",
-	2:"zuly",
-	3:"ricardo",
-	4:"violeta",
-	5:"patroclo",
-	6:"walter"
+	0:"arturo",
+	1:"zuly",
+	2:"ricardo",
+	3:"violeta",
+	4:"patroclo",
+	5:"walter"
 }
 
 var nombres_armas:Dictionary={
@@ -81,7 +81,7 @@ var es_mi_panel: bool = false
 
 func _ready() -> void:
 	$".".hide() # lo oculto apra que cargue perfecto de 0
-	sprite_personaje.play("idle1")
+	sprite_personaje.play("idle0")
 	_actualizar_habilidades(indice_personaje)
 	_actualizar_nombre(indice_arma)
 	nombre_personaje_arma.text="arturo"
@@ -173,8 +173,8 @@ func cambiar_personaje_arma(direccion:int):
 	if sprite_personaje.visible:
 		id_personaje += direccion
 		if id_personaje > cant_personajes:
-			id_personaje = 1
-		elif id_personaje < 1:
+			id_personaje = 0
+		elif id_personaje < 0:
 			id_personaje = cant_personajes
 		_reproducir_personaje(id_personaje)
 		_actualizar_habilidades(id_personaje)
@@ -202,8 +202,6 @@ func cambiar_personaje_arma(direccion:int):
 
 
 func _reproducir_personaje(id):
-	if id==0:
-		return
 	if sprite_personaje.visible:
 		sprite_personaje.play("idle" + str(id))
 			
@@ -269,7 +267,7 @@ func _aplicar_opacidad(texture_rect: TextureRect, nivel: int) -> void:
 		3: texture_rect.modulate.a = 1.0    # Totalmente visible
 		_: texture_rect.modulate.a = 0.15
 
-func actualizar_info(id: int, nombre_jugador: String,personaje: int = 1):
+func actualizar_info(id: int, nombre_jugador: String,personaje: int = 0):
 	peer_id = id
 	nombre = nombre_jugador
 	id_personaje = personaje

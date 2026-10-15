@@ -186,15 +186,6 @@ visible = false
 layout_mode = 2
 horizontal_alignment = 1
 
-[node name="BarraSalud" type="ProgressBar" parent="ArribaCentro/ControlVida" unique_id=1506908608]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 20)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxTexture_nlx67")
-theme_override_styles/fill = SubResource("StyleBoxTexture_g18nd")
-value = 60.84
-show_percentage = false
-
 [node name="BarraExperiencia" type="ProgressBar" parent="ArribaCentro/ControlVida" unique_id=2017376515]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 20)

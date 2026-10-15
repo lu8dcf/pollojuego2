@@ -80,7 +80,7 @@ func _ready() -> void:
 				"score": 0,
 				"username": _obtener_nombre_jugador(),
 				"salud": GlobalJuego.SALUD_DEFAULT,
-				"personaje": 1,
+				"personaje": 0,
 				"ping":0,
 				"inventario":[],
 				"armas_actuales":[]
@@ -123,7 +123,7 @@ func _inicilizar_un_jugador() -> void:
 			"score": 0,
 			"username": _obtener_nombre_jugador(),
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje": 1,
+			"personaje": 0,
 			"ping": 0,
 			"inventario": [],
 			"armas_actuales": []
@@ -217,14 +217,14 @@ func _agregar_jugador_al_lobby(peer_id: int, nombre: String):
 			 peer_id,
 			 nombre,
 			 info_existente.get("listo", false),
-			 info_existente.get("personaje",1)
+			 info_existente.get("personaje",0)
 			)
 			
 			jugadores_en_lobby[peer_id] = {
 				"nombre": nombre,
 				"panel": panel_existente,
 				"listo": info_existente.get("listo", false),
-			 	"personaje":info_existente.get("personaje",1)
+			 	"personaje":info_existente.get("personaje",0)
 			}
 			
 			_actualizar_estado_lobby()
@@ -235,13 +235,13 @@ func _agregar_jugador_al_lobby(peer_id: int, nombre: String):
 	
 	await get_tree().process_frame
 	
-	_actualizar_panel(panel_jugador, peer_id, nombre, false,1)
+	_actualizar_panel(panel_jugador, peer_id, nombre, false,0)
 	
 	jugadores_en_lobby[peer_id] = {
 		"nombre": nombre,
 		"panel": panel_jugador,
 		"listo": false,
-		"personaje":1
+		"personaje":0
 	}
 	
 	_actualizar_estado_lobby()
@@ -253,7 +253,7 @@ func _enviar_mi_info_al_host() :
 	if mi_info.is_empty():
 		mi_info = {
 			"username": _obtener_nombre_jugador(),
-			"personaje": 1,
+			"personaje": 0,
 			"listo": false,
 			"score": 0,
 			"salud": GlobalJuego.SALUD_DEFAULT,
@@ -412,7 +412,6 @@ func seleccionar_pollo(id_pollo:int) ->void:
 		}
 	else:
 		GlobalJuego.session_info[mi_id]["personaje"] = id_pollo
-	print("en seleccionar pollo, pollo elegido: ", id_pollo)
 	if not multiplayer.has_multiplayer_peer():
 		return
 	
@@ -453,7 +452,7 @@ func _verificar_pollos_unicos()->Dictionary:
 	var vistos :={} # id_pollo y peer id que lo eligio, para avisarle
 	var repetidos :=[] # lista de pollos repetidos, id_pollo
 	for peer_id in jugadores_en_lobby.keys():
-		var id_pollo:int = GlobalJuego.session_info.get(peer_id,{}).get("personaje",-1)
+		var id_pollo:int = GlobalJuego.session_info.get(peer_id,{}).get("personaje",0)
 		if  id_pollo<0:
 			continue
 		if vistos.has(id_pollo):
@@ -489,13 +488,13 @@ func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_a
 				panel.actualizar_arma_remoto(id_arma)
 	
 	if not GlobalJuego.session_info.has(peer_id_jugador):
-		if id_personaje==0:
-			id_personaje=1
+		#if id_personaje==0:
+			#id_personaje=1
 		GlobalJuego.session_info[peer_id_jugador] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id_jugador),
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje": (id_personaje-1),
+			"personaje": id_personaje,
 			"ping": 0,
 			"inventario": [id_arma],  # primera arma
 			"armas_actuales":[id_arma,0], # si es cero es que no hay arma en esa mano
@@ -503,7 +502,7 @@ func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_a
 		}
 	else:
 		var info_peer = GlobalJuego.session_info[peer_id_jugador] # obtener la data del usuario
-		info_peer["personaje"] = (id_personaje-1)
+		info_peer["personaje"] = id_personaje
 		
 		# agregar arma al inventario si no está ya
 		var armas_actuales :Array = info_peer.get("armas_actuales",[1,0])
@@ -606,7 +605,7 @@ func _procesar_info_jugador(peer_id: int, info_jugador: Dictionary):
 		return
 	
 	var nombre = info_jugador.get("username", "Jugador " + str(peer_id))
-	var personaje = info_jugador.get("personaje", 1)
+	var personaje = info_jugador.get("personaje", 0)
 	var listo = info_jugador.get("listo", false)
 	var armas_actuales = info_jugador.get("armas_actuales", [1, 0])
 	
@@ -648,7 +647,7 @@ func _responder_info_jugadores(solicitante_id: int):
 		
 		var info_completa = {
 			"username": session_data.get("username", info_lobby.get("nombre", "Jugador " + str(peer_id))),
-			"personaje": session_data.get("personaje", info_lobby.get("personaje", 1)),
+			"personaje": session_data.get("personaje", info_lobby.get("personaje", 0)),
 			"listo": info_lobby.get("listo", false),
 			"score": session_data.get("score", 0),
 			"salud": session_data.get("salud", GlobalJuego.SALUD_DEFAULT),
@@ -692,8 +691,8 @@ func _procesar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int, id
 	
 	# Actualizar session_info
 	if not GlobalJuego.session_info.has(peer_id_jugador):
-		if id_personaje == 0:
-			id_personaje = 1
+		#if id_personaje == 0:
+			#id_personaje = 1
 		GlobalJuego.session_info[peer_id_jugador] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id_jugador),

@@ -166,7 +166,6 @@ func _raise_error(p_code: int, p_message: String):
 func _ready() -> void:
 	
 	if not OS.has_feature("web"):
-		print("no es web")
 		_upnp = TubeUPNP.new()
 	
 	var node_path := NodePath()

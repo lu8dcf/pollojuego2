@@ -92,7 +92,6 @@ func ocultar()->void:
 # ------------------------------------------------------------
 func mostrar_error(mensaje1:String,titulo:String = "Error") -> void:
 	
-	print("se muetra error: ", mensaje1)
 	animated_sprite_2d.visible = false
 	label_cargando.visible = false
 	progreso.visible = false
