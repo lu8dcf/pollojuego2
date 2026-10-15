@@ -10,8 +10,8 @@ class_name Jugador
 const SPEED := 5.0
 const JUMP_VELOCITY := 4.5
 
-var velocidad
-var resistencia
+var velocidad := 5.0
+var resistencia := 0.2
 
 
 var joystick: Joystick = null
@@ -384,13 +384,13 @@ func procesar_movimiento(delta: float) -> void:
 
 	# VELOCIDAD
 	if direction != Vector3.ZERO:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+		velocity.x = direction.x * velocidad
+		velocity.z = direction.z * velocidad
 		if is_multiplayer_authority():
 			pollo.mirar_hacia(direction, delta) #ROTACION POLLO
 	else:
-		velocity.x = move_toward(velocity.x,0,SPEED)
-		velocity.z = move_toward(velocity.z,0,SPEED)
+		velocity.x = move_toward(velocity.x,0,velocidad)
+		velocity.z = move_toward(velocity.z,0,velocidad)
 	
 	if(velocity != Vector3.ZERO):
 		pollo.cambiarAnimacion("esqueleto de pollo1|caminar")
@@ -459,7 +459,8 @@ func recibir_dano(dano: int):
 	if not multiplayer.is_server():
 		return
 	if(puede_recibir_danio()):
-		var vida_actual = salud - dano
+		var danio_mitigado = dano * (1.0 - resistencia)
+		var vida_actual = salud - danio_mitigado
 		#flash_rojo.rpc(get_multiplayer_authority())  # aviso a todos que brille
 		if vida_actual <= 0:
 			cambiar_estado(Estado.CAIDO)
