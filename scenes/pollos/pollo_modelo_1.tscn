@@ -1,11 +1,12 @@
 [gd_scene format=3 uid="uid://6dr1scr4fnwt"]
 
 [ext_resource type="PackedScene" uid="uid://bskyk4ur6lr8m" path="res://assets/modelos/pollos/pollo_1.fbx" id="1_mnqw3"]
+[ext_resource type="AnimationLibrary" uid="uid://ypv5w1ontkhk" path="res://assets/modelos/pollos/animaciones/animaciones_pollos.res" id="2_ghtl4"]
 
 [node name="pollo_1" unique_id=1188442573 instance=ExtResource("1_mnqw3")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
-[node name="Skeleton3D" parent="esqueleto de pollo1" parent_id_path=PackedInt32Array(1613704721) index="0" unique_id=1750762381]
+[node name="Skeleton3D" parent="esqueleto de pollo1" parent_id_path=PackedInt32Array(464516501) index="0" unique_id=575097469]
 bones/0/rotation = Quaternion(0.4999999, 0.5000001, 0.49999994, 0.50000006)
 bones/1/rotation = Quaternion(0.95248675, 0.30457994, 5.59265e-08, -1.7883806e-08)
 bones/3/position = Vector3(0.0020072577, 0.0031390216, -0.0037156206)
@@ -27,3 +28,6 @@ bones/13/rotation = Quaternion(-0.012807288, -0.01280715, 0.70699084, 0.7069907)
 bones/13/scale = Vector3(1, 1, 1)
 bones/15/position = Vector3(0.0037861709, 0.0032923205, 0.0016696778)
 bones/15/rotation = Quaternion(5.421012e-22, 1, 4.5474743e-15, 7.549791e-08)
+
+[node name="AnimationPlayer" parent="." index="1" unique_id=954443067]
+libraries/ = ExtResource("2_ghtl4")
