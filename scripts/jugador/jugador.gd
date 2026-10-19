@@ -45,8 +45,8 @@ var salud_maxima = 100
 var objetivo_actual: Node = null
 
 #DASH
-const DASH_SPEED := 80.0
-const DASH_DURATION := 0.25
+const DASH_SPEED := 40.0
+const DASH_DURATION := 1.33
 var direccion_dash := Vector3.ZERO
 var tiempo_dash := 0.0
 
@@ -305,7 +305,6 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 			entrar_muerte()
 		Estado.OLEADA:
 			entrar_oleada()
-			pollo.cambiarAnimacion("caminar")
 			pollo.cambiarAnimacion("esqueleto de pollo1|caminar")
 		Estado.TIENDA:
 			entrar_tienda()
@@ -314,6 +313,7 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 			pollo.cambiarAnimacion("esqueleto de pollo1|rodar")
 		Estado.AYUDANDO:
 			entrar_ayudando()
+			pollo.cambiarAnimacion("esqueleto de pollo1|volar")
 
 
 
@@ -409,6 +409,8 @@ func procesar_movimiento(delta: float) -> void:
 	
 	if(velocity != Vector3.ZERO):
 		pollo.cambiarAnimacion("esqueleto de pollo1|caminar")
+	else:
+		pollo.detenerAnimacion()
 	move_and_slide()
 
 #------------------------------------------------------------------------PROCESAR
@@ -488,7 +490,7 @@ func recibir_dano(dano: int):
 	if dano <= 0:
 		return
 
-	var nueva_salud = max(salud - dano,	0)
+	var nueva_salud = max(salud - danio_mitigado,	0)
 
 	var peer_id := int(name)
 
@@ -583,6 +585,7 @@ func morir_rpc(jugador_id: int) -> void:
 @rpc("any_peer", "call_local", "reliable")
 func estado_caido_rpc() -> void:
 	timer_caido.start()
+	barraVida.visible = false
 
 func morir():
 	print("jugador ha muerto!")
@@ -594,14 +597,18 @@ func morir():
 	#animacion_muerte()
 	# queue_free()
 #-------------------------------------------------------------------SALVADOO
+
+func actualizar_barra():
+	barraVida.reiniciar_barra()
+	
+
 func polloSalvado():
+	pollo.cambiarAnimacion("esqueleto de pollo1|volar")
 	if( timer_caido):
 		timer_caido.stop()
 	if not GlobalJuego.un_jugador and not multiplayer.is_server():
 		return
 	cambiar_estado(Estado.OLEADA)
 	#salud = salud_maxima
-	barraVida.reiniciar_barra()
 	var peer_id := int(name)
-
 	Network.actualizar_salud_jugador(peer_id,salud_maxima,salud_maxima,false)

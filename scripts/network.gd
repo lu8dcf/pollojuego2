@@ -1018,6 +1018,7 @@ func salvado_rpc(objetivo_id: int) -> void:
 	var objetivo := GlobalJuego._obtener_jugador(objetivo_id)
 	if objetivo == null:
 		return
+	objetivo.actualizar_barra()
 	objetivo.polloSalvado()
 
 # ------------------------------------------------------------

@@ -19,6 +19,8 @@ func bajarVida(porcentaje: float) -> void:
 	if(barraVerde.scale.y > 0):
 		barraVerde.scale.y = porcentaje
 
+func poner_barra_a(porcentaje:float):
+	barraVerde.scale.y = porcentaje
 
 func reiniciar_barra():
-	barraVerde.scale.y = 1
+	barraVerde.scale.y = vidaCompleta

@@ -34,6 +34,9 @@ func _ready():
 		if material is ShaderMaterial:
 			mesh.material_override = material.duplicate()
 	nodoAnimacion = modelo.find_child("AnimationPlayer")
+	#if(nodoAnimacion != null):
+		#var lista  = nodoAnimacion.get_animation_list()
+		#print("animaciones: ", lista)
 
 
 func usar_habilidad() -> void:
@@ -59,10 +62,20 @@ func solicitar_habilidad() -> void:
 	# Ordeno al cliente que la ejecute
 	ejecutar_habilidad.rpc_id(peer_id)
 
-func cambiarAnimacion(animacion: String):
-	if( nodoAnimacion!= null && nodoAnimacion.has_animation(animacion)):
-		nodoAnimacion.play(animacion)
+func detenerAnimacion():
+	if(nodoAnimacion!=null):
+		nodoAnimacion.stop()
 
+func cambiarAnimacion(animacion: String):
+	var otroPollo = "animaciones_pollos/"+animacion
+	if( nodoAnimacion!= null):
+		if(nodoAnimacion.has_animation(animacion)):
+			nodoAnimacion.play(animacion)
+		elif(nodoAnimacion.has_animation(otroPollo)):
+			nodoAnimacion.play(otroPollo)
+			
+		
+		
 @rpc("any_peer", "reliable")
 func ejecutar_habilidad() -> void:
 	habilidad.usar()
