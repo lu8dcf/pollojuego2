@@ -76,6 +76,14 @@ var material_rojo: StandardMaterial3D
 var hace_dano= false
 var jugador_dano: Node3D = null
 
+# pull ups
+var tipo_pullup: int 
+#1= power up rojo te cura la vida 25%+
+#2= power up azul te da un escudo de repulsión 
+#3= power up verde aumento de velocidad
+#4= power up violeta aumento en cadencia de todas las armas al menos un 1.5 o 2 
+#5= 
+
 func _ready():
 	
 	# Areas de colision
@@ -96,7 +104,7 @@ func cargar_materiales():
 	material_rojo.emission_energy_multiplier = 2.0 	
 
 func cargar_pullups():
-	var n = randi_range(0, 10)
+	tipo_pullup = randi_range(1, 10)
 	
 		
 	
@@ -175,6 +183,8 @@ func flash_rojo():
 @rpc("authority", "call_local", "reliable")		
 func morir():
 	$CollisionShape3D.disabled = true  # elimino la collision
+	
+		
 	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
 	shader_muerte = ShaderMaterial.new()
 	shader_muerte.shader = shader
@@ -188,6 +198,13 @@ func morir():
 	#tween.tween_property(self, "global_position:y", global_position.y + 10 ,3)
 	#tween.tween_property(self, "rotation:y", rotation.y + 10, 2)  # Girar mientras sube
 	tween.tween_property(self, "scale", Vector3(0.01,0.01,0.01), 1.5)
+	# cargo el pullups
+	if tipo_pullup<5:
+		var escena_pullup = preload("res://scenes/environment/power_up_generico.tscn")
+		var nuevo_pullup = escena_pullup.instantiate()
+		nuevo_pullup.global_position = global_position
+		nuevo_pullup.tipo=tipo_pullup
+		get_parent().add_child(nuevo_pullup)	
 		
 	await tween.finished
 		

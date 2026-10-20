@@ -67,6 +67,7 @@ _data = {
 
 [node name="PowerUpGenerico" type="Node3D" unique_id=1812622002]
 script = ExtResource("1_o3wrf")
+tipo = null
 
 [node name="jeringa_generica" parent="." unique_id=623105621 instance=ExtResource("2_uakqo")]
 transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, 0, 0.19218916, 0)
