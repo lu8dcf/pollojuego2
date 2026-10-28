@@ -34,6 +34,19 @@ var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
 var cant_jugadres:int = 0
 
+# ===== TIPO DE JUEGO =====
+var duracion_oleada:float=120.0
+var duracion_tienda:float=30.0
+# estados del ciclo
+enum FaseJuego{
+	OLEADA,
+	TIENDA,
+	CARGANDO,
+	LOBBY,
+	MENU
+}
+var fase_actual:FaseJuego = FaseJuego.MENU
+
 #Tamaño del Mapa
 var mapa_x_min = 8
 var mapa_x_max = 72

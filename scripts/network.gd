@@ -670,6 +670,49 @@ func _error_lobby_lleno() -> void:
 	GlobalSignal.error_conexion.emit("La sala está llena (máximo 4 jugadores).")
 
 # ------------------------------------------------------------
+# MANEJO DE FASES DEL JUEGI
+# ------------------------------------------------------------
+ # solo el host pide a todos cambiar de fase
+@rpc("authority","call_local","reliable")
+func cambiar_fase_rpc(nueva_fase:int)->void:
+	GlobalJuego.fase_actual = nueva_fase as GlobalJuego.FaseJuego
+	# actualizar al jugador local que cambio la fase
+	var ui = _obtener_ui_local()
+	if ui and ui.has_method("_on_fase_cambiada"):
+		ui._on_fase_cambiada(nueva_fase)
+	
+	if nueva_fase == GlobalJuego.FaseJuego.CARGANDO:
+		_iniciar_carga_nueva_oleada()
+
+func _iniciar_carga_nueva_oleada():
+	iniciar_carga_sincronizada(GlobalJuego.session_info.keys())
+	GlobalJuego.oleada +=1
+
+# el host llama a esto cuando el timer de oleada llega a 0
+func host_iniciar_tienda() -> void:
+	if not multiplayer.is_server():
+		return
+	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.TIENDA)
+
+
+# el host llama a esto cuando el timer de tienda llega a 0
+func host_iniciar_carga_nueva_oleada() -> void:
+	if not multiplayer.is_server():
+		return
+	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.CARGANDO)
+
+func _obtener_ui_local() -> Node:
+	# buscamos el jugador local en el mundo
+	var mundo = obtener_mundo_actual()
+	if not mundo:
+		return null
+	var mi_id = multiplayer.get_unique_id()
+	var jugador = mundo.get_node_or_null(str(mi_id))
+	if jugador:
+		return jugador.get_node_or_null("Player_UI")
+	return null
+
+# ------------------------------------------------------------
 # MANEJO DE PANTALLA DE CARGA
 # ------------------------------------------------------------
 func iniciar_carga_sincronizada(lista_peer_ids: Array) -> void:

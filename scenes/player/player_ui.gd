@@ -35,7 +35,8 @@ const PANEL_UI_MOVIL = preload("uid://wsf5ahon4ims")
 
 # tiempo
 @onready var label_tiempo: Label = %LabelTiempo
-
+var _timer_fase: Timer = null
+var _tiempo_restante: float = 0.0
 
 
 # vida barra experiencia, monedas
@@ -115,8 +116,118 @@ func _ready() -> void:
 	
 	process_mode = Node.PROCESS_MODE_ALWAYS # ESTO HARA QUE SIGA PROCESANDO EL CANVAS LAYER, NO SE QUE TAN BUENO SEA
 
+func iniciar_ciclo_de_fases()->void:
+	if _timer_fase==null:
+		_timer_fase=Timer.new()
+		_timer_fase.one_shot = true
+		_timer_fase.timeout.connect(_on_timer_fase_timeout)
+		add_child(_timer_fase)
+	
+	_arrancar_timer_para_fase(GlobalJuego.fase_actual)
+
+func _arrancar_timer_para_fase(fase:int) ->void:
+	if _timer_fase == null:
+		return
+	var duracion:float=0.0
+	match fase:
+		GlobalJuego.FaseJuego.OLEADA:
+			duracion = GlobalJuego.duracion_oleada
+		GlobalJuego.FaseJuego.TIENDA:
+			duracion = GlobalJuego.duracion_oleada
+		GlobalJuego.FaseJuego.CARGANDO:
+			duracion = 0.0 # la carga no tiene timer
+		GlobalJuego.FaseJuego.MENU:
+			duracion = 0.0  # la carga no tiene timer
+		GlobalJuego.FaseJuego.LOBBY:
+			duracion = 0.0  # la carga no tiene timer
+	_tiempo_restante = duracion
+	_timer_fase.stop()
+	if duracion >0.0:
+		_timer_fase.wait_time = duracion
+		_timer_fase.start()
+		
+	_actualizar_label_tiempo()
+
+func _on_timer_fase_timeout():
+	if not multiplayer.is_server():
+		return
+		
+	match  GlobalJuego.fase_actual:
+		GlobalJuego.FaseJuego.OLEADA:
+			Network.host_iniciar_tienda()
+		GlobalJuego.FaseJuego.TIENDA:
+			Network.host_iniciar_carga_nueva_oleada()
+
+# se llama desde Network cuando el host cambia la fase
+func _on_fase_cambiada(nueva_fase: int) -> void:
+	# actualizamos la fase local
+	GlobalJuego.fase_actual = nueva_fase as GlobalJuego.FaseJuego
+	
+	# arrancamos el timer para la nueva fase
+	_arrancar_timer_para_fase(nueva_fase)
+	
+	# logica visual segun la fase
+	match nueva_fase:
+		GlobalJuego.FaseJuego.OLEADA:
+			# mostrar ui de oleada, ocultar tienda
+			_mostrar_ui_oleada()
+		GlobalJuego.FaseJuego.TIENDA:
+			# mostrar ui de tienda, ocultar oleada
+			_mostrar_ui_tienda()
+		GlobalJuego.FaseJuego.CARGANDO:
+			# ocultar ui de juego, mostrar pantalla de carga
+			_mostrar_ui_carga()
+
+
 func _process(delta: float) -> void:
 	label_fps.text = "FPS: %d" % Engine.get_frames_per_second()
+	
+	if _timer_fase and not _timer_fase.is_stopped():
+		_tiempo_restante = _timer_fase.time_left
+		_actualizar_label_tiempo()
+
+# formatea el tiempo como MM:SS
+func _actualizar_label_tiempo() ->void:
+	if not label_tiempo:
+		return
+	
+	var segundos_totales:=int(ceil(_tiempo_restante))
+	if segundos_totales <0:
+		segundos_totales = 0
+	
+	var minutos:= segundos_totales / 60
+	var segundos:=segundos_totales % 60
+	
+	label_tiempo.text = "%02d:%02d" % [minutos,segundos]
+	# cambiar color segun corresponda
+	if segundos_totales <=10:
+		label_tiempo.modulate = Color.RED
+	if segundos_totales <=30:
+		label_tiempo.modulate = Color.YELLOW
+	else:
+		label_tiempo.modulate = Color.WHITE
+
+func _mostrar_ui_oleada() ->void:
+	if control_vida:
+		control_vida.show()
+	if usuarios_vida:
+		usuarios_vida.show()
+	if label_tiempo:
+		label_tiempo.show()
+
+func _mostrar_ui_tienda() ->void:
+	if label_tiempo:
+		label_tiempo.show()
+		label_tiempo.modulate = Color.CYAN
+
+func _mostrar_ui_carga() -> void:
+	# ocultar todo lo de gameplay, se muestra la pantalla de carga
+	if control_vida:
+		control_vida.hide()
+	if usuarios_vida:
+		usuarios_vida.hide()
+	if label_tiempo:
+		label_tiempo.hide()
 
 
 # ===== SI ES MOBILE =====
