@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://78tq15o40i3"]
+
+[ext_resource type="PackedScene" uid="uid://usv08loimu0y" path="res://assets/modelos/armas/arma_3_04.fbx" id="1_u6heo"]
+
+[node name="arma_3_04" unique_id=638999747 instance=ExtResource("1_u6heo")]
