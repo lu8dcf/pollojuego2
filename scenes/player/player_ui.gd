@@ -43,7 +43,7 @@ var _tiempo_restante: float = 0.0
 @onready var control_vida: VBoxContainer = %ControlVida
 @onready var etiqueta_nombre: Label = %EtiquetaNombre
 @onready var etiqueta_salud: Label = %EtiquetaSalud
-@onready var barra_salud: ProgressBar = %BarraSalud
+#@onready var barra_salud: ProgressBar = %BarraSalud
 @onready var barra_experiencia: ProgressBar = %BarraExperiencia
 
 @onready var controls_root: VBoxContainer = %ControlsRoot
@@ -64,7 +64,9 @@ func _ready() -> void:
 		
 	else:
 		menu.hide() # los botones de salir y pausa
-		
+	
+	
+	
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	# BOTON SALIR
 	boton_salir.pressed.connect(func(): Network.leave_server())
@@ -116,15 +118,21 @@ func _ready() -> void:
 	
 	process_mode = Node.PROCESS_MODE_ALWAYS # ESTO HARA QUE SIGA PROCESANDO EL CANVAS LAYER, NO SE QUE TAN BUENO SEA
 
+# MANEJO DE FASES
+
 func iniciar_ciclo_de_fases()->void:
+	print("inicio de ciclo")
 	if _timer_fase==null:
 		_timer_fase=Timer.new()
 		_timer_fase.one_shot = true
 		_timer_fase.timeout.connect(_on_timer_fase_timeout)
 		add_child(_timer_fase)
+		print("arranca timer")
+		
 	
 	_arrancar_timer_para_fase(GlobalJuego.fase_actual)
 
+# MANEJO DE TIEMPO
 func _arrancar_timer_para_fase(fase:int) ->void:
 	if _timer_fase == null:
 		return
@@ -137,9 +145,10 @@ func _arrancar_timer_para_fase(fase:int) ->void:
 		GlobalJuego.FaseJuego.CARGANDO:
 			duracion = 0.0 # la carga no tiene timer
 		GlobalJuego.FaseJuego.MENU:
-			duracion = 0.0  # la carga no tiene timer
+			duracion = 0.0  # el menu no tiene timer
 		GlobalJuego.FaseJuego.LOBBY:
-			duracion = 0.0  # la carga no tiene timer
+			duracion = 0.0  # el lobby no tiene timer
+	print("fase: ", GlobalJuego.fase_actual, " timer: ", duracion)
 	_tiempo_restante = duracion
 	_timer_fase.stop()
 	if duracion >0.0:
@@ -179,7 +188,7 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 			_mostrar_ui_carga()
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	label_fps.text = "FPS: %d" % Engine.get_frames_per_second()
 	
 	if _timer_fase and not _timer_fase.is_stopped():
@@ -195,7 +204,7 @@ func _actualizar_label_tiempo() ->void:
 	if segundos_totales <0:
 		segundos_totales = 0
 	
-	var minutos:= segundos_totales / 60
+	var minutos:= segundos_totales / 60.0
 	var segundos:=segundos_totales % 60
 	
 	label_tiempo.text = "%02d:%02d" % [minutos,segundos]

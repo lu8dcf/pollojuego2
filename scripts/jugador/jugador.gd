@@ -122,7 +122,10 @@ func _ready() -> void:
 	player_ui.hide()
 	if not GlobalSignal.enviar_joystick.is_connected(recibir_joystick):
 		GlobalSignal.enviar_joystick.connect(recibir_joystick)# para obtener el joystick
-	if GlobalJuego.un_jugador:
+	if is_multiplayer_authority() or GlobalJuego.un_jugador:
+		if player_ui and player_ui.has_method("iniciar_ciclo_de_fases"):
+			player_ui.iniciar_ciclo_de_fases()
+			
 		# MODO UN JUGADOR
 		await get_tree().process_frame
 		if camera_3d:

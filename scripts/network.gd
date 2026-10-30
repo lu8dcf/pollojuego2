@@ -464,7 +464,7 @@ func crear_todos_los_jugadores(): #SOLO EL HOST llama a esta función
 		
 		# Crear localmente
 		crear_jugador_en_mundo(mundo, peer_id, username, posicion,id_pollo)
-		
+		cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
 		# Notificar a todos los clientes
 		spawnear_jugador_rpc.rpc(peer_id, username, posicion,id_pollo)
 
@@ -498,12 +498,13 @@ func crear_jugador_en_mundo(mundo: Node, peer_id: int, username: String, posicio
 			# correctamente en multijugador.
 			jugador.crear_pollo_en_red(id_pollo)
 
-		print(
-			"Se solicitó crear el pollo ",
-			id_pollo,
-			" para el jugador ",
-			jugador.name
-		)
+		#print(
+			#"Se solicitó crear el pollo ",
+			#id_pollo,
+			#" para el jugador ",
+			#jugador.name
+		#)
+		cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
 	else:
 		push_warning("El jugador no tiene crear_pollo_en_red()")
 	

@@ -10,20 +10,23 @@ offset_top = 205.0
 offset_right = 291.0
 offset_bottom = 648.0
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelInventario" unique_id=128644111]
+[node name="Label" type="Label" parent="PanelInventario" unique_id=1343452314]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -51.0
-offset_right = 51.0
+anchors_preset = 10
+anchor_right = 1.0
 offset_bottom = 20.0
 grow_horizontal = 2
-
-[node name="Label" type="Label" parent="PanelInventario/MarginContainer" unique_id=1343452314]
-layout_mode = 2
 text = "inventario"
 label_settings = ExtResource("1_kd47h")
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelInventario" unique_id=128644111]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="GridContainer" type="GridContainer" parent="PanelInventario/MarginContainer" unique_id=925142735]
 layout_mode = 2
@@ -52,20 +55,23 @@ offset_top = 56.0
 offset_right = 1060.0
 offset_bottom = 328.0
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelTiendaArmas" unique_id=1498508535]
+[node name="Label" type="Label" parent="PanelTiendaArmas" unique_id=857276967]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -75.5
-offset_right = 75.5
+anchors_preset = 10
+anchor_right = 1.0
 offset_bottom = 49.0
 grow_horizontal = 2
-
-[node name="Label" type="Label" parent="PanelTiendaArmas/MarginContainer" unique_id=857276967]
-layout_mode = 2
 text = "armas"
 label_settings = ExtResource("2_fy1g5")
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelTiendaArmas" unique_id=1498508535]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="GridContainer" type="GridContainer" parent="PanelTiendaArmas/MarginContainer" unique_id=1248084018]
 layout_mode = 2
