@@ -43,9 +43,13 @@ enum FaseJuego{
 	TIENDA,
 	CARGANDO,
 	LOBBY,
-	MENU
+	MENU,
+	PAUSA
 }
 var fase_actual:FaseJuego = FaseJuego.MENU
+var fase_antes_de_pausa:FaseJuego = FaseJuego.OLEADA
+var esta_pausado:bool = false
+
 
 #Tamaño del Mapa
 var mapa_x_min = 8

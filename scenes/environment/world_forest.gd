@@ -51,7 +51,7 @@ func disable_menu_mode() -> void:
 
 func agregar_mapa():
 	var mapa = load("res://scenes/environment/generador_mapa.tscn")
-	var mapa_actual = mapa.instanciate()
+	var mapa_actual = mapa.instantiate()
 	add_child(mapa_actual)
 	
 func spawn_enemy():

@@ -33,11 +33,16 @@ var paneles_usuarios:Dictionary = {}
 # panel de ui mobile
 const PANEL_UI_MOVIL = preload("uid://wsf5ahon4ims")
 
+# panel de tienda
+var tienda_actual = null
+
 # tiempo
 @onready var label_tiempo: Label = %LabelTiempo
 var _timer_fase: Timer = null
 var _tiempo_restante: float = 0.0
-
+var _tiempo_al_pausar:float = 0.0
+#fase a la que hayq ue regresar
+var _fase_para_reanudar:int = GlobalJuego.FaseJuego.OLEADA
 
 # vida barra experiencia, monedas
 @onready var control_vida: VBoxContainer = %ControlVida
@@ -47,6 +52,7 @@ var _tiempo_restante: float = 0.0
 @onready var barra_experiencia: ProgressBar = %BarraExperiencia
 
 @onready var controls_root: VBoxContainer = %ControlsRoot
+
 
 var COLORS: Array[Color] =[ # colores de la barra de vida
 	Color.MAGENTA,
@@ -65,7 +71,7 @@ func _ready() -> void:
 	else:
 		menu.hide() # los botones de salir y pausa
 	
-	
+	agregar_tienda()
 	
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	# BOTON SALIR
@@ -141,13 +147,15 @@ func _arrancar_timer_para_fase(fase:int) ->void:
 		GlobalJuego.FaseJuego.OLEADA:
 			duracion = GlobalJuego.duracion_oleada
 		GlobalJuego.FaseJuego.TIENDA:
-			duracion = GlobalJuego.duracion_oleada
+			duracion = GlobalJuego.duracion_tienda
 		GlobalJuego.FaseJuego.CARGANDO:
 			duracion = 0.0 # la carga no tiene timer
 		GlobalJuego.FaseJuego.MENU:
 			duracion = 0.0  # el menu no tiene timer
 		GlobalJuego.FaseJuego.LOBBY:
 			duracion = 0.0  # el lobby no tiene timer
+		GlobalJuego.FaseJuego.PAUSA:
+			duracion = 0.0  # la pausa no tiene timer
 	print("fase: ", GlobalJuego.fase_actual, " timer: ", duracion)
 	_tiempo_restante = duracion
 	_timer_fase.stop()
@@ -158,17 +166,37 @@ func _arrancar_timer_para_fase(fase:int) ->void:
 	_actualizar_label_tiempo()
 
 func _on_timer_fase_timeout():
+	if GlobalJuego.esta_pausado or GlobalJuego.fase_actual == GlobalJuego.FaseJuego.PAUSA:
+		return
 	if not multiplayer.is_server():
 		return
-		
+		 
 	match  GlobalJuego.fase_actual:
 		GlobalJuego.FaseJuego.OLEADA:
 			Network.host_iniciar_tienda()
 		GlobalJuego.FaseJuego.TIENDA:
 			Network.host_iniciar_carga_nueva_oleada()
 
+func _pausar_timer_fase() ->void:
+	if _timer_fase == null or _timer_fase.is_stopped():
+		return
+	_tiempo_al_pausar = _timer_fase.time_left # el timepo que le quedaba antes de pausar
+	_fase_para_reanudar = GlobalJuego.fase_actual
+	_timer_fase.stop() # detener el contador al pausar
+
+func _reanudar_timer_fase() ->void:
+	if _timer_fase == null :
+		return
+	_timer_fase.wait_time = _tiempo_al_pausar
+	_timer_fase.start()
+	_tiempo_al_pausar = 0.0
+
 # se llama desde Network cuando el host cambia la fase
 func _on_fase_cambiada(nueva_fase: int) -> void:
+	# si el juego esta en pausa entonces no procesamos cambios de pausa
+	if GlobalJuego.esta_pausado:
+		return
+	
 	# actualizamos la fase local
 	GlobalJuego.fase_actual = nueva_fase as GlobalJuego.FaseJuego
 	
@@ -186,6 +214,8 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 		GlobalJuego.FaseJuego.CARGANDO:
 			# ocultar ui de juego, mostrar pantalla de carga
 			_mostrar_ui_carga()
+		GlobalJuego.FaseJuego.MENU, GlobalJuego.FaseJuego.LOBBY:
+			pass
 
 
 func _process(_delta: float) -> void:
@@ -204,7 +234,7 @@ func _actualizar_label_tiempo() ->void:
 	if segundos_totales <0:
 		segundos_totales = 0
 	
-	var minutos:= segundos_totales / 60.0
+	var minutos:= segundos_totales / 60
 	var segundos:=segundos_totales % 60
 	
 	label_tiempo.text = "%02d:%02d" % [minutos,segundos]
@@ -228,6 +258,7 @@ func _mostrar_ui_tienda() ->void:
 	if label_tiempo:
 		label_tiempo.show()
 		label_tiempo.modulate = Color.CYAN
+	tienda_actual.show()
 
 func _mostrar_ui_carga() -> void:
 	# ocultar todo lo de gameplay, se muestra la pantalla de carga
@@ -237,6 +268,13 @@ func _mostrar_ui_carga() -> void:
 		usuarios_vida.hide()
 	if label_tiempo:
 		label_tiempo.hide()
+
+# TIENDA
+func agregar_tienda():
+	var tienda = load("res://scenes/ui/tienda/MenuTienda.tscn")
+	tienda_actual = tienda.instantiate()
+	add_child(tienda_actual)
+	tienda_actual.hide()
 
 
 # ===== SI ES MOBILE =====
@@ -350,8 +388,22 @@ func _on_jugador_desconectado(peer_id:int)-> void:
 func _on_server_desconectado()-> void:
 	paneles_usuarios.clear()
 
+# ===== MANEJO DE CICLO BASICO =====
 
-
+func host_iniciar_tienda():
+	if not multiplayer.is_server():
+		return
+	if GlobalJuego.esta_pausado:
+		return
+	Network.cambiar_fase_rpc(GlobalJuego.FaseJuego.TIENDA)
+	
+	
+func host_iniciar_carga_nueva_oleada():
+	if not multiplayer.is_server():
+		return
+	if GlobalJuego.esta_pausado:
+		return
+	Network.cambiar_fase_rpc(GlobalJuego.FaseJuego.CARGANDO)
 	
 # ===== MANEJO DE LA PAUSA =====
 # para manejar la pausa se debe usar el rpc en network
@@ -384,7 +436,11 @@ func _on_pausa_cambiada(esta_pausado: bool, quien_pauso: int) -> void:
 	pausa_panel.visible = esta_pausado
 	
 	if esta_pausado:
-		# Actualizar el texto
+		
+		GlobalJuego.fase_antes_de_pausa = GlobalJuego.fase_actual
+		GlobalJuego.esta_pausado = true
+		_pausar_timer_fase()
+		
 		var nombre_pausador = "Alguien"
 		if GlobalJuego.session_info.has(quien_pauso):
 			nombre_pausador = GlobalJuego.session_info[quien_pauso].get("username", "Jugador " + str(quien_pauso))
@@ -396,5 +452,9 @@ func _on_pausa_cambiada(esta_pausado: bool, quien_pauso: int) -> void:
 			label_texto_informa.text = nombre_pausador + " ha pausado el juego.\nEspera a que continúe."
 			boton_regresar.visible = false
 	else:
+		# reanudar la partida
+		GlobalJuego.fase_actual = GlobalJuego.fase_antes_de_pausa # se retoma la fase anteiorr  a la pausa ( puede ser oleada o tienda)
+		GlobalJuego.esta_pausado = false
+		_reanudar_timer_fase()
 		label_texto_informa.text = ""
 		boton_regresar.visible = false
