@@ -6,6 +6,7 @@ extends Node3D
 @onready var menu_camera: MenuCameraController = $Camera3D
 #@onready var contenedor_mapa: Node3D = $Conteendor_mapa
 
+@onready var mapa: Node3D = %mapa
 
 const enemigo_base = preload("uid://b8go34qeye00a") # Escena enemy0
 
@@ -107,19 +108,21 @@ func pausar_gameplay()->void:
 			enemigo.set_physics_process(false)
 			enemigo.set_process(false)
 	# desactivar a los jugadores
-	for jugador in get_tree().get_nodes_in_group("jugadores"):
+	for jugador in get_tree().get_nodes_in_group("Jugadores"):
 		if is_instance_valid(jugador):
 			jugador.set_physics_process(false)
 			jugador.set_process(false)
 
 func reanudar_gameplay()->void:
+	
 	#activar a los enemigos
 	for enemigo in get_tree().get_nodes_in_group("enemy"):
 		if is_instance_valid(enemigo):
+			
 			enemigo.set_physics_process(true)
 			enemigo.set_process(true)
 	# activar a los jugadores
-	for jugador in get_tree().get_nodes_in_group("jugadores"):
+	for jugador in get_tree().get_nodes_in_group("Jugadores"):
 		if is_instance_valid(jugador):
 			jugador.set_physics_process(true)
 			jugador.set_process(true)
@@ -131,10 +134,9 @@ func reanudar_gameplay()->void:
 func limpiar_enemigos()->void:
 	if not multiplayer.is_server():
 		return # solo host puede eliminar enemigos
-	
 	_borrar_enemigos_locales()
 	# avisarle a los clientes que elmiinen a los enemigos
-	limpiar_enemigos_rpc()
+	limpiar_enemigos_rpc.rpc()
 
 @rpc("authority","call_local","reliable")
 func limpiar_enemigos_rpc() ->void:
@@ -164,8 +166,19 @@ func regenerar_mapa_nueva_oleada(nueva_semilla:int)->void:
 	
 @rpc("authority","call_local","reliable")
 func _regenerar_mapa_rpc(nueva_semilla:int)->void:
-	pass #continuar aca
+	var generador = mapa
+	if not generador:
+		return
+	
+	await generador.regenerar_con_semilla(nueva_semilla)
 
+func obtener_posicion_spawn(indice:int,total:int)->Vector3:
+	var generador = mapa
+	if generador and generador.has_method("obtener_posicion_spawn"):
+		return generador.obtener_posicion_spawn(indice, total)
+	# fallback: posicion por defecto si no hay generador
+	return Vector3(30, 5, 30)
+		
 	
 	
 	

@@ -696,8 +696,11 @@ func host_iniciar_tienda() -> void:
 	if GlobalJuego.esta_pausado:
 		return
 	var mundo = obtener_mundo_actual()
-	if mundo and mundo.has_method("limpiar_enemigos"):
-		mundo.limpiar_enemigos()
+	if mundo:
+		if mundo.has_method("limpiar_enemigos"):
+			mundo.limpiar_enemigos()
+		if mundo.has_method("pausar_gameplay"):
+			mundo.pausar_gameplay()
 	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.TIENDA)
 
 
@@ -705,7 +708,62 @@ func host_iniciar_tienda() -> void:
 func host_iniciar_carga_nueva_oleada() -> void:
 	if not multiplayer.is_server():
 		return
-	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.CARGANDO)
+	if GlobalJuego.esta_pausado:
+		return
+	_preparar_nueva_oleada() # directo a oleada sin mostrar pantalla de carga
+	
+
+func _preparar_nueva_oleada()->void:
+	if not multiplayer.is_server():
+		return
+	
+	#primero semilla
+	GlobalJuego.semilla_mapa  = randi()
+	_replicar_semilla.rpc(GlobalJuego.semilla_mapa)
+	var mundo = obtener_mundo_actual()
+	if not mundo:
+		return
+	if mundo.has_method("regenerar_mapa_nueva_oleada"):
+		await mundo.regenerar_mapa_nueva_oleada(GlobalJuego.semilla_mapa)
+	
+	await reposicionar_jugadores()
+	
+	if mundo.has_method("reanudar_gameplay"):
+		mundo.reanudar_gameplay()
+	
+	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
+	
+	GlobalJuego.oleada+=1
+
+func reposicionar_jugadores():
+	if not multiplayer.is_server():
+		return
+	var mundo = obtener_mundo_actual()
+	if not mundo:
+		return
+	var peers_ids=GlobalJuego.session_info.keys()
+	var total_peers = peers_ids.size()
+	for i in range(total_peers):
+		var peer_id = peers_ids[i]
+		var jugador=mundo.get_node_or_null(str(peer_id))
+		if not jugador:
+			continue
+		var posicion=mundo.obtener_posicion_spawn(i,total_peers)
+		
+		_mover_jugador_rpc.rpc(peer_id,posicion)
+	await get_tree().process_frame
+
+@rpc("authority", "call_local", "reliable")
+func _mover_jugador_rpc(peer_id: int, nueva_posicion: Vector3) -> void:
+	var mundo = obtener_mundo_actual()
+	if not mundo:
+		return
+	var jugador = mundo.get_node_or_null(str(peer_id))
+	if jugador:
+		jugador.global_position = nueva_posicion
+		# reseteamos velocidad para que no siga "cayendo" con la velocidad vieja
+		if "velocity" in jugador:
+			jugador.velocity = Vector3.ZERO
 
 func _obtener_ui_local() -> Node:
 	# buscamos el jugador local en el mundo

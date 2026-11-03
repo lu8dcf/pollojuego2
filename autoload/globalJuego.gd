@@ -33,10 +33,11 @@ var mundo:Node3D# mapa actual, esto es forest
 var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
 var cant_jugadres:int = 0
+var oleada:int = 1
 
 # ===== TIPO DE JUEGO =====
-var duracion_oleada:float=120.0
-var duracion_tienda:float=30.0
+var duracion_oleada:float=10.0
+var duracion_tienda:float=10.0
 # estados del ciclo
 enum FaseJuego{
 	OLEADA,

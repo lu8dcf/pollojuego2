@@ -202,7 +202,7 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 	
 	# arrancamos el timer para la nueva fase
 	_arrancar_timer_para_fase(nueva_fase)
-	
+	var mundo = Network.obtener_mundo_actual()
 	# logica visual segun la fase
 	match nueva_fase:
 		GlobalJuego.FaseJuego.OLEADA:
@@ -211,6 +211,8 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 		GlobalJuego.FaseJuego.TIENDA:
 			# mostrar ui de tienda, ocultar oleada
 			_mostrar_ui_tienda()
+			if mundo and mundo.has_method("pausar_gameplay"):
+				mundo.pausar_gameplay()
 		GlobalJuego.FaseJuego.CARGANDO:
 			# ocultar ui de juego, mostrar pantalla de carga
 			_mostrar_ui_carga()
@@ -253,6 +255,8 @@ func _mostrar_ui_oleada() ->void:
 		usuarios_vida.show()
 	if label_tiempo:
 		label_tiempo.show()
+	if tienda_actual:
+		tienda_actual.hide()
 
 func _mostrar_ui_tienda() ->void:
 	if label_tiempo:
