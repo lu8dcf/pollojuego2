@@ -80,8 +80,6 @@ func instanciar_enemigo():
 
 func fabrica_enemigos(tipo):
 
-		
-	
 	if tipo < 0 or tipo >= GlobalJuego.cant_tipo_enemigos: # hasta aca solo 4 enemigos
 		push_error("Valor X fuera de rango: " + str(tipo))
 		return
@@ -96,3 +94,34 @@ func fabrica_enemigos(tipo):
 	nuevo_enemigo.tipo = tipo
 	
 	return nuevo_enemigo
+
+# ============================================================
+# PAUSA DE GAMEPLAY (para la tienda)
+# ============================================================
+func pausar_gameplay()->void:
+	if timer_enemy:
+		timer_enemy.stop() # detener el timer de enemigos
+	#desactivar a los enemigos
+	for enemigo in get_tree().get_nodes_in_group("enemy"):
+		if is_instance_valid(enemigo):
+			enemigo.set_physics_process(false)
+			enemigo.set_process(false)
+	# desactivar a los jugadores
+	for jugador in get_tree().get_nodes_in_group("jugadores"):
+		if is_instance_valid(jugador):
+			jugador.set_physics_process(false)
+			jugador.set_process(false)
+
+func reanudar_gameplay()->void:
+	#activar a los enemigos
+	for enemigo in get_tree().get_nodes_in_group("enemy"):
+		if is_instance_valid(enemigo):
+			enemigo.set_physics_process(true)
+			enemigo.set_process(true)
+	# activar a los jugadores
+	for jugador in get_tree().get_nodes_in_group("jugadores"):
+		if is_instance_valid(jugador):
+			jugador.set_physics_process(true)
+			jugador.set_process(true)
+	if timer_enemy:
+		timer_enemy.start() # reactivar el spawn de enemigo
