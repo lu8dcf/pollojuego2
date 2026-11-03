@@ -693,6 +693,11 @@ func _iniciar_carga_nueva_oleada():
 func host_iniciar_tienda() -> void:
 	if not multiplayer.is_server():
 		return
+	if GlobalJuego.esta_pausado:
+		return
+	var mundo = obtener_mundo_actual()
+	if mundo and mundo.has_method("limpiar_enemigos"):
+		mundo.limpiar_enemigos()
 	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.TIENDA)
 
 

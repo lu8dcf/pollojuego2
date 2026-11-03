@@ -125,3 +125,53 @@ func reanudar_gameplay()->void:
 			jugador.set_process(true)
 	if timer_enemy:
 		timer_enemy.start() # reactivar el spawn de enemigo
+
+
+# eliminar enemigos del spawn
+func limpiar_enemigos()->void:
+	if not multiplayer.is_server():
+		return # solo host puede eliminar enemigos
+	
+	_borrar_enemigos_locales()
+	# avisarle a los clientes que elmiinen a los enemigos
+	limpiar_enemigos_rpc()
+
+@rpc("authority","call_local","reliable")
+func limpiar_enemigos_rpc() ->void:
+	_borrar_enemigos_locales()
+	
+func _borrar_enemigos_locales()->void:
+	for enemigo in get_tree().get_nodes_in_group("enemy"):
+		if is_instance_valid(enemigo):
+			enemigo.queue_free()
+	
+	if spawn_container: # cada enemigo que haya quedado se elminda de forma local
+		for child in spawn_container.get_children():
+			if child.is_in_group("enemy"):
+				child.queue_free()
+	
+# REGENERAR MAPA ENTRE OLEADAS
+
+func regenerar_mapa_nueva_oleada(nueva_semilla:int)->void:
+	if not multiplayer.is_server():
+		return
+	
+	limpiar_enemigos()
+	#avisar a los cleintes que reactualicen la semilla
+	_regenerar_mapa_rpc(nueva_semilla) 
+	
+	await get_tree().create_timer(0.3).timeout
+	
+@rpc("authority","call_local","reliable")
+func _regenerar_mapa_rpc(nueva_semilla:int)->void:
+	pass #continuar aca
+
+	
+	
+	
+	
+	
+	
+	
+	
+	

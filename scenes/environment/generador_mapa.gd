@@ -44,7 +44,7 @@ func _ready() -> void:
 	else:
 		actualizar_semilla_desde_global()
 		
-	generar_mapa()
+	await generar_mapa()
 
 func actualizar_semilla_desde_global() -> void:
 	var global = get_node_or_null("/root/GlobalJuego")
@@ -62,7 +62,7 @@ func _decidir_carga_simple() -> bool:
 func arrancar_partida_con_global() -> void:
 	es_escena_menu = false
 	actualizar_semilla_desde_global()
-	generar_mapa()
+	await generar_mapa()
 
 # -----------------------------------------------------------------------------
 # PUNTO DE ENTRADA
@@ -71,7 +71,11 @@ func generar_mapa() -> void:
 	# Limpiar instancias previas
 	for child in get_children():
 		child.queue_free()
-
+	
+	# esperar un frame para que se liberen del todo
+	if is_inside_tree():
+		await get_tree().process_frame
+		
 	# 1) Calcular el mapa completo (sin instanciar nada aún)
 	var datos := _calcular_datos_mapa()
 	var visitados: Dictionary = datos["visitados"]
@@ -82,6 +86,11 @@ func generar_mapa() -> void:
 		mapa_carga_simple(visitados, distancias)
 	else:
 		mapa_carga_compleja(visitados, distancias)
+
+# regenera el mapa completo con una nueva semilla, se utiliza entre oleadas
+func regenerar_con_semilla(nueva_semilla:int) ->void:
+	semilla_mapa = nueva_semilla
+	await generar_mapa()
 
 func mapa_carga_simple(visitados: Dictionary, distancias: Dictionary) -> void:
 	for z in range(largo):
