@@ -728,8 +728,8 @@ func _preparar_nueva_oleada()->void:
 	
 	await reposicionar_jugadores()
 	
-	if mundo.has_method("reanudar_gameplay"):
-		mundo.reanudar_gameplay()
+	#if mundo.has_method("reanudar_gameplay"):
+		#mundo.reanudar_gameplay()
 	
 	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
 	

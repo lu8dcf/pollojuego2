@@ -62,7 +62,9 @@ func spawn_enemy():
 
 	if is_menu_mode:
 		return
-
+		
+	if GlobalJuego.esta_pausado or GlobalJuego.fase_actual == GlobalJuego.FaseJuego.TIENDA:
+		return
 	if get_tree().get_nodes_in_group("enemy").size() >= GlobalJuego.cant_enemigos:
 		return
 

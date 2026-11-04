@@ -203,11 +203,14 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 	# arrancamos el timer para la nueva fase
 	_arrancar_timer_para_fase(nueva_fase)
 	var mundo = Network.obtener_mundo_actual()
+	
 	# logica visual segun la fase
 	match nueva_fase:
 		GlobalJuego.FaseJuego.OLEADA:
 			# mostrar ui de oleada, ocultar tienda
 			_mostrar_ui_oleada()
+			if mundo.has_method("reanudar_gameplay"):
+				mundo.reanudar_gameplay()
 		GlobalJuego.FaseJuego.TIENDA:
 			# mostrar ui de tienda, ocultar oleada
 			_mostrar_ui_tienda()
