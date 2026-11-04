@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://blh60f5rkssxd"]
+
+[ext_resource type="Texture2D" uid="uid://dh5gcay1w7qa3" path="res://assets/modelos/mapas/alfa_plantas.png" id="1_tsxmb"]
+
+[resource]
+transparency = 1
+albedo_color = Color(0.6310075, 0.91043866, 0.13107008, 1)
+albedo_texture = ExtResource("1_tsxmb")
+albedo_texture_msdf = true
