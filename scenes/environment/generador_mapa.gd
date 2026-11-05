@@ -23,7 +23,13 @@ extends Node3D
 
 var bloque_terreno: PackedScene = preload("res://scenes/environment/BloqueTerreno.tscn")
 var bloque_borde: PackedScene = preload("res://scenes/environment/BloqueBorde.tscn")
-var escena_planta: PackedScene = preload("res://scenes/environment/planta_1.tscn")
+
+var escenas_plantas: Array[PackedScene] = [
+	preload("res://scenes/environment/planta_1.tscn"),
+	preload("res://scenes/environment/planta_2.tscn"),
+	preload("res://scenes/environment/planta_3.tscn"),
+	preload("res://scenes/environment/planta_4.tscn")
+]
 
 var ruido = FastNoiseLite.new()
 var ruido_borde = FastNoiseLite.new()
@@ -143,7 +149,8 @@ func generar_mapa() -> void:
 					var dist_centro_planta = Vector2(pos_final.x, pos_final.z).distance_to(Vector2(centro_x * tamano_bloque, centro_z * tamano_bloque))
 					if dist_centro_planta > radio_exclusion_centro_plantas:
 						if rng.randf() < probabilidad_spawn_planta:
-							var planta = escena_planta.instantiate()
+							var indice_planta = rng.randi() % escenas_plantas.size()
+							var planta = escenas_plantas[indice_planta].instantiate()
 							add_child(planta)
 							var offset_x = rng.randf_range(-0.35, 0.35)
 							var offset_z = rng.randf_range(-0.35, 0.35)

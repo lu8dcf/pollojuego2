@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://5qyru4bawtq7"]
+
+[ext_resource type="PackedScene" uid="uid://0wbim1jrl2w1" path="res://assets/modelos/mapas/planta_3.fbx" id="1_8o478"]
+[ext_resource type="Material" uid="uid://blh60f5rkssxd" path="res://assets/modelos/mapas/plantas.tres" id="2_n1d2e"]
+
+[node name="planta_3" unique_id=1396329420 instance=ExtResource("1_8o478")]
+
+[node name="planta_3" parent="." index="0" unique_id=1431242203]
+material_override = ExtResource("2_n1d2e")
