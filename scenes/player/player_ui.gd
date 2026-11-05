@@ -128,7 +128,7 @@ func _ready() -> void:
 	await get_tree().create_timer(0.5).timeout
 	_actualizar_paneles_aliados(GlobalJuego.session_info)
 	
-	process_mode = Node.PROCESS_MODE_ALWAYS # ESTO HARA QUE SIGA PROCESANDO EL CANVAS LAYER, NO SE QUE TAN BUENO SEA
+	process_mode = Node.PROCESS_MODE_ALWAYS 
 
 # MANEJO DE FASES
 
@@ -146,7 +146,6 @@ func iniciar_ciclo_de_fases()->void:
 
 # MANEJO DE OLEADA
 func mostrar_oleada_actual():
-	print("Oleada: ", GlobalJuego.oleada)
 	label_oleada.text = "Oleada: "+ str(GlobalJuego.oleada)
 
 # MANEJO DE TIEMPO
@@ -167,7 +166,7 @@ func _arrancar_timer_para_fase(fase:int) ->void:
 			duracion = 0.0  # el lobby no tiene timer
 		GlobalJuego.FaseJuego.PAUSA:
 			duracion = 0.0  # la pausa no tiene timer
-	print("fase: ", GlobalJuego.fase_actual, " timer: ", duracion)
+	#print("fase: ", GlobalJuego.fase_actual, " timer: ", duracion)
 	_tiempo_restante = duracion
 	_timer_fase.stop()
 	if duracion >0.0:

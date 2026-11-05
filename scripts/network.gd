@@ -734,7 +734,6 @@ func _preparar_nueva_oleada()->void:
 		#mundo.reanudar_gameplay()
 	
 	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
-	print("se suma una oleada mas")
 	GlobalJuego.oleada+=1
 	GlobalSignal.emit_signal("cambia_oleada")
 
@@ -966,7 +965,6 @@ func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3,id_po
 		
 @rpc("authority","call_local","reliable")
 func _replicar_semilla(semilla:int)->void:
-	print("[Network][PEER ", multiplayer.get_unique_id(), "] recibio semilla: ", semilla)
 	GlobalJuego.semilla_mapa = semilla
 
 func _exit_tree() -> void:
