@@ -47,7 +47,8 @@ folder_colors={
 "res://resources/": "blue",
 "res://scenes/": "red",
 "res://scenes/enemy/": "pink",
-"res://scripts/": "yellow"
+"res://scripts/": "yellow",
+"res://shaders/": "pink"
 }
 
 [gui]

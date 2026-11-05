@@ -122,7 +122,10 @@ func _ready() -> void:
 	player_ui.hide()
 	if not GlobalSignal.enviar_joystick.is_connected(recibir_joystick):
 		GlobalSignal.enviar_joystick.connect(recibir_joystick)# para obtener el joystick
-	if GlobalJuego.un_jugador:
+	if is_multiplayer_authority() or GlobalJuego.un_jugador:
+		if player_ui and player_ui.has_method("iniciar_ciclo_de_fases"):
+			player_ui.iniciar_ciclo_de_fases()
+			
 		# MODO UN JUGADOR
 		await get_tree().process_frame
 		if camera_3d:
@@ -143,10 +146,24 @@ func _ready() -> void:
 		if camera_3d:
 			camera_3d.current = true
 		ready_client_visuals()
-
+	
+	if GlobalSignal.has_signal("sesion_actualizada"):
+		if not GlobalSignal.sesion_actualizada.is_connected(_on_sesion_actualizada):
+			GlobalSignal.sesion_actualizada.connect(_on_sesion_actualizada)
 	
 
-
+func _on_sesion_actualizada(info:Dictionary)->void:
+	var peer_id :int = int(name)
+	if not info.has(peer_id):
+		return
+	var mi_info :Dictionary=info[peer_id]
+	var salud_remota :int = mi_info.get("salud",salud)
+	var salud_max_remota :int = mi_info.get("salud_maxima",salud_maxima)
+	
+	if salud_remota == salud and salud_max_remota == salud_maxima:
+		return
+	
+	aplicar_salud_local(salud_remota,salud_max_remota,false)
 
 func recibir_joystick(j: Joystick) -> void:
 	joystick = j
@@ -185,8 +202,9 @@ func _process(_delta: float) -> void:
 			pollo.usar_habilidad()
 
 	if Input.is_action_just_pressed("menu"):
-		estadoActual = Estado.TIENDA
+		#estadoActual = Estado.TIENDA
 		open_menu(player_ui.menu.visible)
+		return
 		
 	if Input.is_action_just_pressed("test_caido"): # M
 		cambiar_estado(Estado.CAIDO) #aca

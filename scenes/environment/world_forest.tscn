@@ -29,6 +29,7 @@ process_mode = 1
 script = ExtResource("1_3pli8")
 
 [node name="mapa" parent="." unique_id=139508461 instance=ExtResource("2_dxoa6")]
+unique_name_in_owner = true
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1711943740]
 transform = Transform3D(0.57484823, -0.09363707, 0.8128848, -1.4901161e-08, 0.99343085, 0.11443438, -0.8182601, -0.06578241, 0.5710719, 40.108917, 3.1898546, 46.12387)

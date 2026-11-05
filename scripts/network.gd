@@ -464,7 +464,7 @@ func crear_todos_los_jugadores(): #SOLO EL HOST llama a esta función
 		
 		# Crear localmente
 		crear_jugador_en_mundo(mundo, peer_id, username, posicion,id_pollo)
-		
+		cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
 		# Notificar a todos los clientes
 		spawnear_jugador_rpc.rpc(peer_id, username, posicion,id_pollo)
 
@@ -498,12 +498,13 @@ func crear_jugador_en_mundo(mundo: Node, peer_id: int, username: String, posicio
 			# correctamente en multijugador.
 			jugador.crear_pollo_en_red(id_pollo)
 
-		print(
-			"Se solicitó crear el pollo ",
-			id_pollo,
-			" para el jugador ",
-			jugador.name
-		)
+		#print(
+			#"Se solicitó crear el pollo ",
+			#id_pollo,
+			#" para el jugador ",
+			#jugador.name
+		#)
+		cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
 	else:
 		push_warning("El jugador no tiene crear_pollo_en_red()")
 	
@@ -668,6 +669,134 @@ func _on_tube_error_raised(code: int, message: String) -> void:
 @rpc("authority", "reliable")
 func _error_lobby_lleno() -> void:
 	GlobalSignal.error_conexion.emit("La sala está llena (máximo 4 jugadores).")
+
+# ------------------------------------------------------------
+# MANEJO DE FASES DEL JUEGI
+# ------------------------------------------------------------
+ # solo el host pide a todos cambiar de fase
+@rpc("authority","call_local","reliable")
+func cambiar_fase_rpc(nueva_fase:int)->void:
+	GlobalJuego.fase_actual = nueva_fase as GlobalJuego.FaseJuego
+	# actualizar al jugador local que cambio la fase
+	var ui = _obtener_ui_local()
+	if ui and ui.has_method("_on_fase_cambiada"):
+		ui._on_fase_cambiada(nueva_fase)
+	
+	if nueva_fase == GlobalJuego.FaseJuego.CARGANDO:
+		_iniciar_carga_nueva_oleada()
+
+func _iniciar_carga_nueva_oleada():
+	iniciar_carga_sincronizada(GlobalJuego.session_info.keys())
+	
+
+# el host llama a esto cuando el timer de oleada llega a 0
+func host_iniciar_tienda() -> void:
+	if not multiplayer.is_server():
+		return
+	if GlobalJuego.esta_pausado:
+		return
+	var mundo = obtener_mundo_actual()
+	if mundo:
+		if mundo.has_method("limpiar_enemigos"):
+			mundo.limpiar_enemigos()
+		if mundo.has_method("pausar_gameplay"):
+			mundo.pausar_gameplay()
+	GlobalJuego.reiniciar_vida_todos()
+	resetear_vida_todos_rpc.rpc()
+	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.TIENDA)
+
+
+# el host llama a esto cuando el timer de tienda llega a 0
+func host_iniciar_carga_nueva_oleada() -> void:
+	if not multiplayer.is_server():
+		return
+	if GlobalJuego.esta_pausado:
+		return
+	_preparar_nueva_oleada() # directo a oleada sin mostrar pantalla de carga
+	
+
+func _preparar_nueva_oleada()->void:
+	if not multiplayer.is_server():
+		return
+	
+	#primero semilla
+	GlobalJuego.semilla_mapa  = randi()
+	_replicar_semilla.rpc(GlobalJuego.semilla_mapa)
+	var mundo = obtener_mundo_actual()
+	if not mundo:
+		return
+	if mundo.has_method("regenerar_mapa_nueva_oleada"):
+		await mundo.regenerar_mapa_nueva_oleada(GlobalJuego.semilla_mapa)
+	
+	await reposicionar_jugadores()
+	
+	#if mundo.has_method("reanudar_gameplay"):
+		#mundo.reanudar_gameplay()
+	
+	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
+	GlobalJuego.oleada+=1
+	GlobalSignal.emit_signal("cambia_oleada")
+
+func reposicionar_jugadores():
+	if not multiplayer.is_server():
+		return
+	var mundo = obtener_mundo_actual()
+	if not mundo:
+		return
+	var peers_ids=GlobalJuego.session_info.keys()
+	var total_peers = peers_ids.size()
+	for i in range(total_peers):
+		var peer_id = peers_ids[i]
+		var jugador=mundo.get_node_or_null(str(peer_id))
+		if not jugador:
+			continue
+		var posicion=mundo.obtener_posicion_spawn(i,total_peers)
+		
+		_mover_jugador_rpc.rpc(peer_id,posicion)
+	await get_tree().process_frame
+
+@rpc("authority", "call_local", "reliable")
+func _mover_jugador_rpc(peer_id: int, nueva_posicion: Vector3) -> void:
+	var mundo = obtener_mundo_actual()
+	if not mundo:
+		return
+	var jugador = mundo.get_node_or_null(str(peer_id))
+	if jugador:
+		jugador.global_position = nueva_posicion
+		# reseteamos velocidad para que no siga "cayendo" con la velocidad vieja
+		if "velocity" in jugador:
+			jugador.velocity = Vector3.ZERO
+
+func _obtener_ui_local() -> Node:
+	# buscamos el jugador local en el mundo
+	var mundo = obtener_mundo_actual()
+	if not mundo:
+		return null
+	var mi_id = multiplayer.get_unique_id()
+	var jugador = mundo.get_node_or_null(str(mi_id))
+	if jugador:
+		return jugador.get_node_or_null("Player_UI")
+	return null
+
+# ------------------------------------------------------------
+# RESETEO DE VIDA ENTRE OLEADAS
+# ------------------------------------------------------------
+
+@rpc("authority","call_local","reliable")
+func resetear_vida_todos_rpc() ->void:
+	for jugador in get_tree().get_nodes_in_group("Jugadores"):
+		if not is_instance_valid(jugador):
+			continue
+		var peer_id = int(jugador.name)
+		if not GlobalJuego.session_info.has(peer_id):
+			continue
+		var info:Dictionary = GlobalJuego.session_info[peer_id]
+		var salud_max:int = info.get("salud_maxima",GlobalJuego.SALUD_DEFAULT)
+		jugador.aplicar_salud_local(salud_max,salud_max,false)
+		
+		
+		
+
 
 # ------------------------------------------------------------
 # MANEJO DE PANTALLA DE CARGA
@@ -836,7 +965,6 @@ func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3,id_po
 		
 @rpc("authority","call_local","reliable")
 func _replicar_semilla(semilla:int)->void:
-	#print("la semialla es: ", semilla)
 	GlobalJuego.semilla_mapa = semilla
 
 func _exit_tree() -> void:
