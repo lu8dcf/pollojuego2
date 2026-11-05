@@ -106,6 +106,8 @@ signal ronda_terminada()
 signal juego_pausado()
 @warning_ignore("unused_signal")
 signal juego_reanudado()
+@warning_ignore("unused_signal")
+signal cambia_oleada()
 
 # ===== SEÑALES DE PUNTAJE =====
 @warning_ignore("unused_signal")

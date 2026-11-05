@@ -15,6 +15,7 @@ extends CanvasLayer
 # Referencias a paneles
 @onready var panel_un_jugador: Control = %PanelUnJugador
 @onready var panel_multijugador: Control = %PanelMultijugador
+@onready var panel_multijugador_enet: PanelContainer = %PanelMultijugadorEnet
 @onready var panel_opciones: Control = %PanelOpciones
 #@onready var panel_creditos: Control = %PanelCreditos
 
@@ -88,6 +89,7 @@ func _boton_requisitos(tongle:bool):
 func _ocultar_todos_los_paneles() -> void:
 	panel_un_jugador.visible = false
 	panel_multijugador.visible = false
+	panel_multijugador_enet.visible = false
 	panel_opciones.visible = false
 	boton_local.visible = false
 	boton_online.visible = false

@@ -162,7 +162,7 @@ func regenerar_mapa_nueva_oleada(nueva_semilla:int)->void:
 	
 	limpiar_enemigos()
 	#avisar a los cleintes que reactualicen la semilla
-	_regenerar_mapa_rpc(nueva_semilla) 
+	_regenerar_mapa_rpc.rpc(nueva_semilla) 
 	
 	await get_tree().create_timer(0.3).timeout
 	

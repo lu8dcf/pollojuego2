@@ -50,9 +50,16 @@ var _fase_para_reanudar:int = GlobalJuego.FaseJuego.OLEADA
 @onready var etiqueta_salud: Label = %EtiquetaSalud
 #@onready var barra_salud: ProgressBar = %BarraSalud
 @onready var barra_experiencia: ProgressBar = %BarraExperiencia
+@onready var label_oleada: Label = %LabelOleada
 
 @onready var controls_root: VBoxContainer = %ControlsRoot
 
+
+# referencias del fade in y out (color rect)
+@onready var fade: ColorRect = %Fade
+@export var duracion_fade: float = 0.4
+# tween activo (para cancelar si se dispara otro fade antes de que termine)
+var _tween_fade: Tween = null
 
 var COLORS: Array[Color] =[ # colores de la barra de vida
 	Color.MAGENTA,
@@ -72,7 +79,7 @@ func _ready() -> void:
 		menu.hide() # los botones de salir y pausa
 	
 	agregar_tienda()
-	
+	mostrar_oleada_actual()
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	# BOTON SALIR
 	boton_salir.pressed.connect(func(): Network.leave_server())
@@ -85,12 +92,11 @@ func _ready() -> void:
 	multiplayer.peer_disconnected.connect(_on_jugador_desconectado)
 	multiplayer.server_disconnected.connect(_on_server_desconectado)
 	#var es_host = multiplayer.is_server()
-	for i in GlobalJuego.session_info:
-		print("i: ",i, "Global: ", GlobalJuego.session_info[i])
 	
 	if GlobalSignal.has_signal("pausa_cambiada"):
 		GlobalSignal.pausa_cambiada.connect(_on_pausa_cambiada)
-		
+	if GlobalSignal.has_signal("cambia_oleada"):
+		GlobalSignal.cambia_oleada.connect(mostrar_oleada_actual)
 
 	for single_color in COLORS:
 		var new_texture = GradientTexture2D.new()
@@ -138,6 +144,11 @@ func iniciar_ciclo_de_fases()->void:
 	
 	_arrancar_timer_para_fase(GlobalJuego.fase_actual)
 
+# MANEJO DE OLEADA
+func mostrar_oleada_actual():
+	print("Oleada: ", GlobalJuego.oleada)
+	label_oleada.text = "Oleada: "+ str(GlobalJuego.oleada)
+
 # MANEJO DE TIEMPO
 func _arrancar_timer_para_fase(fase:int) ->void:
 	if _timer_fase == null:
@@ -165,6 +176,7 @@ func _arrancar_timer_para_fase(fase:int) ->void:
 		
 	_actualizar_label_tiempo()
 
+
 func _on_timer_fase_timeout():
 	if GlobalJuego.esta_pausado or GlobalJuego.fase_actual == GlobalJuego.FaseJuego.PAUSA:
 		return
@@ -176,6 +188,7 @@ func _on_timer_fase_timeout():
 			Network.host_iniciar_tienda()
 		GlobalJuego.FaseJuego.TIENDA:
 			Network.host_iniciar_carga_nueva_oleada()
+			mostrar_oleada_actual()
 
 func _pausar_timer_fase() ->void:
 	if _timer_fase == null or _timer_fase.is_stopped():
@@ -208,19 +221,25 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 	match nueva_fase:
 		GlobalJuego.FaseJuego.OLEADA:
 			# mostrar ui de oleada, ocultar tienda
+			fade_out()
 			_mostrar_ui_oleada()
 			if mundo.has_method("reanudar_gameplay"):
 				mundo.reanudar_gameplay()
+			Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 		GlobalJuego.FaseJuego.TIENDA:
 			# mostrar ui de tienda, ocultar oleada
+			fade_in()
 			_mostrar_ui_tienda()
 			if mundo and mundo.has_method("pausar_gameplay"):
 				mundo.pausar_gameplay()
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+
 		GlobalJuego.FaseJuego.CARGANDO:
 			# ocultar ui de juego, mostrar pantalla de carga
 			_mostrar_ui_carga()
 		GlobalJuego.FaseJuego.MENU, GlobalJuego.FaseJuego.LOBBY:
 			pass
+	mostrar_oleada_actual()
 
 
 func _process(_delta: float) -> void:
@@ -283,6 +302,59 @@ func agregar_tienda():
 	add_child(tienda_actual)
 	tienda_actual.hide()
 
+# ===== MANEJAR TRANSICION FADE IN Y OUT =====
+# hace fade in a negro (0 -> 1)
+func fade_in() -> void:
+	if not fade:
+		return
+	if _tween_fade and _tween_fade.is_valid():
+		_tween_fade.kill()
+	
+	fade.visible = true
+	_tween_fade = create_tween()
+	_tween_fade.tween_method(
+		_set_fade_progress,
+		_get_fade_progress(),
+		1.0,
+		duracion_fade
+	)
+
+# hace fade out (1 -> 0)
+func fade_out() -> void:
+	if not fade:
+		return
+	if _tween_fade and _tween_fade.is_valid():
+		_tween_fade.kill()
+	
+	_tween_fade = create_tween()
+	_tween_fade.tween_method(
+		_set_fade_progress,
+		_get_fade_progress(),
+		0.0,
+		duracion_fade
+	)
+	# al terminar, ocultar el ColorRect para no gastar draw calls
+	_tween_fade.tween_callback(func():
+		if fade:
+			fade.visible = false
+	)
+
+# helpers para leer/escribir el progress del shader
+func _set_fade_progress(valor: float) -> void:
+	if not fade:
+		return
+	var mat := fade.material as ShaderMaterial
+	if mat:
+		mat.set_shader_parameter("progress", clamp(valor, 0.0, 1.0))
+
+func _get_fade_progress() -> float:
+	if not fade:
+		return 0.0
+	var mat := fade.material as ShaderMaterial
+	if mat:
+		return mat.get_shader_parameter("progress") as float
+	return 0.0
+
 
 # ===== SI ES MOBILE =====
 func _verificar_si_es_mobile() -> void:
@@ -318,13 +390,12 @@ func _actualizar_paneles_aliados(info:Dictionary)-> void:
 	if not lista_usuarios:
 		print("ERROR: contenedor_aliados no está configurado")
 		return
-	var mi_id = multiplayer.get_unique_id()
+	var mi_id = _obtener_mi_peer_id()
 	var ids_remotos: Array = []
 	
 	for peer_id in info.keys(): # recorrer todos los jugadores de la sesión
 		if peer_id == mi_id:
 			continue  # no mostrar el status del mismo jugador
-		
 		ids_remotos.append(peer_id)
 		var player_info = info[peer_id]
 		var nombre = player_info.get("username", "Jugador " + str(peer_id))
@@ -351,9 +422,8 @@ func _actualizar_paneles_aliados(info:Dictionary)-> void:
 func _crear_panel_aliado(peer_id: int, _nombre: String, salud: int, salud_max: int, personaje: int) -> void:
 	var panel = PANEL_USUARIO.instantiate()
 	lista_usuarios.add_child(panel) # agregarlo antes de configurar
-	await  get_tree().process_frame
-	panel.configurar(peer_id, salud, salud_max, personaje)
 	paneles_usuarios[peer_id] = panel
+	panel.configurar(peer_id, salud, salud_max, personaje)
 	#print("session info: ", GlobalJuego.session_info)
 
 func _eliminar_panel_aliado0(peer_id) -> void:
@@ -364,6 +434,20 @@ func _eliminar_panel_aliado0(peer_id) -> void:
 		panel.queue_free()
 	paneles_usuarios.erase(peer_id) # seelimina el aliado que se desconecto
 
+
+func _obtener_mi_peer_id() -> int:
+	if not multiplayer.has_multiplayer_peer():
+		return 1
+	var id := multiplayer.get_unique_id()
+	if id <= 0:
+		# fallback: buscar el jugador local en el mundo
+		var mundo = Network.obtener_mundo_actual()
+		if mundo:
+			for child in mundo.get_children():
+				if child is Jugador and child.is_multiplayer_authority():
+					return int(child.name)
+		return 1
+	return id
 
 
 func _actualizar_experiencia(nueva_exp:int):

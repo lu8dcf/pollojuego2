@@ -7,6 +7,20 @@
 layout_mode = 3
 anchors_preset = 0
 
+[node name="Label" type="Label" parent="." unique_id=756712702]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 64.0
+offset_top = 8.0
+offset_right = 220.0
+offset_bottom = 57.0
+grow_horizontal = 2
+text = "TIENDA"
+label_settings = ExtResource("2_fy1g5")
+horizontal_alignment = 1
+
 [node name="PanelInventario" type="Panel" parent="." unique_id=1765299463]
 layout_mode = 0
 offset_top = 205.0
@@ -36,10 +50,20 @@ layout_mode = 2
 
 [node name="PanelPersonaje" type="Panel" parent="." unique_id=112597444]
 layout_mode = 0
-offset_left = 5.0
-offset_top = -1.0
-offset_right = 339.0
-offset_bottom = 139.0
+offset_left = -1.0
+offset_top = 65.0
+offset_right = 291.0
+offset_bottom = 205.0
+
+[node name="Label" type="Label" parent="PanelPersonaje" unique_id=729249063]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 20.0
+grow_horizontal = 2
+text = "personaje"
+label_settings = ExtResource("1_kd47h")
+horizontal_alignment = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelPersonaje" unique_id=328669865]
 visible = false
@@ -80,3 +104,46 @@ grow_vertical = 2
 
 [node name="GridContainer" type="GridContainer" parent="PanelTiendaArmas/MarginContainer" unique_id=1248084018]
 layout_mode = 2
+
+[node name="PanelCombinacion" type="Panel" parent="." unique_id=2066395517]
+layout_mode = 0
+offset_left = 518.0
+offset_top = 357.0
+offset_right = 1060.0
+offset_bottom = 629.0
+
+[node name="Label" type="Label" parent="PanelCombinacion" unique_id=962972526]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 49.0
+grow_horizontal = 2
+text = "combinación"
+label_settings = ExtResource("2_fy1g5")
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelCombinacion" unique_id=1442232730]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="PanelCombinacion/MarginContainer" unique_id=1485078218]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="." unique_id=426791389]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 187.0
+offset_top = 412.99997
+offset_right = 791.0
+offset_bottom = 461.99997
+grow_horizontal = 2
+rotation = -0.383254
+text = "we are workeando in this"
+label_settings = ExtResource("2_fy1g5")
+horizontal_alignment = 1

@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://c35unm3ykc85i" path="res://scenes/player/player_ui.gd" id="1_m6sn8"]
 [ext_resource type="Texture2D" uid="uid://b1t8eqspo4bb6" path="res://assets/keyboard-&-mouse_sheet_default.png" id="3_fatww"]
 [ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="4_mo8vb"]
+[ext_resource type="Shader" uid="uid://dhta31awldte3" path="res://shaders/fade_out_in.gdshader" id="4_nlx67"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nlx67"]
 atlas = ExtResource("3_fatww")
@@ -62,6 +63,11 @@ region = Rect2(0, 128, 64, 64)
 [sub_resource type="AtlasTexture" id="AtlasTexture_mo8vb"]
 atlas = ExtResource("3_fatww")
 region = Rect2(448, 576, 64, 64)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mo8vb"]
+shader = ExtResource("4_nlx67")
+shader_parameter/fade_color = Color(0, 0, 0, 1)
+shader_parameter/progress = 0.0
 
 [node name="Player_UI" type="CanvasLayer" unique_id=1188246629]
 process_mode = 3
@@ -157,16 +163,33 @@ theme_override_constants/margin_bottom = 20
 [node name="ControlVida" type="VBoxContainer" parent="ArribaCentro" unique_id=1544861557]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 8
 
 [node name="LabelTiempo" type="Label" parent="ArribaCentro/ControlVida" unique_id=753765349]
 unique_name_in_owner = true
+z_index = 20
 layout_mode = 2
 text = "Tiempo:"
 label_settings = ExtResource("4_mo8vb")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Label" type="Label" parent="ArribaCentro/ControlVida" unique_id=1456244193]
+[node name="HBoxContainer" type="HBoxContainer" parent="ArribaCentro/ControlVida" unique_id=1635212464]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 80
+
+[node name="LabelOleada" type="Label" parent="ArribaCentro/ControlVida/HBoxContainer" unique_id=311077641]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Oleada:"
+label_settings = ExtResource("4_mo8vb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label" type="Label" parent="ArribaCentro/ControlVida/HBoxContainer" unique_id=1456244193]
 layout_mode = 2
 text = "Monedas: "
 label_settings = ExtResource("4_mo8vb")
@@ -281,3 +304,13 @@ label_settings = ExtResource("4_mo8vb")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="Fade" type="ColorRect" parent="." unique_id=539059642]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_mo8vb")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

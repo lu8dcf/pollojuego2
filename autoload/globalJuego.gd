@@ -34,6 +34,7 @@ var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
 var cant_jugadres:int = 0
 var oleada:int = 1
+var menu_abierto: bool = false
 
 # ===== TIPO DE JUEGO =====
 var duracion_oleada:float=10.0
@@ -96,6 +97,17 @@ func _configurar_sesion():
 			return
 	_replicar_session_info.rpc(session_info)
 
+func reiniciar_vida_jugador(peer_id:int) ->void:
+	if not session_info.has(peer_id):
+		return
+	var info:Dictionary = session_info[peer_id]
+	var salud_max :int = info.get("salud_maxima",SALUD_DEFAULT)
+	info["salud"] = salud_max
+	session_info[peer_id] = info
+	_replicar_session_info.rpc(session_info)
+	
+	
+
 func _agregar_jugador(peer_id: int):
 	await get_tree().create_timer(1.0).timeout
 	
@@ -135,6 +147,19 @@ func _obtener_jugador(peer_id: int) -> Node:
 	return null
 
 # ===== FUNCIONES DE SALUD =====
+
+#reiniciar la vida de todos y replicar el resultado
+func reiniciar_vida_todos()->void:
+	for peer_id in session_info.keys():
+		var info : Dictionary = session_info[peer_id]
+		var salud_max:int = info.get("salud_maxima",SALUD_DEFAULT)
+		info["salud"] = salud_max
+		session_info[peer_id] = info
+	
+	_replicar_session_info(session_info)
+	#for i in GlobalJuego.session_info.keys():
+		#print("DESPUES DE REINICIAR i: ",i, "Global: ", GlobalJuego.session_info[i])
+
 func dañar_jugador(peer_id: int, cantidad_daño: int):
 	"""Aplica daño a un jugador específico"""
 	if not session_info.has(peer_id):

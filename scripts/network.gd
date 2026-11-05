@@ -687,7 +687,7 @@ func cambiar_fase_rpc(nueva_fase:int)->void:
 
 func _iniciar_carga_nueva_oleada():
 	iniciar_carga_sincronizada(GlobalJuego.session_info.keys())
-	GlobalJuego.oleada +=1
+	
 
 # el host llama a esto cuando el timer de oleada llega a 0
 func host_iniciar_tienda() -> void:
@@ -701,6 +701,8 @@ func host_iniciar_tienda() -> void:
 			mundo.limpiar_enemigos()
 		if mundo.has_method("pausar_gameplay"):
 			mundo.pausar_gameplay()
+	GlobalJuego.reiniciar_vida_todos()
+	resetear_vida_todos_rpc.rpc()
 	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.TIENDA)
 
 
@@ -732,8 +734,9 @@ func _preparar_nueva_oleada()->void:
 		#mundo.reanudar_gameplay()
 	
 	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
-	
+	print("se suma una oleada mas")
 	GlobalJuego.oleada+=1
+	GlobalSignal.emit_signal("cambia_oleada")
 
 func reposicionar_jugadores():
 	if not multiplayer.is_server():
@@ -775,6 +778,26 @@ func _obtener_ui_local() -> Node:
 	if jugador:
 		return jugador.get_node_or_null("Player_UI")
 	return null
+
+# ------------------------------------------------------------
+# RESETEO DE VIDA ENTRE OLEADAS
+# ------------------------------------------------------------
+
+@rpc("authority","call_local","reliable")
+func resetear_vida_todos_rpc() ->void:
+	for jugador in get_tree().get_nodes_in_group("Jugadores"):
+		if not is_instance_valid(jugador):
+			continue
+		var peer_id = int(jugador.name)
+		if not GlobalJuego.session_info.has(peer_id):
+			continue
+		var info:Dictionary = GlobalJuego.session_info[peer_id]
+		var salud_max:int = info.get("salud_maxima",GlobalJuego.SALUD_DEFAULT)
+		jugador.aplicar_salud_local(salud_max,salud_max,false)
+		
+		
+		
+
 
 # ------------------------------------------------------------
 # MANEJO DE PANTALLA DE CARGA
@@ -943,7 +966,7 @@ func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3,id_po
 		
 @rpc("authority","call_local","reliable")
 func _replicar_semilla(semilla:int)->void:
-	#print("la semialla es: ", semilla)
+	print("[Network][PEER ", multiplayer.get_unique_id(), "] recibio semilla: ", semilla)
 	GlobalJuego.semilla_mapa = semilla
 
 func _exit_tree() -> void:
