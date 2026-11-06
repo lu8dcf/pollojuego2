@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://ckp6ocga3v5sr"]
+
+[ext_resource type="PackedScene" uid="uid://dyfq675e617wa" path="res://assets/modelos/mapas/planta_4.fbx" id="1_djt0h"]
+[ext_resource type="Shader" uid="uid://cpb1fntvl7jg6" path="res://assets/modelos/mapas/plantas.gdshader" id="2_c1bec"]
+[ext_resource type="Texture2D" uid="uid://dh5gcay1w7qa3" path="res://assets/modelos/mapas/alfa_plantas.png" id="3_dw4my"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_700pu"]
+render_priority = 0
+shader = ExtResource("2_c1bec")
+shader_parameter/textura_mascara = ExtResource("3_dw4my")
+shader_parameter/color_personalizado = Color(0.7935427, 0.890625, 0.4685278, 1)
+shader_parameter/usar_mascara = true
+shader_parameter/usar_fundido = true
+shader_parameter/corte_alfa = 0.5
+shader_parameter/suavizado_borde = 0.0
+
+[node name="planta_4" unique_id=1558358449 instance=ExtResource("1_djt0h")]
+
+[node name="planta_4" parent="." index="0" unique_id=1307124391]
+material_override = SubResource("ShaderMaterial_700pu")

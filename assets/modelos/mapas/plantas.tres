@@ -4,6 +4,7 @@
 
 [resource]
 transparency = 1
-albedo_color = Color(0.6310075, 0.91043866, 0.13107008, 1)
+albedo_color = Color(0.49538726, 0.8784314, 0.20416887, 1)
 albedo_texture = ExtResource("1_tsxmb")
 albedo_texture_msdf = true
+metallic_texture_channel = 1
