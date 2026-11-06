@@ -1,9 +1,20 @@
 [gd_scene format=3 uid="uid://5qyru4bawtq7"]
 
-[ext_resource type="PackedScene" uid="uid://0wbim1jrl2w1" path="res://assets/modelos/mapas/planta_3.fbx" id="1_8o478"]
-[ext_resource type="Material" uid="uid://blh60f5rkssxd" path="res://assets/modelos/mapas/plantas.tres" id="2_n1d2e"]
+[ext_resource type="PackedScene" uid="uid://l15n17aduk64" path="res://assets/modelos/mapas/planta_3.fbx" id="1_8o478"]
+[ext_resource type="Shader" uid="uid://cpb1fntvl7jg6" path="res://assets/modelos/mapas/plantas.gdshader" id="2_n1d2e"]
+[ext_resource type="Texture2D" uid="uid://dh5gcay1w7qa3" path="res://assets/modelos/mapas/alfa_plantas.png" id="3_qfn3p"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n1d2e"]
+render_priority = 0
+shader = ExtResource("2_n1d2e")
+shader_parameter/textura_mascara = ExtResource("3_qfn3p")
+shader_parameter/color_personalizado = Color(0.8829157, 0.9921875, 0.5201335, 1)
+shader_parameter/usar_mascara = true
+shader_parameter/usar_fundido = true
+shader_parameter/corte_alfa = 0.5
+shader_parameter/suavizado_borde = 0.05
 
 [node name="planta_3" unique_id=1396329420 instance=ExtResource("1_8o478")]
 
-[node name="planta_3" parent="." index="0" unique_id=1431242203]
-material_override = ExtResource("2_n1d2e")
+[node name="planta_3" parent="." index="0" unique_id=1503923741]
+material_override = SubResource("ShaderMaterial_n1d2e")
