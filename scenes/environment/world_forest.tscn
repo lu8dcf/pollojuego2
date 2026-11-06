@@ -73,7 +73,3 @@ _spawnable_scenes = PackedStringArray("uid://ctd4on41k0ea4", "uid://df6wkbhxh2ii
 spawn_path = NodePath("../ContenedorHabilidades")
 
 [node name="ContenedorBalas" type="Node3D" parent="." unique_id=1716599380 groups=["contenedor_balas"]]
-
-[node name="SpawnerBalas" type="MultiplayerSpawner" parent="." unique_id=372688315]
-_spawnable_scenes = PackedStringArray("uid://b635l88o7cpj4", "uid://dmk64w66uhmkc", "uid://d0hnrx2eowpsn")
-spawn_path = NodePath("../ContenedorBalas")

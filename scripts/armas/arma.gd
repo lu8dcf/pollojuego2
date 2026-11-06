@@ -5,7 +5,8 @@ class_name Arma
 enum TipoArma {
 	MELEE,
 	COMUN,
-	EXPLOSIVA
+	EXPLOSIVA,
+	ESCOPETA
 }
 @export var id: int #o usar un StringName (nombre unico, genial!)
 @export var nombre: String
