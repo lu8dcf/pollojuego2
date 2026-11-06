@@ -1,5 +1,8 @@
 [gd_scene format=3 uid="uid://bv2wbh2huthd3"]
 
-[ext_resource type="PackedScene" uid="uid://8eiyxtwiw8xy" path="res://assets/modelos/armas/arma_2_01.fbx" id="1_60qu1"]
+[ext_resource type="PackedScene" uid="uid://gxlmvxju3wl7" path="res://assets/modelos/armas/arma_2_01.fbx" id="1_60qu1"]
 
 [node name="arma_2_01" unique_id=1470931385 instance=ExtResource("1_60qu1")]
+
+[node name="Marker3D" type="Marker3D" parent="." index="1" unique_id=1230655884]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18767089, 0.6481012)

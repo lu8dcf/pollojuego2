@@ -10,7 +10,7 @@ var velocidadBala = 15
 var direccion
 
 var inicio = false
-
+var es_fantasma: bool = false 
 var danioBala 
 #solo explosiva
 @onready var areaExplosiva = $area_explosion
@@ -21,7 +21,7 @@ var danioBala
 @onready var textureBullet =$explosiva
 
 
-func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio: int) -> void:
+func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio: int,visual_local: bool = false) -> void:
 
 	if comp == null: #si por alguna razon no tiene comportamiento, vuelve
 		return
@@ -32,7 +32,8 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 	danioBala = danio
 	direccion = direccion_inicial.normalized()
 	inicio = true
-
+	tiempo.wait_time =comp.get_tiempoEspoleta()
+	es_fantasma = visual_local
 	
 func _ready() -> void:
 	top_level = true
@@ -45,8 +46,6 @@ func _process(_delta: float) -> void:
 		balaExplosiva()
 
 func _physics_process(delta: float) -> void:
-	if !is_multiplayer_authority():
-		return
 	if(avanza): #bala comun y explosiva
 		global_position += direccion * velocidadBala * delta
 
@@ -78,13 +77,9 @@ func explosion():
 
 #-----------------------------------------------------------------------------comun y explosiva
 func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
-	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
-		return
 	eliminarBala()
 	
 func eliminarBala():
-	if !is_multiplayer_authority():
-		return
 	queue_free()
 
 
@@ -101,7 +96,8 @@ func _on_area_explosion_body_entered(_body: Node3D) -> void:
 
 
 func _on_body_entered(body: Node3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
+	if es_fantasma:
+		eliminarBala()
 		return
 	if body.is_in_group("enemy"):
 		# Aplicar daño al enemigo

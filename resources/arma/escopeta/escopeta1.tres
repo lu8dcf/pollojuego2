@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Arma" format=3 uid="uid://c4031ucaxivhs"]
+
+[ext_resource type="Script" uid="uid://ckltpinun1cgl" path="res://scripts/armas/arma.gd" id="1_cjdn8"]
+[ext_resource type="PackedScene" uid="uid://c46wfxec6q4kf" path="res://scenes/bala/balaEscopeta.tscn" id="1_d1xam"]
+[ext_resource type="PackedScene" uid="uid://d3oqg0ivxs0h5" path="res://scenes/armas/armas_modelos/arma_4_01.tscn" id="2_02g1v"]
+[ext_resource type="Script" uid="uid://e1xldo2nnltg" path="res://scripts/armas/comportamiento/comportamientoEscopeta.gd" id="2_eu1or"]
+
+[sub_resource type="Resource" id="Resource_lt6ua"]
+script = ExtResource("2_eu1or")
+vida_bala = 0.4
+cant_perdigones = 3
+metadata/_custom_type_script = "uid://e1xldo2nnltg"
+
+[resource]
+script = ExtResource("1_cjdn8")
+id = 12
+danio = 20.0
+sprite = ExtResource("2_02g1v")
+tiempoDeAtaque = 2.0
+tipo = 3
+comportamiento = SubResource("Resource_lt6ua")
+metadata/_custom_type_script = "uid://ckltpinun1cgl"

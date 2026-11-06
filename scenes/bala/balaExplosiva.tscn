@@ -5,14 +5,6 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_0wskc"]
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_gvbmg"]
-properties/0/path = NodePath(".:global_position")
-properties/0/spawn = true
-properties/0/replication_mode = 2
-properties/1/path = NodePath("explosiva:visible")
-properties/1/spawn = true
-properties/1/replication_mode = 2
-
 [sub_resource type="SphereShape3D" id="SphereShape3D_sugfe"]
 radius = 0.22944674
 
@@ -22,7 +14,6 @@ collision_mask = 72
 script = ExtResource("1_8udgy")
 
 [node name="explosiva" parent="." unique_id=896676526 instance=ExtResource("2_8udgy")]
-visible = false
 
 [node name="area_explosion" type="Area3D" parent="." unique_id=1832871902]
 collision_layer = 16
@@ -32,9 +23,6 @@ collision_mask = 2
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -0.011737466, 0)
 shape = SubResource("SphereShape3D_0wskc")
 debug_color = Color(0.8156863, 0.14509805, 0.78039217, 0.9137255)
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1675147379]
-replication_config = SubResource("SceneReplicationConfig_gvbmg")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=793220646]
 shape = SubResource("SphereShape3D_sugfe")

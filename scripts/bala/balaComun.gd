@@ -12,7 +12,7 @@ var direccion
 var inicio = false
 
 var danioBala
-
+var es_fantasma: bool = false 
 #solo comun
 #@onready var areaComun = $area_comun
 
@@ -20,7 +20,7 @@ var danioBala
 @onready var textureBullet = $pollo_1
 @onready var dano = 10 # daño de la balad
 
-func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio) -> void:
+func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio,visual_local: bool = false) -> void:
 
 	if comp == null: #si por alguna razon no tiene comportamiento, vuelve
 		return
@@ -31,7 +31,7 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 	danioBala = danio
 	direccion = direccion_inicial.normalized()
 	inicio = true
-
+	es_fantasma = visual_local
 	
 func _ready() -> void:
 	add_to_group("bala")
@@ -44,8 +44,7 @@ func _process(_delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if !is_multiplayer_authority():
-		return
+
 	if(avanza): #bala comun y explosiva
 		global_position += direccion * velocidadBala * delta
 
@@ -54,11 +53,7 @@ func _physics_process(delta: float) -> void:
 
 func balaComun():
 	inicio = false
-	#TEST------------------------------------
-	#textureBullet.visible = true
-	#fin Test
-	
-	#areaComun.visible = true
+
 	avanza=true
 	tiempoDeVida.start()
 
@@ -67,29 +62,24 @@ func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
 	eliminarBala()
 	
 func eliminarBala():
-	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
-		return
 	
 	queue_free()
 
 
 func _on_area_comun_body_entered(_body: Node3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
-		return
-		
 				#--------------------------Aca cuando choca con el enemigo
 	eliminarBala()
 	
 
 
 func _on_area_comun_area_entered(_area: Area3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
-		return
+
 	eliminarBala()
 
 
 func _on_body_entered(body: Node3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
+	if es_fantasma:
+		eliminarBala()
 		return
 	if body.is_in_group("enemy"):
 		# Aplicar daño al enemigo
@@ -100,6 +90,5 @@ func _on_body_entered(body: Node3D) -> void:
 
 
 func _on_area_entered(_area: Area3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede eliminar balas
-		return
+
 	eliminarBala()

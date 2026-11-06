@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Arma" format=3 uid="uid://bfjw7tx5ca81k"]
+
+[ext_resource type="PackedScene" uid="uid://d0hnrx2eowpsn" path="res://scenes/bala/balaComun.tscn" id="1_a5el3"]
+[ext_resource type="Script" uid="uid://ckltpinun1cgl" path="res://scripts/armas/arma.gd" id="1_alyqb"]
+[ext_resource type="Script" uid="uid://jotbeoqr0ybl" path="res://scripts/armas/comportamiento/comportamientoComun.gd" id="2_hyetx"]
+[ext_resource type="PackedScene" uid="uid://c8wrvf4jsvrsa" path="res://scenes/armas/armas_modelos/arma_1_06.tscn" id="4_ud2a8"]
+
+[sub_resource type="Resource" id="Resource_trve5"]
+script = ExtResource("2_hyetx")
+metadata/_custom_type_script = "uid://jotbeoqr0ybl"
+
+[resource]
+script = ExtResource("1_alyqb")
+id = 6
+danio = 17.5
+sprite = ExtResource("4_ud2a8")
+tiempoDeAtaque = 0.5
+tipo = 1
+comportamiento = SubResource("Resource_trve5")
+metadata/_custom_type_script = "uid://ckltpinun1cgl"

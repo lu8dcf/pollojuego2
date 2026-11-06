@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Arma" format=3 uid="uid://beu8vdq3rm6u0"]
+
+[ext_resource type="Script" uid="uid://ckltpinun1cgl" path="res://scripts/armas/arma.gd" id="1_78lbw"]
+[ext_resource type="PackedScene" uid="uid://dmk64w66uhmkc" path="res://scenes/bala/balaMelee.tscn" id="1_qmm6s"]
+[ext_resource type="Script" uid="uid://b47t1prnayyqk" path="res://scripts/armas/comportamiento/comportamientoMelee.gd" id="2_b5dqr"]
+[ext_resource type="PackedScene" uid="uid://1kk8o0ed0vqf" path="res://scenes/armas/armas_modelos/arma_3_02.tscn" id="4_80h4c"]
+
+[sub_resource type="Resource" id="Resource_bqrym"]
+script = ExtResource("2_b5dqr")
+metadata/_custom_type_script = "uid://b47t1prnayyqk"
+
+[resource]
+script = ExtResource("1_78lbw")
+id = 10
+danio = 18.0
+sprite = ExtResource("4_80h4c")
+tiempoDeAtaque = 0.5
+comportamiento = SubResource("Resource_bqrym")
+metadata/_custom_type_script = "uid://ckltpinun1cgl"
