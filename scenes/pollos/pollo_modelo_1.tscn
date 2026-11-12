@@ -1,8 +1,7 @@
 [gd_scene format=3 uid="uid://6dr1scr4fnwt"]
 
 [ext_resource type="PackedScene" uid="uid://bskyk4ur6lr8m" path="res://assets/modelos/pollos/pollo_1.fbx" id="1_mnqw3"]
-[ext_resource type="AnimationLibrary" uid="uid://ypv5w1ontkhk" path="res://assets/modelos/pollos/animaciones/animaciones_pollos.res" id="2_ghtl4"]
-[ext_resource type="AnimationLibrary" uid="uid://ypv5w1ontkhk" path="res://assets/modelos/pollos/Animaciones/animaciones_pollos.res" id="3_0x36p"]
+[ext_resource type="AnimationLibrary" uid="uid://ypv5w1ontkhk" path="res://assets/modelos/pollos/animaciones/animaciones_pollos.res" id="3_0x36p"]
 
 [node name="pollo_1" unique_id=1188442573 instance=ExtResource("1_mnqw3")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
@@ -31,5 +30,4 @@ bones/15/position = Vector3(0.0037861709, 0.0032923205, 0.0016696778)
 bones/15/rotation = Quaternion(5.421012e-22, 1, 4.5474743e-15, 7.549791e-08)
 
 [node name="AnimationPlayer" parent="." index="1" unique_id=954443067]
-libraries/ = ExtResource("2_ghtl4")
-libraries/animaciones_pollos = ExtResource("3_0x36p")
+libraries/ = ExtResource("3_0x36p")
