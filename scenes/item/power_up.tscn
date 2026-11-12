@@ -7,6 +7,14 @@
 height = 0.31866455
 radius = 0.20605469
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_m5l1u"]
+properties/0/path = NodePath(".:tipo")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
 [node name="powerUp" type="Area3D" unique_id=1451276215]
 collision_layer = 32
 collision_mask = 38
@@ -24,6 +32,9 @@ debug_color = Color(0.79775673, 0.21879712, 0.8860096, 0.41960785)
 wait_time = 8.0
 one_shot = true
 autostart = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1128048415]
+replication_config = SubResource("SceneReplicationConfig_m5l1u")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="timeout" from="tiempo_vida" to="." method="_on_tiempo_vida_timeout"]

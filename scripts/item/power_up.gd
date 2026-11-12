@@ -1,7 +1,7 @@
 extends Node
 
 var libre = true  # bandera para que solo lo capture uno
-var tipo = 0 # tipo de item
+@export var tipo: int = 1 # tipo d item
 
 # Si un jugador lo captura
 func _on_body_entered(body: Node3D) -> void:
@@ -10,12 +10,12 @@ func _on_body_entered(body: Node3D) -> void:
 		libre = false
 		
 			
-		print ("item capturado")
+		#print ("item capturado")
 		eliminar()
 
 
 func _on_tiempo_vida_timeout() -> void:
-	print ("tiempo elimidado")
+	#print ("tiempo elimidado")
 	eliminar()
 	
 func eliminar():
