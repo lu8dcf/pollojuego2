@@ -118,7 +118,9 @@ func generar_mapa() -> void:
 # CALCULO DEL MAPA
 # -----------------------------------------------------------------------------
 func _calcular_datos_mapa() -> Dictionary:
+	@warning_ignore("integer_division")
 	var centro_x = int(ancho / 2)
+	@warning_ignore("integer_division")
 	var centro_z = int(largo / 2)
 	var centro_vector = Vector2i(centro_x, centro_z)
 	
@@ -194,7 +196,9 @@ func _calcular_datos_mapa() -> Dictionary:
 # INSTANCIACION DE BLOQUES
 # -----------------------------------------------------------------------------
 func mapa_carga_simple(visitados: Dictionary, _distancias: Dictionary) -> void:
+	@warning_ignore("integer_division")
 	var centro_x = int(ancho / 2)
+	@warning_ignore("integer_division")
 	var centro_z = int(largo / 2)
 	
 	for z in range(largo):
@@ -241,7 +245,9 @@ func mapa_carga_simple(visitados: Dictionary, _distancias: Dictionary) -> void:
 
 
 func mapa_carga_compleja(visitados: Dictionary, _distancias: Dictionary) -> void:
+	@warning_ignore("integer_division")
 	var centro_x = int(ancho / 2)
+	@warning_ignore("integer_division")
 	var centro_z = int(largo / 2)
 	
 	for z in range(largo):

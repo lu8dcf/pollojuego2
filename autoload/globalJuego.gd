@@ -34,6 +34,7 @@ var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
 var cant_jugadores:int = 0 # minimo de jugadores (ni bien se conecte uno se suma)
 var max_cant_jugadores:int = 4 # maximo de jugadores en una partida
+
 var oleada:int = 1
 var menu_abierto: bool = false
 

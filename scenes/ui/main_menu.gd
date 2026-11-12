@@ -12,6 +12,9 @@ extends CanvasLayer
 # gaficos 
 @onready var check_button: CheckButton = %CheckButton
 
+# --- AGREGADO PARA EL BOTÓN DE VOLUMEN ---
+@onready var boton_volumen: TextureButton = %volumen
+
 # Referencias a paneles
 @onready var panel_un_jugador: Control = %PanelUnJugador
 @onready var panel_multijugador: Control = %PanelMultijugador
@@ -78,6 +81,11 @@ func conectar_botones()->void:
 	opciones.pressed.connect(_mostrar_opciones)
 	boton_salir.pressed.connect(_boton_salir)
 	check_button.toggled.connect(_boton_requisitos)
+	
+	# --- AGREGADO PARA EL BOTÓN DE VOLUMEN ---
+	boton_volumen.toggle_mode = true
+	if not boton_volumen.toggled.is_connected(_on_volumen_toggled):
+		boton_volumen.toggled.connect(_on_volumen_toggled)
 
 
 func _boton_requisitos(tongle:bool):
@@ -408,3 +416,6 @@ func _mostrar_error(mensaje: String, titulo: String = "Error de conexión") -> v
 	
 	if pantalla_carga_actual and pantalla_carga_actual.has_method("mostrar_error"):
 		pantalla_carga_actual.mostrar_error(mensaje, titulo)
+		
+func _on_volumen_toggled(button_pressed: bool) -> void:
+	Sonidos.toggle_silenciar_audio(button_pressed, "Master")
