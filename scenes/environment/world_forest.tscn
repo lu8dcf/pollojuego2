@@ -17,8 +17,10 @@ sky_material = SubResource("PanoramaSkyMaterial_mklfh")
 background_mode = 2
 sky = SubResource("Sky_bpyjm")
 tonemap_mode = 2
+ssr_enabled = true
 ssil_enabled = true
 glow_enabled = true
+fog_enabled = true
 fog_mode = 1
 fog_density = 1.0
 fog_sky_affect = 0.3
@@ -52,7 +54,7 @@ unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1.125, 20.981)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=979900599]
-_spawnable_scenes = PackedStringArray("uid://b8go34qeye00a")
+_spawnable_scenes = PackedStringArray("uid://b8go34qeye00a", "uid://lnfka41ohm0k")
 spawn_path = NodePath("../SpawnContainer")
 
 [node name="TimerEnemy" type="Timer" parent="." unique_id=32496409]
