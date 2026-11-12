@@ -1,7 +1,7 @@
 extends Node
 
 var libre = true  # bandera para que solo lo capture uno
-@export var tipo: int = 1 # tipo d item
+@export var tipo: int = 0 # tipo d item
 @onready var power_up_generico = $PowerUpGenerico
 
 func _ready() -> void:
@@ -15,11 +15,18 @@ func configurar_power_up() -> void:
 
 # Si un jugador lo captura
 func _on_body_entered(body: Node3D) -> void:
-	if body.is_in_group("Jugadores") and libre:
+	if is_multiplayer_authority() and body.is_in_group("Jugadores") and libre:
 		# recolectar item
 		libre = false
 		
+		#  Obtenemos el peer_id del jugador que colisionó
+		var peer_id_jugador = body.get_multiplayer_authority()
+		#print("El jugador con Peer ID: ", peer_id_jugador, " recogió el ítem.",tipo)	
+		
+		
+			# Si esto corre en el servidor, ya sabemos qué jugador fue.
 			
+		#aplicar_power_up(peer_id_jugador)
 		#print ("item capturado")
 		eliminar()
 

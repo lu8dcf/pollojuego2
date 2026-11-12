@@ -246,9 +246,9 @@ func mapa_carga_simple(visitados: Dictionary, _distancias: Dictionary) -> void:
 
 func mapa_carga_compleja(visitados: Dictionary, _distancias: Dictionary) -> void:
 	@warning_ignore("integer_division")
-	var centro_x = int(ancho / 2)
+	var _centro_x = int(ancho / 2)
 	@warning_ignore("integer_division")
-	var centro_z = int(largo / 2)
+	var _centro_z = int(largo / 2)
 	
 	for z in range(largo):
 		for x in range(ancho):
