@@ -174,7 +174,16 @@ func flash_rojo():
 
 @rpc("authority", "call_local", "reliable")		
 func morir():
+	if not multiplayer.is_server():
+		# El cliente solo ejecuta la animación, no crea ítems
+		_efecto_muerte()
+		return
 	$CollisionShape3D.disabled = true  # elimino la collision
+	crearItem()
+	_efecto_muerte()
+		
+	
+func _efecto_muerte():
 	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
 	shader_muerte = ShaderMaterial.new()
 	shader_muerte.shader = shader
@@ -189,12 +198,21 @@ func morir():
 	#tween.tween_property(self, "rotation:y", rotation.y + 10, 2)  # Girar mientras sube
 	tween.tween_property(self, "scale", Vector3(0.01,0.01,0.01), 1.5)
 		
-	await tween.finished
-		
+	await tween.finished	
 	queue_free()
 	
-
-
+func crearItem():
+	if not multiplayer.is_server():
+		return
+	var numero_aleatorio = randi_range(0, 9)
+	if numero_aleatorio < 4:
+		var item_escena = load("res://scenes/item/power_up.tscn")
+		var item = item_escena.instantiate()
+		item.name = "PowerUp_" + str(randi())  # nombre único para evitar conflictos
+		
+		get_parent().add_child(item) #instancia el item enun nivel superior para que al morirr en enemy no desaparezca el item
+		item.global_position = global_position
+		
 func cambios():
 	if animacion_ataque:
 		animation_player.play("ataque_bicho")
