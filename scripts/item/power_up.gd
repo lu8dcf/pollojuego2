@@ -21,7 +21,7 @@ func _on_body_entered(body: Node3D) -> void:
 		
 		#  Obtenemos el peer_id del jugador que colisionó
 		var peer_id_jugador = body.get_multiplayer_authority()
-		print("El jugador con Peer ID: ", peer_id_jugador, " recogió el ítem.",tipo)	
+		#print("El jugador con Peer ID: ", peer_id_jugador, " recogió el ítem.",tipo)	
 		
 		
 			# Si esto corre en el servidor, ya sabemos qué jugador fue.

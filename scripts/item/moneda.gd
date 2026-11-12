@@ -22,13 +22,13 @@ func _on_tiempo_vida_timeout() -> void:
 func _on_body_entered(body: Node3D) -> void:
 	
 	if is_multiplayer_authority() and body.is_in_group("Jugadores") and libre:
-		print ("moneda")
+		
 		# recolectar item
 		libre = false
 		
 		#  Obtenemos el peer_id del jugador que colisionó
 		var peer_id_jugador = body.get_multiplayer_authority()
-		print("El jugador con Peer ID: ", peer_id_jugador, " moneda.",tipo)	
+		#print("El jugador con Peer ID: ", peer_id_jugador, " moneda.",tipo)	
 		
 		
 			# Si esto corre en el servidor, ya sabemos qué jugador fue.
