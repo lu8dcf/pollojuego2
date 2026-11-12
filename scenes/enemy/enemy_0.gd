@@ -208,7 +208,7 @@ func crearItem():
 		get_parent().add_child(item) #instancia el item enun nivel superior para que al morirr en enemy no desaparezca el item
 		item.global_position = global_position
 	
-	elif numero_aleatorio < 6 : #power ups
+	if numero_aleatorio < 6 and numero_aleatorio > 1: #power ups
 		var item_escena = load("res://scenes/item/power_up.tscn")
 		var item = item_escena.instantiate()
 		item.tipo = numero_aleatorio

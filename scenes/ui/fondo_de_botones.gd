@@ -49,6 +49,6 @@ func _animar_entrada_por_x() -> void:
 
 func _verificar_ultima_barra() -> void:
 	# Busca si hay otras barras aún animándose en el grupo
-	var barras = get_tree().get_nodes_in_group("barras_animadas")
+	var _barras = get_tree().get_nodes_in_group("barras_animadas")
 	# Si es el último en terminar, emite la señal global
 	barras_completadas.emit()
