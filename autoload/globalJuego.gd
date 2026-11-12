@@ -32,7 +32,7 @@ const DAÑO_MAXIMO: int = 100
 var mundo:Node3D# mapa actual, esto es forest
 var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
-var cant_jugadres:int = 0
+var cant_jugadres:int = 1
 var oleada:int = 1
 var menu_abierto: bool = false
 
