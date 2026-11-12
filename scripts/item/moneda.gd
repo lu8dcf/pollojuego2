@@ -2,7 +2,7 @@ extends Node
 
 var libre = true  # bandera para que solo lo capture uno
 @export var tipo: int = 0 # tipo d item
-@onready var power_up_generico = $PowerUpGenerico
+@onready var power_up_generico = $moneda
 
 func _ready() -> void:
 	# 1. Al inicializar (o cuando definas la opción), le pasas el dato al hijo
