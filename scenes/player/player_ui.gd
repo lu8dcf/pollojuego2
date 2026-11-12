@@ -121,9 +121,7 @@ func _ready() -> void:
 		GlobalSignal.jugador_recibio_daño.connect(_on_jugador_recibio_daño)
 	GlobalSignal.mi_ping_actualizado.connect(_actualizar_mi_ping)
 	_actualizar_mi_ping(0)
-	
-	
-	
+		
 	_verificar_si_es_mobile()
 	await get_tree().create_timer(0.5).timeout
 	_actualizar_paneles_aliados(GlobalJuego.session_info)
@@ -133,13 +131,11 @@ func _ready() -> void:
 # MANEJO DE FASES
 
 func iniciar_ciclo_de_fases()->void:
-	print("inicio de ciclo")
 	if _timer_fase==null:
 		_timer_fase=Timer.new()
 		_timer_fase.one_shot = true
 		_timer_fase.timeout.connect(_on_timer_fase_timeout)
 		add_child(_timer_fase)
-		print("arranca timer")
 		
 	
 	_arrancar_timer_para_fase(GlobalJuego.fase_actual)

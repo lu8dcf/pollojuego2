@@ -445,7 +445,7 @@ func crear_todos_los_jugadores(): #SOLO EL HOST llama a esta función
 	# calcular posiciones en base 
 	var peer_ids = GlobalJuego.session_info.keys()
 	var total = peer_ids.size()
-	
+	GlobalJuego.cant_jugadores = total
 	for i in range(total):
 		var peer_id = peer_ids[i]
 		var info_peer: Dictionary = GlobalJuego.session_info[peer_id]

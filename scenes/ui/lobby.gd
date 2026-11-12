@@ -130,7 +130,9 @@ func _inicilizar_un_jugador() -> void:
 		}
 	
 	lobby_inicializado = true
-
+	if GlobalJuego.un_jugador:
+		GlobalJuego.cant_jugadores = 1
+	
 func _obtener_nombre_jugador() -> String:
 	return GlobalJuego.nombre_jugador
 
@@ -169,13 +171,13 @@ func _on_jugador_conectado(peer_id: int): #245698
 	
 	await get_tree().create_timer(1.5).timeout
 	
-	if jugadores_en_lobby.size() > 4:
+	if jugadores_en_lobby.size() > GlobalJuego.max_cant_jugadores:
 		Network._error_lobby_lleno.rpc_id(peer_id)
 		# desconectar al cliente después de un momento
 		await get_tree().create_timer(0.5).timeout
 		multiplayer.multiplayer_peer.disconnect_peer(peer_id)
 		return
-		
+
 	#if es_host:
 		#_solicitar_info_jugador.rpc_id(peer_id)
 		#_enviar_estado_actual_a_cliente(peer_id)
@@ -191,6 +193,7 @@ func _on_jugador_desconectado(peer_id: int):
 	
 	_actualizar_estado_lobby()
 
+
 func _on_host_desconectado_lobby():
 	
 	if multiplayer.is_server():
@@ -201,6 +204,8 @@ func _on_host_desconectado_lobby():
 		Network._volver_al_menu_por_desconexion_host()
 	else:
 		get_tree().reload_current_scene()
+		
+	GlobalJuego.cant_jugadres = 0
 
 func _agregar_jugador_al_lobby(peer_id: int, nombre: String):
 		

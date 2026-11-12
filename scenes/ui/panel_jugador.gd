@@ -143,6 +143,9 @@ func conectar_verificar_botones() -> void:
 		personaje_eleccion.pressed.connect(se_selecciona_personajes)
 	if not arma_eleccion.pressed.is_connected(se_selecciona_armas):
 		arma_eleccion.pressed.connect(se_selecciona_armas)
+	
+	if es_mi_panel:
+		_habilitar_deshabilitar_botones(esta_listo)
 	# primero mostrar el perosnaje y despues las armas
 	sprite_personaje.visible = true
 	sprite_arma.visible = false
@@ -304,6 +307,8 @@ func actualizar_estado_listo(estado: bool):
 	
 	if estoy_listo_boton:
 		estoy_listo_boton.cambiar_texto("¡Listo!" if estado else "¿Listo?")
+	if es_mi_panel:
+		_habilitar_deshabilitar_botones(estado)
 
 # esto solo sincroniza los perosnajes de los demas
 func actualizar_personaje_remoto(id: int) -> void:
@@ -339,20 +344,19 @@ func _habilitar_deshabilitar_botones(esta_habilitado:bool): # se deshabilita cau
 
 func marcar_listo():
 	esta_listo = true
+	_actualizar_indicador()
 	if estoy_listo_boton:
 		estoy_listo_boton.cambiar_texto("¡Listo!")
-	_habilitar_deshabilitar_botones(esta_listo)
-	_actualizar_indicador()
-	
-	# Emitir señal para notificar al lobby
+	_habilitar_deshabilitar_botones(true)
+	# se emite la señal para notificar al lobby
 	Network._notificar_estado_listo.rpc(peer_id, true)
 
 func marcar_no_listo():
 	esta_listo = false
+	_actualizar_indicador()
 	if estoy_listo_boton:
 		estoy_listo_boton.cambiar_texto("¿Listo?")
-	_actualizar_indicador()
-	# Emitir señal para notificar al lobby
+	_habilitar_deshabilitar_botones(false)
 	Network._notificar_estado_listo.rpc(peer_id, false)
 
 func _on_estoy_listo_boton_pressed() -> void:
