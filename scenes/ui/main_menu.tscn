@@ -16,10 +16,19 @@
 [ext_resource type="Script" uid="uid://u58yougmjulp" path="res://scenes/ui/fondo_movil.gd" id="10_otr3d"]
 [ext_resource type="Texture2D" uid="uid://dx2wxef0utuvw" path="res://assets/ui/menu/texto.png" id="11_n4uci"]
 [ext_resource type="Shader" uid="uid://bxv8phnk55knj" path="res://scenes/ui/aberracion_cromatica.gdshader" id="13_8ekit"]
+[ext_resource type="Texture2D" uid="uid://dr8nm0n8hpcqx" path="res://assets/ui/menu/sonido.png" id="16_y2j7i"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dklp6"]
 shader = ExtResource("13_8ekit")
 shader_parameter/intensidad = 0.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dklp6"]
+atlas = ExtResource("16_y2j7i")
+region = Rect2(0, 0, 826, 825)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fodb4"]
+atlas = ExtResource("16_y2j7i")
+region = Rect2(1095, 0, 825, 825)
 
 [node name="MainMenu" type="CanvasLayer" unique_id=1482325763]
 script = ExtResource("1_sl1te")
@@ -597,6 +606,18 @@ offset_top = 602.0
 offset_right = 712.0
 offset_bottom = 634.0
 button_pressed = true
+
+[node name="volumen" type="TextureButton" parent="Control" unique_id=1014037673]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1097.0
+offset_top = 593.0
+offset_right = 1137.0
+offset_bottom = 633.0
+scale = Vector2(0.057423208, 0.057423208)
+toggle_mode = true
+texture_normal = SubResource("AtlasTexture_dklp6")
+texture_pressed = SubResource("AtlasTexture_fodb4")
 
 [node name="MundoTemporal" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
 unique_name_in_owner = true

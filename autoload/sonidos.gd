@@ -13,6 +13,12 @@ var playlist_musica = [
 ]
 var indices_reproducidos = []
 
+
+func toggle_silenciar_audio(debe_silenciar: bool, nombre_bus: String = "Master"):
+	var bus_idx = AudioServer.get_bus_index(nombre_bus)
+	if bus_idx != -1:
+		AudioServer.set_bus_mute(bus_idx, debe_silenciar)
+		
 func _ready() -> void:
 	crear_buses_audio()
 	reproducir_musica_aleatoria()
