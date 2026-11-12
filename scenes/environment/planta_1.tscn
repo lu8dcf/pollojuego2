@@ -1,9 +1,21 @@
 [gd_scene format=3 uid="uid://cvfqlbn5411nu"]
 
 [ext_resource type="PackedScene" uid="uid://0r6dg2s5fxxe" path="res://assets/modelos/mapas/planta_1.fbx" id="1_hbrwd"]
-[ext_resource type="Material" uid="uid://blh60f5rkssxd" path="res://assets/modelos/mapas/plantas.tres" id="2_rdw8x"]
+[ext_resource type="Shader" uid="uid://cpb1fntvl7jg6" path="res://assets/modelos/mapas/plantas.gdshader" id="2_hbrwd"]
+[ext_resource type="Texture2D" uid="uid://dh5gcay1w7qa3" path="res://assets/modelos/mapas/alfa_plantas.png" id="4_1utou"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rdw8x"]
+render_priority = 0
+shader = ExtResource("2_hbrwd")
+shader_parameter/textura_mascara = ExtResource("4_1utou")
+shader_parameter/color_personalizado = Color(0.7473499, 0.83984375, 0.44027048, 1)
+shader_parameter/usar_mascara = true
+shader_parameter/usar_fundido = true
+shader_parameter/corte_alfa = 0.5
+shader_parameter/suavizado_borde = 0.05
 
 [node name="planta_1" unique_id=1456453291 instance=ExtResource("1_hbrwd")]
 
 [node name="planta_1" parent="." index="0" unique_id=1505629967]
-material_override = ExtResource("2_rdw8x")
+material_override = SubResource("ShaderMaterial_rdw8x")
+cast_shadow = 2

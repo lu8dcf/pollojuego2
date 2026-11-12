@@ -27,7 +27,13 @@ extends Node3D
 
 var bloque_terreno: PackedScene = preload("res://scenes/environment/BloqueTerreno.tscn")
 var bloque_borde: PackedScene = preload("res://scenes/environment/BloqueBorde.tscn")
-var escena_planta: PackedScene = preload("res://scenes/environment/planta_1.tscn")
+
+var escenas_plantas: Array[PackedScene] = [
+	preload("res://scenes/environment/planta_1.tscn"),
+	preload("res://scenes/environment/planta_2.tscn"),
+	preload("res://scenes/environment/planta_3.tscn"),
+	preload("res://scenes/environment/planta_4.tscn")
+]
 
 var ruido = FastNoiseLite.new()
 var ruido_borde = FastNoiseLite.new()
@@ -201,21 +207,32 @@ func mapa_carga_simple(visitados: Dictionary, _distancias: Dictionary) -> void:
 				add_child(bloque)
 				bloque.position = pos_final
 				
-				# plantas (solo fuera del centro seguro)
+				# plantas en grupitos y con escala aleatoria (sin rotación)
 				if generar_plantas:
 					var dist_centro_planta = Vector2(pos_final.x, pos_final.z).distance_to(
 						Vector2(centro_x * tamano_bloque, centro_z * tamano_bloque)
 					)
 					if dist_centro_planta > radio_exclusion_centro_plantas:
 						if rng.randf() < probabilidad_spawn_planta:
-							var planta = escena_planta.instantiate()
-							add_child(planta)
-							var offset_x = rng.randf_range(-0.35, 0.35)
-							var offset_z = rng.randf_range(-0.35, 0.35)
-							planta.position = pos_final + Vector3(offset_x, 0.0, offset_z)
-							planta.rotation = Vector3.ZERO
-							var escala_azar = rng.randf_range(0.85, 1.15)
-							planta.scale = Vector3(escala_azar, escala_azar, escala_azar)
+							# Cantidad de plantas en el grupito (entre 1 y 3 juntas)
+							var cantidad_en_grupo = rng.randi_range(1, 3)
+							
+							for i in range(cantidad_en_grupo):
+								var indice_planta = rng.randi() % escenas_plantas.size()
+								var planta = escenas_plantas[indice_planta].instantiate()
+								add_child(planta)
+								
+								# Offset cercano para formar el grupito
+								var offset_x = rng.randf_range(-0.35, 0.35)
+								var offset_z = rng.randf_range(-0.35, 0.35)
+								planta.position = pos_final + Vector3(offset_x, 0.0, offset_z)
+								
+								# Rotación en cero para que no roten
+								planta.rotation = Vector3.ZERO
+								
+								# Escala aleatoria variada (desde 0.6x hasta 1.4x)
+								var escala_azar = rng.randf_range(0.6, 1.4)
+								planta.scale = Vector3(escala_azar, escala_azar, escala_azar)
 			else:
 				var muro = bloque_borde.instantiate()
 				add_child(muro)
