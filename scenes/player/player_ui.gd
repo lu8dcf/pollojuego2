@@ -257,6 +257,7 @@ func _actualizar_label_tiempo() ->void:
 	if segundos_totales <0:
 		segundos_totales = 0
 	
+	@warning_ignore("integer_division")
 	var minutos:= segundos_totales / 60
 	var segundos:=segundos_totales % 60
 	

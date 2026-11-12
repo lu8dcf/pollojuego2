@@ -83,7 +83,7 @@ func _ready():
 	cargar_modelo()
 	add_to_group('enemy')
 	tipo_enemigo()
-	cargar_pullups()
+	
 	await get_tree().physics_frame
 	marcapaso.timeout.connect(cambios)
 		
@@ -95,11 +95,6 @@ func cargar_materiales():
 	material_rojo.emission = Color.RED
 	material_rojo.emission_energy_multiplier = 2.0 	
 
-func cargar_pullups():
-	var n = randi_range(0, 10)
-	
-		
-	
 
 func cargar_modelo(): # tipo de enemigo
 	var escena_glb = load("res://scenes/enemy/enemigo_"+ str(tipo)+".tscn")
@@ -205,9 +200,10 @@ func crearItem():
 	if not multiplayer.is_server():
 		return
 	var numero_aleatorio = randi_range(0, 9)
-	if numero_aleatorio < 4:
+	if numero_aleatorio < 5:
 		var item_escena = load("res://scenes/item/power_up.tscn")
 		var item = item_escena.instantiate()
+		item.tipo = numero_aleatorio
 		item.name = "PowerUp_" + str(randi())  # nombre único para evitar conflictos
 		
 		get_parent().add_child(item) #instancia el item enun nivel superior para que al morirr en enemy no desaparezca el item
