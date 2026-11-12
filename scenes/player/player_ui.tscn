@@ -21,13 +21,6 @@ region = Rect2(584, 264, 48, 48)
 atlas = ExtResource("3_fatww")
 region = Rect2(648, 264, 48, 48)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gfjak"]
-bg_color = Color(1, 1, 1, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-
 [sub_resource type="Gradient" id="Gradient_m6sn8"]
 colors = PackedColorArray(0.43137255, 0.28235295, 0.9254902, 1, 1, 0.8666667, 1, 1)
 
@@ -130,30 +123,14 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 45
 
-[node name="CentroPantallaPuntero" type="Panel" parent="." unique_id=305474234]
-visible = false
-custom_minimum_size = Vector2(5, 5)
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -2.5
-offset_top = -2.5
-offset_right = 2.5
-offset_bottom = 2.5
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_gfjak")
-
 [node name="ArribaCentro" type="MarginContainer" parent="." unique_id=1042432544]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
+offset_top = 1.0
 offset_right = 200.0
-offset_bottom = 108.0
+offset_bottom = 88.0
 grow_horizontal = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
@@ -164,11 +141,13 @@ theme_override_constants/margin_bottom = 20
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 8
+theme_override_constants/separation = 20
 
 [node name="LabelTiempo" type="Label" parent="ArribaCentro/ControlVida" unique_id=753765349]
 unique_name_in_owner = true
 z_index = 20
 layout_mode = 2
+theme_override_font_sizes/font_size = 23
 text = "Tiempo:"
 label_settings = ExtResource("4_mo8vb")
 horizontal_alignment = 1
@@ -189,7 +168,8 @@ label_settings = ExtResource("4_mo8vb")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Label" type="Label" parent="ArribaCentro/ControlVida/HBoxContainer" unique_id=1456244193]
+[node name="LabelMonedas" type="Label" parent="ArribaCentro/ControlVida/HBoxContainer" unique_id=1456244193]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Monedas: "
 label_settings = ExtResource("4_mo8vb")
@@ -211,6 +191,7 @@ horizontal_alignment = 1
 
 [node name="BarraExperiencia" type="ProgressBar" parent="ArribaCentro/ControlVida" unique_id=2017376515]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(200, 20)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxTexture_nlx67")

@@ -721,7 +721,7 @@ func _preparar_nueva_oleada()->void:
 	
 	#primero semilla
 	GlobalJuego.semilla_mapa  = randi()
-	_replicar_semilla.rpc(GlobalJuego.semilla_mapa)
+	_replicar_semilla.rpc(GlobalJuego.semilla_mapa) # se replica la semilla a los demas jugadores
 	var mundo = obtener_mundo_actual()
 	if not mundo:
 		return
@@ -730,11 +730,12 @@ func _preparar_nueva_oleada()->void:
 	
 	await reposicionar_jugadores()
 	
-	#if mundo.has_method("reanudar_gameplay"):
-		#mundo.reanudar_gameplay()
-	
-	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
+
+	# se incrementa la oleada y se replica
 	GlobalJuego.oleada+=1
+	_actualizar_oleada_rpc.rpc(GlobalJuego.oleada)
+	# se cambia la fase de TIENDA a OLEADA y se avisa
+	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.OLEADA)
 	GlobalSignal.emit_signal("cambia_oleada")
 
 func reposicionar_jugadores():
@@ -966,6 +967,10 @@ func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3,id_po
 @rpc("authority","call_local","reliable")
 func _replicar_semilla(semilla:int)->void:
 	GlobalJuego.semilla_mapa = semilla
+
+func _actualizar_oleada_rpc(nueva_oleada:int) ->void:
+	GlobalJuego.oleada = nueva_oleada
+	GlobalSignal.emit_signal("cambia_oleada")
 
 func _exit_tree() -> void:
 	if tube_enabled:

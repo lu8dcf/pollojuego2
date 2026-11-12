@@ -32,13 +32,14 @@ const DAÑO_MAXIMO: int = 100
 var mundo:Node3D# mapa actual, esto es forest
 var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
-var cant_jugadres:int = 0
+var cant_jugadores:int = 0 # minimo de jugadores (ni bien se conecte uno se suma)
+var max_cant_jugadores:int = 4 # maximo de jugadores en una partida
 var oleada:int = 1
 var menu_abierto: bool = false
 
 # ===== TIPO DE JUEGO =====
-var duracion_oleada:float=120.0
-var duracion_tienda:float=30.0
+var duracion_oleada:float=90.0
+var duracion_tienda:float=15.0
 # estados del ciclo
 enum FaseJuego{
 	OLEADA,

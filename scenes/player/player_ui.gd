@@ -51,6 +51,7 @@ var _fase_para_reanudar:int = GlobalJuego.FaseJuego.OLEADA
 #@onready var barra_salud: ProgressBar = %BarraSalud
 @onready var barra_experiencia: ProgressBar = %BarraExperiencia
 @onready var label_oleada: Label = %LabelOleada
+@onready var label_monedas: Label = %LabelMonedas
 
 @onready var controls_root: VBoxContainer = %ControlsRoot
 
@@ -97,7 +98,7 @@ func _ready() -> void:
 		GlobalSignal.pausa_cambiada.connect(_on_pausa_cambiada)
 	if GlobalSignal.has_signal("cambia_oleada"):
 		GlobalSignal.cambia_oleada.connect(mostrar_oleada_actual)
-
+	
 	for single_color in COLORS:
 		var new_texture = GradientTexture2D.new()
 		var gradient = Gradient.new()
@@ -117,6 +118,8 @@ func _ready() -> void:
 	
 	# señales
 	GlobalSignal.sesion_actualizada.connect(_actualizar_paneles_aliados)
+	GlobalSignal.sesion_actualizada.connect(_actualizar_monedas)  
+	
 	if GlobalSignal.has_signal("jugador_recibio_daño"):
 		GlobalSignal.jugador_recibio_daño.connect(_on_jugador_recibio_daño)
 	GlobalSignal.mi_ping_actualizado.connect(_actualizar_mi_ping)
@@ -413,6 +416,16 @@ func _actualizar_paneles_aliados(info:Dictionary)-> void:
 			if is_instance_valid(panel):
 				panel.queue_free()
 			paneles_usuarios.erase(peer_id)
+
+func _actualizar_monedas(info:Dictionary)->void:
+	if not label_monedas:
+		return
+	var mi_id := _obtener_mi_peer_id()
+	if not info.has(mi_id):
+		label_monedas.text = "0"
+		return
+	var score: int = int(info[mi_id].get("score", 0))
+	label_monedas.text = "monedas: "+ "%d" % score
 
 func _crear_panel_aliado(peer_id: int, _nombre: String, salud: int, salud_max: int, personaje: int) -> void:
 	var panel = PANEL_USUARIO.instantiate()
