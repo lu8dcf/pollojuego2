@@ -1,7 +1,7 @@
 extends Node
 
 var libre = true  # bandera para que solo lo capture uno
-@export var tipo: int = 1 # tipo d item
+@export var tipo: int = 0 # tipo d item
 @onready var power_up_generico = $PowerUpGenerico
 
 func _ready() -> void:
