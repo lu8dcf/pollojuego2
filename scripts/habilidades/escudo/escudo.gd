@@ -5,7 +5,7 @@ var jugador: Node3D
 @onready var areaDeteccion: Area3D = $Area3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
 
-var tiempo_de_vida : float = 5.0
+var tiempo_de_vida : float = 50.0
 var tiempo_transcurrido: float = 0.0
 
 
@@ -77,12 +77,9 @@ func _chequeo_inicial_rapido() -> void:
 			_eliminar_enemigo(enemigo)
 
 func _eliminar_enemigo(enemigo: Node3D) -> void:
-	print("enemigo que no pasa el escudo: ", enemigo.name)
-	#if enemigo.has_method("morir"):
-		#enemigo.morir()
-	#else:
-		#enemigo.queue_free()
-		#enemigo.queue_free()
+	if enemigo.has_method("recibir_dano"):
+		enemigo.recibir_dano(500)
+		queue_free()
 
 func destruir():
 	queue_free()

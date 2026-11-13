@@ -116,97 +116,6 @@ func _on_tiempo_disparo_timeout() -> void:
 func _on_buscar_objetivo_timeout() -> void:
 	actualizar_objetivo()
 
-##
-#func disparo():
-#
-	#if objetivo == null or not is_instance_valid(objetivo):
-		#return
-#
-	#var direccion = objetivo.global_position - puntero.global_position
-	#direccion.y = 0
-	#direccion = direccion.normalized()
-	#
-	#
-	##jugadorPadre = GlobalJuego._obtener_jugador(multiplayer.get_unique_id())
-	#if jugadorPadre == null or not jugadorPadre.puede_disparar():
-		#return
-#
-#
-	#if multiplayer.is_server():
-		### Si este ArmaBase está en el servidor,
-		### no necesitamos hacer un RPC.
-		#crear_bala(
-			#puntero.global_position,
-			#direccion,
-			##tipo_bala
-		#)
-	#else:
-		### Si este ArmaBase pertenece a un cliente,
-		## le pedimos al servidor que cree la bala.
-		#solicitar_disparo.rpc_id(
-			#1,
-			#puntero.global_position,
-			#direccion,
-			##tipo_bala
-		#)
-#func crear_bala(posicion: Vector3, direccion: Vector3) -> void:
-	#
-	#if not multiplayer.is_server():
-		#return
-#
-	#if balaArma == null: return
-#
-	#var cantidad = 1
-	#var paso_grados = 15.0
-#
-	#if datos and datos.comportamiento:
-		#if datos.comportamiento.has_method("get_cant_perdigones"):
-			#cantidad = datos.comportamiento.get_cant_perdigones()
-		#
-		#if "dispersion" in datos.comportamiento:
-			#paso_grados = datos.comportamiento.dispersion
-#
-#
-	## si vas a usar 3 o 4 perdigones
-	#var abanico = [0.0, 15.0, -15.0, 30.0, -30.0] 
-#
-	#var angulos_a_usar = []
-#
-	#if cantidad == 1:
-	## Si es 1 (bala normal) uso solo el primer valor (0.0 para ir derecho)
-		#angulos_a_usar = [abanico[0]] 
-	#else:
-	## Si es escopeta, toma tantos angulo del arreglo como perdigones tenga configurados
-		#angulos_a_usar = abanico.slice(0, cantidad)
-#
-	##Disparamos cada bala con su angulo correspondiente
-	#for grados in angulos_a_usar:
-		#var dir_final = direccion.rotated(Vector3.UP, deg_to_rad(grados))
-#
-		#var nueva_bala = balaArma.instantiate()
-		#nueva_bala.set_multiplayer_authority(1)
-		#containerBalas.add_child(nueva_bala, true)
-#
-		## Repartimos el danio total entre la cantidad de perdigones que salgan
-		#var danio_bala = datos.danio / angulos_a_usar.size()
-#
-		#nueva_bala.iniciar(
-			#datos.comportamiento,
-			#posicion,
-			#dir_final,
-			#danio_bala
-		#)
-#
-##--------------------------------------------------------------------------------SERVIDOR
-#
-#@rpc("any_peer", "reliable")
-#func solicitar_disparo(posicion: Vector3, direccion: Vector3) -> void:
-	#if !multiplayer.is_server():
-		#return
-#
-	#crear_bala(posicion, direccion)
-
-# En tu script de Arma:
 
 func disparo():
 	if objetivo == null or not is_instance_valid(objetivo):
@@ -231,12 +140,12 @@ func disparo():
 	var posicion = puntero.global_position
 
 	if multiplayer.is_server():
-		# Si dispara el servidor, creamos la bala REAL (autoritativa para hacer daño)
+		# Si dispara el servidor, creamos la bala REAL (autoritativa para hacer danio)
 		procesar_disparo_servidor(posicion, direccion, datos.danio, cantidad, dispersion, 1)
 	else:
-		# 1. PREDICCIÓN LOCAL: El cliente crea su bala VISUAL (con 'true' para indicar que no haga daño)
+		#Cada cliente crea su bala VISUAL (con 'true' para indicar que no haga danioo)
 		crear_balas_visualmente(posicion, direccion, datos.danio, cantidad, dispersion, true)
-		# 2. Pedimos al servidor que procese el disparo real
+		# Pido al seervidor que procese el disparo real
 		solicitar_disparo.rpc_id(1, direccion)
 
 
@@ -256,7 +165,7 @@ func solicitar_disparo(direccion: Vector3) -> void:
 		if "dispersion" in datos.comportamiento:
 			dispersion = datos.comportamiento.dispersion
 
-	# El servidor crea la bala REAL (con 'false', lo que significa que SÍ aplicará daño)
+	# El servidor crea la bala REAL (con 'false', lo que significa que SI se aplica danio)
 	procesar_disparo_servidor(posicion, direccion, datos.danio, cantidad, dispersion, emisor)
 
 
@@ -264,7 +173,7 @@ func procesar_disparo_servidor(posicion: Vector3, direccion: Vector3, danio: flo
 	# El servidor crea la bala autoritativa
 	crear_balas_visualmente(posicion, direccion, danio, cantidad, dispersion, false)
 
-	# Replicamos a los demás clientes para que las dibujen (también marcadas como visuales 'true')
+	# Replico para los demas clientes para que las dibujen (marcadas como visuales 'true')
 	replicar_disparo_a_otros.rpc(posicion, direccion, danio, cantidad, dispersion, id_emisor)
 
 
@@ -273,11 +182,11 @@ func replicar_disparo_a_otros(posicion: Vector3, direccion: Vector3, danio: floa
 	if multiplayer.get_unique_id() == id_emisor:
 		return
 
-		# Los demás clientes crean su bala visual
+		# Los demas clientes crean su bala visual
 	crear_balas_visualmente(posicion, direccion, danio, cantidad, dispersion, true)
 
 
-# Añadimos el parámetro es_visual_local a la función
+# parametro es_visual_local a la funcin
 func crear_balas_visualmente(posicion: Vector3, direccion: Vector3, danio: float, cantidad: int, dispersion: float, es_visual_local: bool) -> void:
 	if balaArma == null:
 		return
@@ -292,7 +201,7 @@ func crear_balas_visualmente(posicion: Vector3, direccion: Vector3, danio: float
 		nueva_bala.top_level = true
 		containerBalas.add_child(nueva_bala, true)
 
-		# Le pasamos el indicador de si es visual o real
+		# Indicador si es visual/fantasma o real
 		nueva_bala.iniciar(
 			datos.comportamiento,
 			posicion,

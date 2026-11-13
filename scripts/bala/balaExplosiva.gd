@@ -75,8 +75,8 @@ func explosion():
 				cuerpo.recibir_dano(danioBala)
 	tiempo.start()
 
-#-----------------------------------------------------------------------------comun y explosiva
-func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
+#-----------------------------------------------------------------------------cexplosiva
+func _on_tiempo_vida_timeout() -> void:
 	eliminarBala()
 	
 func eliminarBala():
