@@ -418,6 +418,18 @@ func _actualizar_paneles_aliados(info:Dictionary)-> void:
 				panel.queue_free()
 			paneles_usuarios.erase(peer_id)
 
+
+func _actualizar_mi_panel(info:Dictionary)->void:
+	var mi_id := _obtener_mi_peer_id()
+	if not info.has(mi_id):
+		return
+	var datos: Dictionary = info[mi_id]
+
+	# Monedas (ya lo hacías en _actualizar_monedas, pero lo centralizamos acá también
+	# por si querés que _actualizar_monedas haga otra cosa visualmente)
+	if label_monedas:
+		label_monedas.text = "monedas: %d" % int(datos.get("score", 0))
+
 func _actualizar_monedas(info:Dictionary)->void:
 	if not label_monedas:
 		return
