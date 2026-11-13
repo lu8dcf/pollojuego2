@@ -510,7 +510,7 @@ func recibir_dano(dano: int):
 	#flash_rojo.rpc(get_multiplayer_authority())  # aviso a todos que brille
 	if vida_actual <= 0:
 		cambiar_estado(Estado.CAIDO)
-	salud = vida_actual
+	salud = int(vida_actual)
 
 	if dano <= 0:
 		return
