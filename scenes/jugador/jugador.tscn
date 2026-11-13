@@ -80,8 +80,7 @@ shape = SubResource("CylinderShape3D_8w0r3")
 wait_time = 10.0
 
 [node name="timer_salvar" type="Timer" parent="." unique_id=2130058164]
-wait_time = 3.0
-one_shot = true
+wait_time = 2.0
 
 [node name="FabricaPollos" parent="." unique_id=824404091 instance=ExtResource("6_6htac")]
 

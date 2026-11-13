@@ -49,15 +49,11 @@ func activar_melee() -> void:
 	areaMelee.visible = true
 	await get_tree().create_timer(0.2).timeout
 
-	if ya_eliminada or not is_inside_tree():
-		return
-
 	var cuerpos_en_area = areaMelee.get_overlapping_bodies()
 	for cuerpo in cuerpos_en_area:
 		if cuerpo.is_in_group("enemy"):
 			if cuerpo.has_method("recibir_dano"):
 				cuerpo.recibir_dano(danioBala)
-				queue_free()
 
 
 	eliminarBala()
@@ -79,6 +75,7 @@ func _on_area_melee_body_entered(_body: Node3D) -> void:
 	if es_fantasma:
 		eliminarBala()
 		return
+	activar_melee()
 	# Si ya esta siendo eliminada, no hagas nada
 	if ya_eliminada:
 		return

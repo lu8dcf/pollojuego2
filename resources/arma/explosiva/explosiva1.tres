@@ -16,6 +16,7 @@ id = 7
 nombre = "ee"
 danio = 25.0
 sprite = ExtResource("4_fnbjd")
+tiempoDeAtaque = 8.0
 tipo = 2
 comportamiento = SubResource("Resource_lt6ua")
 metadata/_custom_type_script = "uid://ckltpinun1cgl"
