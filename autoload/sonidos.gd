@@ -192,6 +192,7 @@ func sonidoRecoleccionMonedas():
 	var player = crear_audio_player("SFX")
 	player.stream = load("res://assets/sound/sfx_recoleccion_monedas.mp3")
 	player.pitch_scale = randf_range(0.9, 1.2)
+	player.volume_db = 20.0  # Establece el volumen directamente a 20 dB
 	add_child(player)
 	player.play()
 	await player.finished
