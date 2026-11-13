@@ -11,11 +11,42 @@ const PANEL_JUGADOR = preload("uid://b4gmxx0tqmgc4")
 @onready var label_ip: Label = %LabelIp
 @onready var label_puerto: Label = %LabelPuerto
 
+# chat
+@onready var chat_input: TextEdit = %ChatInput
+@onready var chat_historial: RichTextLabel = %ChatHistorial
+@onready var chat_enviar: Button = %ChatEnviar
+ # paleta de colores para los peers. se elige por hash del peer_id
+# para que sea deterministica: mismo peer = mismo color en todos los clientes.
+const COLORES_PEER: Array[Color] = [
+	Color("#ff6b6b"),  # rojo
+	Color("#4ecdc4"),  # turquesa
+	Color("#ffe66d"),  # amarillo
+	Color("#a29bfe"),  # violeta
+	Color("#55efc4"),  # verde menta
+	Color("#fd79a8"),  # rosa
+	Color("#74b9ff"),  # celeste
+	Color("#fab1a0"),  # salmon
+]
+
+# color del host (peer_id == 1) siempre destacado
+const COLOR_HOST := Color("#ffd166")
+# color de los mensajes de sistema
+const COLOR_SISTEMA := Color("#ff5555")
+# color del texto en si (el cuerpo del mensaje)
+const COLOR_TEXTO := Color("#e0e0e0")
+
 
 var jugadores_en_lobby: Dictionary = {}  # peer_id -> {nombre: String, panel: Node, listo: bool}
 var es_host: bool = false
 var lobby_inicializado: bool = false
 var partida_iniciada_flag: bool = false
+
+# para saber que pollo esta ya seleccionado
+var pollos_asignados: Dictionary = {}
+
+# conjunto inverso para saber rapido si un pollo ya esta tomado
+# pollo_id -> peer_id
+var pollos_tomados: Dictionary = {}
 
 signal partida_iniciada
 
@@ -49,7 +80,7 @@ func _ready() -> void:
 				"score": 0,
 				"username": _obtener_nombre_jugador(),
 				"salud": GlobalJuego.SALUD_DEFAULT,
-				"personaje": 1,
+				"personaje": 0,
 				"ping":0,
 				"inventario":[],
 				"armas_actuales":[]
@@ -61,7 +92,13 @@ func _ready() -> void:
 		_enviar_mi_info_al_host()
 	
 	lobby_inicializado = true
-
+	if GlobalJuego.un_jugador:
+		chat_input.visible = false
+		chat_enviar.visible = false
+		
+	if chat_enviar and not GlobalJuego.un_jugador:
+		chat_enviar.pressed.connect(_on_chat_enviar_pressed)
+	
 # UN SOLO JUGADOR
 func _inicilizar_un_jugador() -> void:
 	es_host = true
@@ -86,14 +123,16 @@ func _inicilizar_un_jugador() -> void:
 			"score": 0,
 			"username": _obtener_nombre_jugador(),
 			"salud": GlobalJuego.SALUD_DEFAULT,
-			"personaje": 1,
+			"personaje": 0,
 			"ping": 0,
 			"inventario": [],
 			"armas_actuales": []
 		}
 	
 	lobby_inicializado = true
-
+	if GlobalJuego.un_jugador:
+		GlobalJuego.cant_jugadores = 1
+	
 func _obtener_nombre_jugador() -> String:
 	return GlobalJuego.nombre_jugador
 
@@ -132,13 +171,13 @@ func _on_jugador_conectado(peer_id: int): #245698
 	
 	await get_tree().create_timer(1.5).timeout
 	
-	if jugadores_en_lobby.size() > 4:
+	if jugadores_en_lobby.size() > GlobalJuego.max_cant_jugadores:
 		Network._error_lobby_lleno.rpc_id(peer_id)
 		# desconectar al cliente después de un momento
 		await get_tree().create_timer(0.5).timeout
 		multiplayer.multiplayer_peer.disconnect_peer(peer_id)
 		return
-		
+
 	#if es_host:
 		#_solicitar_info_jugador.rpc_id(peer_id)
 		#_enviar_estado_actual_a_cliente(peer_id)
@@ -154,6 +193,7 @@ func _on_jugador_desconectado(peer_id: int):
 	
 	_actualizar_estado_lobby()
 
+
 func _on_host_desconectado_lobby():
 	
 	if multiplayer.is_server():
@@ -164,6 +204,8 @@ func _on_host_desconectado_lobby():
 		Network._volver_al_menu_por_desconexion_host()
 	else:
 		get_tree().reload_current_scene()
+		
+	GlobalJuego.cant_jugadres = 0
 
 func _agregar_jugador_al_lobby(peer_id: int, nombre: String):
 		
@@ -180,14 +222,14 @@ func _agregar_jugador_al_lobby(peer_id: int, nombre: String):
 			 peer_id,
 			 nombre,
 			 info_existente.get("listo", false),
-			 info_existente.get("personaje",1)
+			 info_existente.get("personaje",0)
 			)
 			
 			jugadores_en_lobby[peer_id] = {
 				"nombre": nombre,
 				"panel": panel_existente,
 				"listo": info_existente.get("listo", false),
-			 	"personaje":info_existente.get("personaje",1)
+			 	"personaje":info_existente.get("personaje",0)
 			}
 			
 			_actualizar_estado_lobby()
@@ -198,13 +240,13 @@ func _agregar_jugador_al_lobby(peer_id: int, nombre: String):
 	
 	await get_tree().process_frame
 	
-	_actualizar_panel(panel_jugador, peer_id, nombre, false,1)
+	_actualizar_panel(panel_jugador, peer_id, nombre, false,0)
 	
 	jugadores_en_lobby[peer_id] = {
 		"nombre": nombre,
 		"panel": panel_jugador,
 		"listo": false,
-		"personaje":1
+		"personaje":0
 	}
 	
 	_actualizar_estado_lobby()
@@ -216,7 +258,7 @@ func _enviar_mi_info_al_host() :
 	if mi_info.is_empty():
 		mi_info = {
 			"username": _obtener_nombre_jugador(),
-			"personaje": 1,
+			"personaje": 0,
 			"listo": false,
 			"score": 0,
 			"salud": GlobalJuego.SALUD_DEFAULT,
@@ -316,17 +358,118 @@ func _on_iniciar_partida_pressed():
 	if GlobalJuego.un_jugador:
 		_comenzar_partida_un_jugador()
 		return
-		
 	
-	if es_host and jugadores_en_lobby.size() >= 2:
-		var todos_listos = true
-		for peer_id in jugadores_en_lobby.keys():
-			if not jugadores_en_lobby[peer_id].get("listo", false):
-				todos_listos = false
-				break
+	if not es_host:
+		return
 		
-		if todos_listos:
-			Network._iniciar_carga.rpc()
+	if jugadores_en_lobby.size() < 2:
+		Network.host_mensaje_sistema("Se necesitan al menos 2 jugadores para empezar.")
+		return
+	# verificar listos
+	var todos_listos = true
+	for peer_id in jugadores_en_lobby.keys():
+		if not jugadores_en_lobby[peer_id].get("listo", false):
+			todos_listos = false
+			break
+	
+	if not todos_listos:
+		Network.host_mensaje_sistema("Todavia hay jugadores que no están listos.")
+		return
+	
+	# verificar pollos unicos
+	var chequeo:=_verificar_pollos_unicos()
+	if not chequeo["validos"]:
+		# armar msj claro para los repetidos
+		var nombres_pollos :=["arturo","zuly","ricardo","violeta","patroclo","walter"]
+		var lista_str :=""
+		for id_rep in chequeo["repetidos"]:
+			var nombre_p:="desconocido"# nombre del pollo
+			if id_rep>0 and id_rep<nombres_pollos.size():
+				nombre_p = nombres_pollos[id_rep]
+			lista_str += nombre_p+" "
+		Network.host_mensaje_sistema("No se puede iniciar: hay pollos repetidos (%s). Cambien su seleccion." % lista_str.strip_edges())
+		return
+	#si sale todo bien se arranca
+	Network._iniciar_carga.rpc()
+	
+
+	
+
+# ============================================================
+# SELECCION DE POLLO 
+# ============================================================
+func seleccionar_pollo(id_pollo:int) ->void:
+	var mi_id := 1
+	if multiplayer.has_multiplayer_peer():
+		mi_id = multiplayer.get_unique_id()
+		
+	# actualizar local
+	if not GlobalJuego.session_info.has(mi_id):
+		GlobalJuego.session_info[mi_id] = {
+			"score": 0,
+			"username": _obtener_nombre_jugador(),
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"personaje": id_pollo,
+			"ping": 0,
+			"inventario": [],
+			"armas_actuales": [0, 0],
+			"listo": true
+		}
+	else:
+		GlobalJuego.session_info[mi_id]["personaje"] = id_pollo
+	if not multiplayer.has_multiplayer_peer():
+		return
+	
+	# si hay red avisar al host
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		Network._solicitar_cambio_pollo.rpc_id(1,mi_id,id_pollo)
+	elif multiplayer.is_server():
+		_procesar_cambio_pollo(mi_id,id_pollo) # el host procesa directo el pollo
+
+func _procesar_cambio_pollo(peer_id: int, id_pollo:int) ->void:
+	if not GlobalJuego.session_info.has(peer_id):
+		return
+	GlobalJuego.session_info[peer_id]["personaje"] = id_pollo
+	
+	if jugadores_en_lobby.has(peer_id):
+		var info = jugadores_en_lobby[peer_id]
+		info["personaje"] = id_pollo
+		jugadores_en_lobby[peer_id] = info
+		var panel = info.get("panel")
+		if panel and panel.has_method("actualizar_personaje_remoto"):
+			panel.actualizar_personaje_remoto(id_pollo)
+		
+	Network._replicar_cambio_pollo.rpc(peer_id,id_pollo)
+	
+# se llama a aesta funcion desde network cuando el cliente decide actualizar, el host envia esto a todos parque actualicen el pollo
+func _aplicar_cambio_pollo(peer_id:int, id_pollo:int)-> void:
+	if GlobalJuego.session_info.has(peer_id):
+		GlobalJuego.session_info[peer_id]["personaje"] = id_pollo
+	if jugadores_en_lobby.has(peer_id):
+		var info = jugadores_en_lobby[peer_id]
+		info["personaje"] = id_pollo
+		jugadores_en_lobby[peer_id] = info
+		var panel = info.get("panel")
+		if panel and panel.has_method("actualizar_personaje_remoto"):
+			panel.actualizar_personaje_remoto(id_pollo)
+
+func _verificar_pollos_unicos()->Dictionary:
+	var vistos :={} # id_pollo y peer id que lo eligio, para avisarle
+	var repetidos :=[] # lista de pollos repetidos, id_pollo
+	for peer_id in jugadores_en_lobby.keys():
+		var id_pollo:int = GlobalJuego.session_info.get(peer_id,{}).get("personaje",0)
+		if  id_pollo<0:
+			continue
+		if vistos.has(id_pollo):
+			repetidos.append(id_pollo)
+		else:
+			vistos[id_pollo] = peer_id
+	return{
+		"validos":repetidos.is_empty(),
+		"repetidos":repetidos
+	}
+	
+	
 	
 
 # avisar del cambio de personaje, cuando un usuario cambia su eprsonaje, avisa al host para que todos actualicen
@@ -350,8 +493,8 @@ func _aplicar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int,id_a
 				panel.actualizar_arma_remoto(id_arma)
 	
 	if not GlobalJuego.session_info.has(peer_id_jugador):
-		if id_personaje==0:
-			id_personaje=1
+		#if id_personaje==0:
+			#id_personaje=1
 		GlobalJuego.session_info[peer_id_jugador] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id_jugador),
@@ -391,6 +534,8 @@ func _comenzar_partida_un_jugador():
 	partida_iniciada.emit()
 	hide()
 	
+	await  Network.iniciar_partida_un_jugador()
+	
 	
 	
 func _comenzar_partida():
@@ -405,6 +550,48 @@ func _comenzar_partida():
 	# Emitir señal SOLAMENTE
 	partida_iniciada.emit()
 	hide()
+
+
+# ============================================================
+# CHAT 
+# ============================================================
+# devuelve un color estable para un peer_id dado.
+# el host siempre usa COLOR_HOST; el resto rota por la paleta.
+func _color_para_peer(peer_id:int)->Color:
+	if peer_id == 1:
+		return COLOR_HOST
+		 # indice estable basado en el peer_id (no en el orden de la lista)
+	var indice:int = abs(peer_id)%COLORES_PEER.size()
+	return COLORES_PEER[indice]
+
+
+func _on_chat_enviar_pressed()->void:
+	
+	if not chat_input:
+		return
+	var texto := chat_input.text.strip_edges()
+	if texto == "":
+		return
+
+	chat_input.text = ""
+	
+	# mandamos por rpc (el host lo reemite a todos)
+	Network._enviar_mensaje_chat.rpc(texto)
+
+func _recibir_mensaje_chat(id:int,emisor_nombre:String, texto: String, es_sistema: bool) -> void:
+	if not chat_historial:
+		return
+	var color_nombre = "#ffd166"  # amarillo para host
+	var color_texto := "#ffffff"
+	
+	if es_sistema:
+		color_nombre = "#ff5555" # rojo para avisos
+		color_texto = "#ff8888"
+	elif id ==1:
+		color_nombre = "#ffd166"
+	chat_historial.append_text("[color=%s]%s:[/color] [color=%s]%s[/color]\n" % [
+		color_nombre, emisor_nombre, color_texto, texto
+	])
 
 
 func _on_regresar_boton_pressed() -> void:
@@ -423,7 +610,7 @@ func _procesar_info_jugador(peer_id: int, info_jugador: Dictionary):
 		return
 	
 	var nombre = info_jugador.get("username", "Jugador " + str(peer_id))
-	var personaje = info_jugador.get("personaje", 1)
+	var personaje = info_jugador.get("personaje", 0)
 	var listo = info_jugador.get("listo", false)
 	var armas_actuales = info_jugador.get("armas_actuales", [1, 0])
 	
@@ -465,7 +652,7 @@ func _responder_info_jugadores(solicitante_id: int):
 		
 		var info_completa = {
 			"username": session_data.get("username", info_lobby.get("nombre", "Jugador " + str(peer_id))),
-			"personaje": session_data.get("personaje", info_lobby.get("personaje", 1)),
+			"personaje": session_data.get("personaje", info_lobby.get("personaje", 0)),
 			"listo": info_lobby.get("listo", false),
 			"score": session_data.get("score", 0),
 			"salud": session_data.get("salud", GlobalJuego.SALUD_DEFAULT),
@@ -509,8 +696,8 @@ func _procesar_cambio_personaje_arma(peer_id_jugador: int, id_personaje: int, id
 	
 	# Actualizar session_info
 	if not GlobalJuego.session_info.has(peer_id_jugador):
-		if id_personaje == 0:
-			id_personaje = 1
+		#if id_personaje == 0:
+			#id_personaje = 1
 		GlobalJuego.session_info[peer_id_jugador] = {
 			"score": 0,
 			"username": "Jugador " + str(peer_id_jugador),

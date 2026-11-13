@@ -18,6 +18,7 @@ background_mode = 2
 sky = SubResource("Sky_bpyjm")
 tonemap_mode = 2
 ssr_enabled = true
+ssil_enabled = true
 glow_enabled = true
 fog_enabled = true
 fog_mode = 1
@@ -29,6 +30,7 @@ process_mode = 1
 script = ExtResource("1_3pli8")
 
 [node name="mapa" parent="." unique_id=139508461 instance=ExtResource("2_dxoa6")]
+unique_name_in_owner = true
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1711943740]
 transform = Transform3D(0.57484823, -0.09363707, 0.8128848, -1.4901161e-08, 0.99343085, 0.11443438, -0.8182601, -0.06578241, 0.5710719, 40.108917, 3.1898546, 46.12387)
@@ -52,7 +54,7 @@ unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1.125, 20.981)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=979900599]
-_spawnable_scenes = PackedStringArray("uid://b8go34qeye00a")
+_spawnable_scenes = PackedStringArray("uid://b8go34qeye00a", "uid://lnfka41ohm0k", "uid://viyc4t6ee6ob")
 spawn_path = NodePath("../SpawnContainer")
 
 [node name="TimerEnemy" type="Timer" parent="." unique_id=32496409]
@@ -72,7 +74,3 @@ _spawnable_scenes = PackedStringArray("uid://ctd4on41k0ea4", "uid://df6wkbhxh2ii
 spawn_path = NodePath("../ContenedorHabilidades")
 
 [node name="ContenedorBalas" type="Node3D" parent="." unique_id=1716599380 groups=["contenedor_balas"]]
-
-[node name="SpawnerBalas" type="MultiplayerSpawner" parent="." unique_id=372688315]
-_spawnable_scenes = PackedStringArray("uid://b635l88o7cpj4", "uid://dmk64w66uhmkc", "uid://d0hnrx2eowpsn")
-spawn_path = NodePath("../ContenedorBalas")

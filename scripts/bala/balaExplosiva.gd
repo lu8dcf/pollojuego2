@@ -1,7 +1,7 @@
 extends Node3D
 
 var tipoComportamiento = comportamientoArma
-@onready var tiempoDeVida = $tiempoVida
+
 var posicionInicio
 
 #explosiva
@@ -10,16 +10,18 @@ var velocidadBala = 15
 var direccion
 
 var inicio = false
-
+var es_fantasma: bool = false 
 var danioBala 
 #solo explosiva
 @onready var areaExplosiva = $area_explosion
+@onready var tiempo = $captarExplosion
+
 
 #TEST
 @onready var textureBullet =$explosiva
 
 
-func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio: int) -> void:
+func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio: int,visual_local: bool = false) -> void:
 
 	if comp == null: #si por alguna razon no tiene comportamiento, vuelve
 		return
@@ -30,7 +32,8 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 	danioBala = danio
 	direccion = direccion_inicial.normalized()
 	inicio = true
-
+	tiempo.wait_time =comp.get_tiempoEspoleta()
+	es_fantasma = visual_local
 	
 func _ready() -> void:
 	top_level = true
@@ -43,8 +46,6 @@ func _process(_delta: float) -> void:
 		balaExplosiva()
 
 func _physics_process(delta: float) -> void:
-	if !is_multiplayer_authority():
-		return
 	if(avanza): #bala comun y explosiva
 		global_position += direccion * velocidadBala * delta
 
@@ -72,16 +73,13 @@ func explosion():
 			if(cuerpo.is_in_group("enemy") and cuerpo.has_method("recibir_dano")):
 				print(cuerpo)
 				cuerpo.recibir_dano(danioBala)
-	await get_tree().create_timer(0.5).timeout
-	eliminarBala()
+	tiempo.start()
 
 #-----------------------------------------------------------------------------comun y explosiva
 func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
 	eliminarBala()
 	
 func eliminarBala():
-	if !is_multiplayer_authority():
-		return
 	queue_free()
 
 
@@ -94,4 +92,20 @@ func _on_area_explosion_area_entered(area: Area3D) -> void:
 
 func _on_area_explosion_body_entered(_body: Node3D) -> void:
 	explosion()
+	pass # Replace with function body.
+
+
+func _on_body_entered(body: Node3D) -> void:
+	if es_fantasma:
+		eliminarBala()
+		return
+	if body.is_in_group("enemy"):
+		# Aplicar daño al enemigo
+		if body.has_method("recibir_dano"):
+			body.recibir_dano(danioBala)
+			queue_free()
+
+
+func _on_captar_explosion_timeout() -> void:
+	eliminarBala()
 	pass # Replace with function body.

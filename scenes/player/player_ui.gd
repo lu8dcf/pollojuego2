@@ -4,6 +4,10 @@ class_name PlayerUI
 
 @onready var menu: Control = %Menu
 
+# LABEL DE FPS
+@onready var label_fps: Label = %LabelFPS
+
+
 # PANEL ARRIBA DERECHA - MENU Y SALIR
 @onready var boton_pausa: TextureButton = %BotonPausa
 @onready var boton_salir: TextureButton = %BotonSalir # para salir del servidor
@@ -29,19 +33,34 @@ var paneles_usuarios:Dictionary = {}
 # panel de ui mobile
 const PANEL_UI_MOVIL = preload("uid://wsf5ahon4ims")
 
+# panel de tienda
+var tienda_actual = null
+
 # tiempo
 @onready var label_tiempo: Label = %LabelTiempo
-
-
+var _timer_fase: Timer = null
+var _tiempo_restante: float = 0.0
+var _tiempo_al_pausar:float = 0.0
+#fase a la que hayq ue regresar
+var _fase_para_reanudar:int = GlobalJuego.FaseJuego.OLEADA
 
 # vida barra experiencia, monedas
 @onready var control_vida: VBoxContainer = %ControlVida
 @onready var etiqueta_nombre: Label = %EtiquetaNombre
 @onready var etiqueta_salud: Label = %EtiquetaSalud
-@onready var barra_salud: ProgressBar = %BarraSalud
+#@onready var barra_salud: ProgressBar = %BarraSalud
 @onready var barra_experiencia: ProgressBar = %BarraExperiencia
+@onready var label_oleada: Label = %LabelOleada
+@onready var label_monedas: Label = %LabelMonedas
 
 @onready var controls_root: VBoxContainer = %ControlsRoot
+
+
+# referencias del fade in y out (color rect)
+@onready var fade: ColorRect = %Fade
+@export var duracion_fade: float = 0.4
+# tween activo (para cancelar si se dispara otro fade antes de que termine)
+var _tween_fade: Tween = null
 
 var COLORS: Array[Color] =[ # colores de la barra de vida
 	Color.MAGENTA,
@@ -59,7 +78,9 @@ func _ready() -> void:
 		
 	else:
 		menu.hide() # los botones de salir y pausa
-		
+	
+	agregar_tienda()
+	mostrar_oleada_actual()
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	# BOTON SALIR
 	boton_salir.pressed.connect(func(): Network.leave_server())
@@ -75,8 +96,9 @@ func _ready() -> void:
 	
 	if GlobalSignal.has_signal("pausa_cambiada"):
 		GlobalSignal.pausa_cambiada.connect(_on_pausa_cambiada)
-		
-
+	if GlobalSignal.has_signal("cambia_oleada"):
+		GlobalSignal.cambia_oleada.connect(mostrar_oleada_actual)
+	
 	for single_color in COLORS:
 		var new_texture = GradientTexture2D.new()
 		var gradient = Gradient.new()
@@ -85,12 +107,6 @@ func _ready() -> void:
 		new_texture.gradient = gradient	
 
 	
-	#salud perosanje
-	barra_salud.max_value = GlobalJuego.salud_maxima
-	barra_salud.value = GlobalJuego.salud_jugador
-	# señales de salud
-	GlobalSignal.salud_jugador_cambiada.connect(_actualizar_barra_salud)
-	GlobalSignal.sesion_actualizada.connect(_actualizar_info_sesion)
 	GlobalSignal.jugador_recibio_daño.connect(_mostrar_daño)
 	#experiencia  perosanje
 	barra_experiencia.max_value = GlobalJuego.experiencia_maxima
@@ -102,22 +118,241 @@ func _ready() -> void:
 	
 	# señales
 	GlobalSignal.sesion_actualizada.connect(_actualizar_paneles_aliados)
+	GlobalSignal.sesion_actualizada.connect(_actualizar_monedas)  
+	
 	if GlobalSignal.has_signal("jugador_recibio_daño"):
 		GlobalSignal.jugador_recibio_daño.connect(_on_jugador_recibio_daño)
 	GlobalSignal.mi_ping_actualizado.connect(_actualizar_mi_ping)
 	_actualizar_mi_ping(0)
-	
-	# Y para cuando la salud cambia:
-	if GlobalSignal.has_signal("salud_jugador_cambiada"):
-		GlobalSignal.salud_jugador_cambiada.connect(_on_salud_jugador_cambiada)
-	
-	_actualizar_barra_salud(GlobalJuego.salud_jugador)
-	
+		
 	_verificar_si_es_mobile()
 	await get_tree().create_timer(0.5).timeout
 	_actualizar_paneles_aliados(GlobalJuego.session_info)
 	
-	process_mode = Node.PROCESS_MODE_ALWAYS # ESTO HARA QUE SIGA PROCESANDO EL CANVAS LAYER, NO SE QUE TAN BUENO SEA
+	process_mode = Node.PROCESS_MODE_ALWAYS 
+
+# MANEJO DE FASES
+
+func iniciar_ciclo_de_fases()->void:
+	if _timer_fase==null:
+		_timer_fase=Timer.new()
+		_timer_fase.one_shot = true
+		_timer_fase.timeout.connect(_on_timer_fase_timeout)
+		add_child(_timer_fase)
+		
+	
+	_arrancar_timer_para_fase(GlobalJuego.fase_actual)
+
+# MANEJO DE OLEADA
+func mostrar_oleada_actual():
+	label_oleada.text = "Oleada: "+ str(GlobalJuego.oleada)
+
+# MANEJO DE TIEMPO
+func _arrancar_timer_para_fase(fase:int) ->void:
+	if _timer_fase == null:
+		return
+	var duracion:float=0.0
+	match fase:
+		GlobalJuego.FaseJuego.OLEADA:
+			duracion = GlobalJuego.duracion_oleada
+		GlobalJuego.FaseJuego.TIENDA:
+			duracion = GlobalJuego.duracion_tienda
+		GlobalJuego.FaseJuego.CARGANDO:
+			duracion = 0.0 # la carga no tiene timer
+		GlobalJuego.FaseJuego.MENU:
+			duracion = 0.0  # el menu no tiene timer
+		GlobalJuego.FaseJuego.LOBBY:
+			duracion = 0.0  # el lobby no tiene timer
+		GlobalJuego.FaseJuego.PAUSA:
+			duracion = 0.0  # la pausa no tiene timer
+	#print("fase: ", GlobalJuego.fase_actual, " timer: ", duracion)
+	_tiempo_restante = duracion
+	_timer_fase.stop()
+	if duracion >0.0:
+		_timer_fase.wait_time = duracion
+		_timer_fase.start()
+		
+	_actualizar_label_tiempo()
+
+
+func _on_timer_fase_timeout():
+	if GlobalJuego.esta_pausado or GlobalJuego.fase_actual == GlobalJuego.FaseJuego.PAUSA:
+		return
+	if not multiplayer.is_server():
+		return
+		 
+	match  GlobalJuego.fase_actual:
+		GlobalJuego.FaseJuego.OLEADA:
+			Network.host_iniciar_tienda()
+		GlobalJuego.FaseJuego.TIENDA:
+			Network.host_iniciar_carga_nueva_oleada()
+			mostrar_oleada_actual()
+
+func _pausar_timer_fase() ->void:
+	if _timer_fase == null or _timer_fase.is_stopped():
+		return
+	_tiempo_al_pausar = _timer_fase.time_left # el timepo que le quedaba antes de pausar
+	_fase_para_reanudar = GlobalJuego.fase_actual
+	_timer_fase.stop() # detener el contador al pausar
+
+func _reanudar_timer_fase() ->void:
+	if _timer_fase == null :
+		return
+	_timer_fase.wait_time = _tiempo_al_pausar
+	_timer_fase.start()
+	_tiempo_al_pausar = 0.0
+
+# se llama desde Network cuando el host cambia la fase
+func _on_fase_cambiada(nueva_fase: int) -> void:
+	# si el juego esta en pausa entonces no procesamos cambios de pausa
+	if GlobalJuego.esta_pausado:
+		return
+	
+	# actualizamos la fase local
+	GlobalJuego.fase_actual = nueva_fase as GlobalJuego.FaseJuego
+	
+	# arrancamos el timer para la nueva fase
+	_arrancar_timer_para_fase(nueva_fase)
+	var mundo = Network.obtener_mundo_actual()
+	
+	# logica visual segun la fase
+	match nueva_fase:
+		GlobalJuego.FaseJuego.OLEADA:
+			# mostrar ui de oleada, ocultar tienda
+			fade_out()
+			_mostrar_ui_oleada()
+			if mundo.has_method("reanudar_gameplay"):
+				mundo.reanudar_gameplay()
+			Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+		GlobalJuego.FaseJuego.TIENDA:
+			# mostrar ui de tienda, ocultar oleada
+			fade_in()
+			_mostrar_ui_tienda()
+			if mundo and mundo.has_method("pausar_gameplay"):
+				mundo.pausar_gameplay()
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+
+		GlobalJuego.FaseJuego.CARGANDO:
+			# ocultar ui de juego, mostrar pantalla de carga
+			_mostrar_ui_carga()
+		GlobalJuego.FaseJuego.MENU, GlobalJuego.FaseJuego.LOBBY:
+			pass
+	mostrar_oleada_actual()
+
+
+func _process(_delta: float) -> void:
+	label_fps.text = "FPS: %d" % Engine.get_frames_per_second()
+	
+	if _timer_fase and not _timer_fase.is_stopped():
+		_tiempo_restante = _timer_fase.time_left
+		_actualizar_label_tiempo()
+
+# formatea el tiempo como MM:SS
+func _actualizar_label_tiempo() ->void:
+	if not label_tiempo:
+		return
+	
+	var segundos_totales:=int(ceil(_tiempo_restante))
+	if segundos_totales <0:
+		segundos_totales = 0
+	
+	@warning_ignore("integer_division")
+	var minutos:= segundos_totales / 60
+	var segundos:=segundos_totales % 60
+	
+	label_tiempo.text = "%02d:%02d" % [minutos,segundos]
+	# cambiar color segun corresponda
+	if segundos_totales <=10:
+		label_tiempo.modulate = Color.RED
+	if segundos_totales <=30:
+		label_tiempo.modulate = Color.YELLOW
+	else:
+		label_tiempo.modulate = Color.WHITE
+
+func _mostrar_ui_oleada() ->void:
+	if control_vida:
+		control_vida.show()
+	if usuarios_vida:
+		usuarios_vida.show()
+	if label_tiempo:
+		label_tiempo.show()
+	if tienda_actual:
+		tienda_actual.hide()
+
+func _mostrar_ui_tienda() ->void:
+	if label_tiempo:
+		label_tiempo.show()
+		label_tiempo.modulate = Color.CYAN
+	tienda_actual.show()
+
+func _mostrar_ui_carga() -> void:
+	# ocultar todo lo de gameplay, se muestra la pantalla de carga
+	if control_vida:
+		control_vida.hide()
+	if usuarios_vida:
+		usuarios_vida.hide()
+	if label_tiempo:
+		label_tiempo.hide()
+
+# TIENDA
+func agregar_tienda():
+	var tienda = load("res://scenes/ui/tienda/MenuTienda.tscn")
+	tienda_actual = tienda.instantiate()
+	add_child(tienda_actual)
+	tienda_actual.hide()
+
+# ===== MANEJAR TRANSICION FADE IN Y OUT =====
+# hace fade in a negro (0 -> 1)
+func fade_in() -> void:
+	if not fade:
+		return
+	if _tween_fade and _tween_fade.is_valid():
+		_tween_fade.kill()
+	
+	fade.visible = true
+	_tween_fade = create_tween()
+	_tween_fade.tween_method(
+		_set_fade_progress,
+		_get_fade_progress(),
+		1.0,
+		duracion_fade
+	)
+
+# hace fade out (1 -> 0)
+func fade_out() -> void:
+	if not fade:
+		return
+	if _tween_fade and _tween_fade.is_valid():
+		_tween_fade.kill()
+	
+	_tween_fade = create_tween()
+	_tween_fade.tween_method(
+		_set_fade_progress,
+		_get_fade_progress(),
+		0.0,
+		duracion_fade
+	)
+	# al terminar, ocultar el ColorRect para no gastar draw calls
+	_tween_fade.tween_callback(func():
+		if fade:
+			fade.visible = false
+	)
+
+# helpers para leer/escribir el progress del shader
+func _set_fade_progress(valor: float) -> void:
+	if not fade:
+		return
+	var mat := fade.material as ShaderMaterial
+	if mat:
+		mat.set_shader_parameter("progress", clamp(valor, 0.0, 1.0))
+
+func _get_fade_progress() -> float:
+	if not fade:
+		return 0.0
+	var mat := fade.material as ShaderMaterial
+	if mat:
+		return mat.get_shader_parameter("progress") as float
+	return 0.0
 
 
 # ===== SI ES MOBILE =====
@@ -154,18 +389,17 @@ func _actualizar_paneles_aliados(info:Dictionary)-> void:
 	if not lista_usuarios:
 		print("ERROR: contenedor_aliados no está configurado")
 		return
-	var mi_id = multiplayer.get_unique_id()
+	var mi_id = _obtener_mi_peer_id()
 	var ids_remotos: Array = []
 	
 	for peer_id in info.keys(): # recorrer todos los jugadores de la sesión
 		if peer_id == mi_id:
 			continue  # no mostrar el status del mismo jugador
-		
 		ids_remotos.append(peer_id)
 		var player_info = info[peer_id]
 		var nombre = player_info.get("username", "Jugador " + str(peer_id))
 		var salud = player_info.get("salud", GlobalJuego.SALUD_DEFAULT)
-		var personaje = player_info.get("personaje", 1)
+		var personaje = player_info.get("personaje", 0)
 		
 		if paneles_usuarios.has(peer_id): # si ya existe el usuario en los panelees, solo lo actualiza
 			var panel = paneles_usuarios[peer_id]
@@ -184,12 +418,21 @@ func _actualizar_paneles_aliados(info:Dictionary)-> void:
 				panel.queue_free()
 			paneles_usuarios.erase(peer_id)
 
+func _actualizar_monedas(info:Dictionary)->void:
+	if not label_monedas:
+		return
+	var mi_id := _obtener_mi_peer_id()
+	if not info.has(mi_id):
+		label_monedas.text = "0"
+		return
+	var score: int = int(info[mi_id].get("score", 0))
+	label_monedas.text = "monedas: "+ "%d" % score
+
 func _crear_panel_aliado(peer_id: int, _nombre: String, salud: int, salud_max: int, personaje: int) -> void:
 	var panel = PANEL_USUARIO.instantiate()
 	lista_usuarios.add_child(panel) # agregarlo antes de configurar
-	await  get_tree().process_frame
-	panel.configurar(peer_id, salud, salud_max, personaje)
 	paneles_usuarios[peer_id] = panel
+	panel.configurar(peer_id, salud, salud_max, personaje)
 	#print("session info: ", GlobalJuego.session_info)
 
 func _eliminar_panel_aliado0(peer_id) -> void:
@@ -201,27 +444,24 @@ func _eliminar_panel_aliado0(peer_id) -> void:
 	paneles_usuarios.erase(peer_id) # seelimina el aliado que se desconecto
 
 
-func _actualizar_barra_salud(nueva_salud: int):
-	barra_salud.value = nueva_salud
-	etiqueta_salud.text = str(nueva_salud) + " / " + str(barra_salud.max_value)
-	
-	# cambiar color según la salud
-	if nueva_salud > barra_salud.max_value * 0.5:
-		barra_salud.modulate = Color.GREEN
-	elif nueva_salud > barra_salud.max_value * 0.25:
-		barra_salud.modulate = Color.YELLOW
-	else:
-		barra_salud.modulate = Color.RED
+func _obtener_mi_peer_id() -> int:
+	if not multiplayer.has_multiplayer_peer():
+		return 1
+	var id := multiplayer.get_unique_id()
+	if id <= 0:
+		# fallback: buscar el jugador local en el mundo
+		var mundo = Network.obtener_mundo_actual()
+		if mundo:
+			for child in mundo.get_children():
+				if child is Jugador and child.is_multiplayer_authority():
+					return int(child.name)
+		return 1
+	return id
+
 
 func _actualizar_experiencia(nueva_exp:int):
 	barra_experiencia.value = nueva_exp
 
-func _actualizar_info_sesion(info: Dictionary):
-	var jugador_local_id = multiplayer.get_unique_id()
-	
-	if info.has(jugador_local_id):
-		var mi_info = info[jugador_local_id]
-		_actualizar_barra_salud(mi_info["salud"])
 
 func _mostrar_daño(peer_id: int, cantidad: int):
 	if peer_id == multiplayer.get_unique_id():
@@ -248,8 +488,22 @@ func _on_jugador_desconectado(peer_id:int)-> void:
 func _on_server_desconectado()-> void:
 	paneles_usuarios.clear()
 
+# ===== MANEJO DE CICLO BASICO =====
 
-
+func host_iniciar_tienda():
+	if not multiplayer.is_server():
+		return
+	if GlobalJuego.esta_pausado:
+		return
+	Network.cambiar_fase_rpc(GlobalJuego.FaseJuego.TIENDA)
+	
+	
+func host_iniciar_carga_nueva_oleada():
+	if not multiplayer.is_server():
+		return
+	if GlobalJuego.esta_pausado:
+		return
+	Network.cambiar_fase_rpc(GlobalJuego.FaseJuego.CARGANDO)
 	
 # ===== MANEJO DE LA PAUSA =====
 # para manejar la pausa se debe usar el rpc en network
@@ -282,7 +536,11 @@ func _on_pausa_cambiada(esta_pausado: bool, quien_pauso: int) -> void:
 	pausa_panel.visible = esta_pausado
 	
 	if esta_pausado:
-		# Actualizar el texto
+		
+		GlobalJuego.fase_antes_de_pausa = GlobalJuego.fase_actual
+		GlobalJuego.esta_pausado = true
+		_pausar_timer_fase()
+		
 		var nombre_pausador = "Alguien"
 		if GlobalJuego.session_info.has(quien_pauso):
 			nombre_pausador = GlobalJuego.session_info[quien_pauso].get("username", "Jugador " + str(quien_pauso))
@@ -294,5 +552,9 @@ func _on_pausa_cambiada(esta_pausado: bool, quien_pauso: int) -> void:
 			label_texto_informa.text = nombre_pausador + " ha pausado el juego.\nEspera a que continúe."
 			boton_regresar.visible = false
 	else:
+		# reanudar la partida
+		GlobalJuego.fase_actual = GlobalJuego.fase_antes_de_pausa # se retoma la fase anteiorr  a la pausa ( puede ser oleada o tienda)
+		GlobalJuego.esta_pausado = false
+		_reanudar_timer_fase()
 		label_texto_informa.text = ""
 		boton_regresar.visible = false

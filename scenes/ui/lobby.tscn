@@ -4,6 +4,10 @@
 [ext_resource type="Script" uid="uid://dny828k6oo18c" path="res://scenes/ui/lobby.gd" id="1_bnidf"]
 [ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="2_2rbxb"]
 [ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_rqagm"]
+[ext_resource type="FontFile" uid="uid://d02ux4lnojyuo" path="res://assets/fuentes/Boring Time.otf" id="5_rqagm"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2rbxb"]
+bg_color = Color(0.6, 0.6, 0.6, 0.4392157)
 
 [node name="Lobby" type="CanvasLayer" unique_id=1877026316]
 script = ExtResource("1_bnidf")
@@ -115,5 +119,48 @@ metadata/_edit_use_anchors_ = true
 [node name="HBoxJugadores" type="HBoxContainer" parent="MarginContenedorJugadores" unique_id=872944241]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="ChatInput" type="TextEdit" parent="." unique_id=165665697]
+unique_name_in_owner = true
+anchors_preset = -1
+anchor_top = 0.95500004
+anchor_right = 0.266
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -8.840027
+offset_right = -27.432007
+offset_bottom = -9.0
+grow_vertical = 0
+
+[node name="ChatHistorial" type="RichTextLabel" parent="." unique_id=689493186]
+unique_name_in_owner = true
+anchors_preset = -1
+anchor_top = 0.83000004
+anchor_right = 0.272
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -26.840027
+offset_right = 7.6559753
+offset_bottom = -36.0
+grow_vertical = 0
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_colors/table_border = Color(0.15686275, 0, 0, 0)
+theme_override_fonts/normal_font = ExtResource("5_rqagm")
+theme_override_styles/normal = SubResource("StyleBoxFlat_2rbxb")
+
+[node name="ChatEnviar" type="Button" parent="." unique_id=1562956397]
+unique_name_in_owner = true
+anchors_preset = -1
+anchor_left = 0.24100001
+anchor_top = 0.94000006
+anchor_right = 0.27800003
+anchor_bottom = 0.9850001
+offset_left = 0.36798096
+offset_top = 1.8799438
+offset_right = 0.7439575
+offset_bottom = 0.7199707
+grow_vertical = 0
+theme_override_font_sizes/font_size = 11
+text = "Enviar"
 
 [connection signal="pressed" from="MarginBoton/RegresarBoton" to="." method="_on_regresar_boton_pressed"]

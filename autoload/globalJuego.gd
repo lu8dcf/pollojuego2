@@ -7,7 +7,7 @@ var semilla_mapa: int = 123456
 var carga_mapa_simple:bool=true
 
 # ===== INVENTARIO GLOBAL =====
-var inventario_jugador = [1, 2, 3, null, null, null] # inventario de maximo 6 slots
+var inventario_jugador = [1, 12, 3, 9, null, null] # inventario de maximo 6 slots
 
 # ===== SELECCIÓN DE PERSONAJE =====
 var polloBasico = "res://scenes/pollos/pollo_modelo_1.tscn"
@@ -32,7 +32,28 @@ const DAÑO_MAXIMO: int = 100
 var mundo:Node3D# mapa actual, esto es forest
 var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
-var cant_jugadres:int = 0
+var cant_jugadores:int = 0 # minimo de jugadores (ni bien se conecte uno se suma)
+var max_cant_jugadores:int = 4 # maximo de jugadores en una partida
+
+var oleada:int = 1
+var menu_abierto: bool = false
+
+# ===== TIPO DE JUEGO =====
+var duracion_oleada:float=90.0
+var duracion_tienda:float=15.0
+# estados del ciclo
+enum FaseJuego{
+	OLEADA,
+	TIENDA,
+	CARGANDO,
+	LOBBY,
+	MENU,
+	PAUSA
+}
+var fase_actual:FaseJuego = FaseJuego.MENU
+var fase_antes_de_pausa:FaseJuego = FaseJuego.OLEADA
+var esta_pausado:bool = false
+
 
 #Tamaño del Mapa
 var mapa_x_min = 8
@@ -43,7 +64,7 @@ var mapa_z_max = 72
 
 #enemigos
 var cant_tipo_enemigos = 4 # maxima cantidad de tipos de eenmigos
-var cant_enemigos = 30  # Cantidad de enemigos en la oleada siempr activos
+var cant_enemigos = 20  # Cantidad de enemigos en la oleada siempr activos por jugador
 
 func _ready():
 	# estas son señales de red 
@@ -56,15 +77,19 @@ func _configurar_sesion():
 	var nombre_temp = "Jugador"
 	if GlobalJuego.nombre_jugador != "":
 		nombre_temp = GlobalJuego.nombre_jugador
-	
+	# PRIMERA CONFIGURACION DE SESSION INFO
 	session_info[1] = {
 		"score": 0,
 		"username": nombre_temp,
 		"salud": SALUD_DEFAULT,
-		"personaje":1,
-		"ping":0,
-		"inventario":[],
-		"armas_actuales":[]
+		"salud_maxima": SALUD_DEFAULT,
+		"velocidad": 5.0,
+		"resistencia": 0.0,
+		"personaje": 0,
+		"estado": Jugador.Estado.OLEADA,
+		"ping": 0,
+		"inventario": [],
+		"armas_actuales": []
 	}
 	#  veerificar que el peer esté listo antes de hacer RPC
 	if multiplayer.multiplayer_peer == null:
@@ -74,6 +99,17 @@ func _configurar_sesion():
 			return
 	_replicar_session_info.rpc(session_info)
 
+func reiniciar_vida_jugador(peer_id:int) ->void:
+	if not session_info.has(peer_id):
+		return
+	var info:Dictionary = session_info[peer_id]
+	var salud_max :int = info.get("salud_maxima",SALUD_DEFAULT)
+	info["salud"] = salud_max
+	session_info[peer_id] = info
+	_replicar_session_info.rpc(session_info)
+	
+	
+
 func _agregar_jugador(peer_id: int):
 	await get_tree().create_timer(1.0).timeout
 	
@@ -81,20 +117,23 @@ func _agregar_jugador(peer_id: int):
 	if jugador:
 		session_info[peer_id] = {
 			"score": 0,
-			"username": jugador.nameplate.text if jugador.nameplate else "Jugador " + str(peer_id),
+			"username": jugador.nameplate.text ,
 			"salud": SALUD_DEFAULT,
-			"personaje":1,
-			"ping":0,
-			"inventario":[],
-			"armas_actuales":[]
+			"salud_maxima": SALUD_DEFAULT,
+			"velocidad": 5.0,
+			"resistencia": 0.0,
+			"personaje": 0,
+			"estado": Jugador.Estado.OLEADA,
+			"ping": 0,
+			"inventario": [],
+			"armas_actuales": []
 		}
 		_replicar_session_info.rpc(session_info)
 		
-		# Emitir señal global de jugador conectado
+		# SE EMITE LA señal global de jugador conectado
 		GlobalSignal.jugador_conectado.emit(peer_id)
 
 func _eliminar_jugador(peer_id: int):
-	"""Elimina un jugador de la sesión"""
 	if session_info.has(peer_id):
 		session_info.erase(peer_id)
 		_replicar_session_info.rpc(session_info)
@@ -110,6 +149,19 @@ func _obtener_jugador(peer_id: int) -> Node:
 	return null
 
 # ===== FUNCIONES DE SALUD =====
+
+#reiniciar la vida de todos y replicar el resultado
+func reiniciar_vida_todos()->void:
+	for peer_id in session_info.keys():
+		var info : Dictionary = session_info[peer_id]
+		var salud_max:int = info.get("salud_maxima",SALUD_DEFAULT)
+		info["salud"] = salud_max
+		session_info[peer_id] = info
+	
+	_replicar_session_info(session_info)
+	#for i in GlobalJuego.session_info.keys():
+		#print("DESPUES DE REINICIAR i: ",i, "Global: ", GlobalJuego.session_info[i])
+
 func dañar_jugador(peer_id: int, cantidad_daño: int):
 	"""Aplica daño a un jugador específico"""
 	if not session_info.has(peer_id):
@@ -175,21 +227,20 @@ func _replicar_session_info(info: Dictionary):
 
 # ===== FUNCIONES PARA SINGLEPLAYER =====
 func configurar_singleplayer():
-	var nombre_temp = "Jugador Solo"
-	if GlobalJuego.nombre_jugador != "":
-		nombre_temp = GlobalJuego.nombre_jugador
-	
 	session_info.clear()
 	session_info[1] = {
 		"score": 0,
-		"username": nombre_temp,
+		"username": nombre_jugador,
 		"salud": SALUD_DEFAULT,
-		"personaje":1,
-		"ping":0,
-		"inventario":[],
-		"armas_actuales":[]
+		"salud_maxima": SALUD_DEFAULT,
+		"velocidad": 5.0,
+		"resistencia": 0.0,
+		"personaje": 0,
+		"estado": Jugador.Estado.OLEADA,
+		"ping": 0,
+		"inventario": [],
+		"armas_actuales": []
 	}
 	
-	# Emitir señal global
 	GlobalSignal.sesion_actualizada.emit(session_info)
 	

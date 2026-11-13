@@ -81,12 +81,9 @@ func _ready():
 	# Areas de colision
 	cargar_materiales()
 	cargar_modelo()
-	#cargar_movimiento()
 	add_to_group('enemy')
 	tipo_enemigo()
-	cargar_pullups()
-	#jugador = get_tree().get_first_node_in_group("Jugadores")
-	# Esperar un frame para que el NavigationServer se inicialice
+	
 	await get_tree().physics_frame
 	marcapaso.timeout.connect(cambios)
 		
@@ -98,8 +95,6 @@ func cargar_materiales():
 	material_rojo.emission = Color.RED
 	material_rojo.emission_energy_multiplier = 2.0 	
 
-func cargar_pullups():
-	pass
 
 func cargar_modelo(): # tipo de enemigo
 	var escena_glb = load("res://scenes/enemy/enemigo_"+ str(tipo)+".tscn")
@@ -121,15 +116,6 @@ func _find_animation_player(node: Node) -> AnimationPlayer: # agrega las animaci
 		if found:
 			return found
 	return null	
-
-func cargar_movimiento():
-	pass
-	#var movimiento = movimiento_especifico.instantiate()
-	#var movimiento_script = "res://scenes/enemy/movimiento/mov_"+str(tipo)+".gd"
-	#var script = load(movimiento_script)
-	#movimiento.set_script(script)
-	#add_child(movimiento)
-	#movimiento.owner = self  #  Establece el owner manualmente
 
 func tipo_enemigo():
 	animation_player.play("caminar_bicho")
@@ -183,7 +169,16 @@ func flash_rojo():
 
 @rpc("authority", "call_local", "reliable")		
 func morir():
+	if not multiplayer.is_server():
+		# El cliente solo ejecuta la animación, no crea ítems
+		_efecto_muerte()
+		return
 	$CollisionShape3D.disabled = true  # elimino la collision
+	crearItem()
+	_efecto_muerte()
+		
+	
+func _efecto_muerte():
 	var shader = preload("res://assets/modelos/shader/muerte.gdshader")
 	shader_muerte = ShaderMaterial.new()
 	shader_muerte.shader = shader
@@ -198,12 +193,30 @@ func morir():
 	#tween.tween_property(self, "rotation:y", rotation.y + 10, 2)  # Girar mientras sube
 	tween.tween_property(self, "scale", Vector3(0.01,0.01,0.01), 1.5)
 		
-	await tween.finished
-		
+	await tween.finished	
 	queue_free()
 	
-
-
+func crearItem():
+	if not multiplayer.is_server():
+		return
+	var numero_aleatorio = randi_range(0, 9)
+	if numero_aleatorio < 2 : # monedas
+		var item_escena = load("res://scenes/item/moneda.tscn")
+		var item = item_escena.instantiate()
+		item.name = "PowerUp_" + str(randi())  # nombre único para evitar conflictos
+		
+		get_parent().add_child(item) #instancia el item enun nivel superior para que al morirr en enemy no desaparezca el item
+		item.global_position = global_position
+	
+	if numero_aleatorio < 6 and numero_aleatorio > 1: #power ups
+		var item_escena = load("res://scenes/item/power_up.tscn")
+		var item = item_escena.instantiate()
+		item.tipo = numero_aleatorio
+		item.name = "PowerUp_" + str(randi())  # nombre único para evitar conflictos
+		
+		get_parent().add_child(item) #instancia el item enun nivel superior para que al morirr en enemy no desaparezca el item
+		item.global_position = global_position
+		
 func cambios():
 	if animacion_ataque:
 		animation_player.play("ataque_bicho")

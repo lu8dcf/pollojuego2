@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://c35unm3ykc85i" path="res://scenes/player/player_ui.gd" id="1_m6sn8"]
 [ext_resource type="Texture2D" uid="uid://b1t8eqspo4bb6" path="res://assets/keyboard-&-mouse_sheet_default.png" id="3_fatww"]
 [ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="4_mo8vb"]
+[ext_resource type="Shader" uid="uid://dhta31awldte3" path="res://shaders/fade_out_in.gdshader" id="4_nlx67"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nlx67"]
 atlas = ExtResource("3_fatww")
@@ -19,13 +20,6 @@ region = Rect2(584, 264, 48, 48)
 [sub_resource type="AtlasTexture" id="AtlasTexture_6m6d0"]
 atlas = ExtResource("3_fatww")
 region = Rect2(648, 264, 48, 48)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gfjak"]
-bg_color = Color(1, 1, 1, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
 
 [sub_resource type="Gradient" id="Gradient_m6sn8"]
 colors = PackedColorArray(0.43137255, 0.28235295, 0.9254902, 1, 1, 0.8666667, 1, 1)
@@ -63,9 +57,23 @@ region = Rect2(0, 128, 64, 64)
 atlas = ExtResource("3_fatww")
 region = Rect2(448, 576, 64, 64)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mo8vb"]
+shader = ExtResource("4_nlx67")
+shader_parameter/fade_color = Color(0, 0, 0, 1)
+shader_parameter/progress = 0.0
+
 [node name="Player_UI" type="CanvasLayer" unique_id=1188246629]
 process_mode = 3
 script = ExtResource("1_m6sn8")
+
+[node name="LabelFPS" type="Label" parent="." unique_id=165403976]
+unique_name_in_owner = true
+offset_right = 94.0
+offset_bottom = 20.0
+text = "fps:"
+label_settings = ExtResource("4_mo8vb")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Menu" type="Control" parent="." unique_id=102514064]
 unique_name_in_owner = true
@@ -115,30 +123,14 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 45
 
-[node name="CentroPantallaPuntero" type="Panel" parent="." unique_id=305474234]
-visible = false
-custom_minimum_size = Vector2(5, 5)
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -2.5
-offset_top = -2.5
-offset_right = 2.5
-offset_bottom = 2.5
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_gfjak")
-
 [node name="ArribaCentro" type="MarginContainer" parent="." unique_id=1042432544]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
+offset_top = 1.0
 offset_right = 200.0
-offset_bottom = 108.0
+offset_bottom = 88.0
 grow_horizontal = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
@@ -148,16 +140,36 @@ theme_override_constants/margin_bottom = 20
 [node name="ControlVida" type="VBoxContainer" parent="ArribaCentro" unique_id=1544861557]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 8
+theme_override_constants/separation = 20
 
 [node name="LabelTiempo" type="Label" parent="ArribaCentro/ControlVida" unique_id=753765349]
 unique_name_in_owner = true
+z_index = 20
 layout_mode = 2
+theme_override_font_sizes/font_size = 23
 text = "Tiempo:"
 label_settings = ExtResource("4_mo8vb")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Label" type="Label" parent="ArribaCentro/ControlVida" unique_id=1456244193]
+[node name="HBoxContainer" type="HBoxContainer" parent="ArribaCentro/ControlVida" unique_id=1635212464]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 80
+
+[node name="LabelOleada" type="Label" parent="ArribaCentro/ControlVida/HBoxContainer" unique_id=311077641]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Oleada:"
+label_settings = ExtResource("4_mo8vb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelMonedas" type="Label" parent="ArribaCentro/ControlVida/HBoxContainer" unique_id=1456244193]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Monedas: "
 label_settings = ExtResource("4_mo8vb")
@@ -177,17 +189,9 @@ visible = false
 layout_mode = 2
 horizontal_alignment = 1
 
-[node name="BarraSalud" type="ProgressBar" parent="ArribaCentro/ControlVida" unique_id=1506908608]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 20)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxTexture_nlx67")
-theme_override_styles/fill = SubResource("StyleBoxTexture_g18nd")
-value = 60.84
-show_percentage = false
-
 [node name="BarraExperiencia" type="ProgressBar" parent="ArribaCentro/ControlVida" unique_id=2017376515]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(200, 20)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxTexture_nlx67")
@@ -281,3 +285,13 @@ label_settings = ExtResource("4_mo8vb")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="Fade" type="ColorRect" parent="." unique_id=539059642]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_mo8vb")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

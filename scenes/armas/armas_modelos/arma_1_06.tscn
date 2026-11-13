@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://c8wrvf4jsvrsa"]
+
+[ext_resource type="PackedScene" uid="uid://ed715hsfimle" path="res://assets/modelos/armas/arma_1_06.fbx" id="1_i7h1m"]
+
+[node name="arma_1_06" unique_id=1446169164 instance=ExtResource("1_i7h1m")]
+
+[node name="9" parent="." index="0" unique_id=1774445627]
+transform = Transform3D(1.3426131e-06, -3.6698386e-06, 22.525309, -22.525309, -9.846125e-07, 1.342613e-06, 9.846123e-07, -22.525309, -3.6698386e-06, 0, 0, 0)
+
+[node name="Skeleton3D" parent="9" index="0" unique_id=362733097]
+bones/1/position = Vector3(0.0018786914, 0.00032810133, -0.007878005)
+bones/1/rotation = Quaternion(-0.7039937, -0.06627821, 0.06627834, 0.7039938)
+bones/3/position = Vector3(0.00046796026, 0.0017034332, -0.007878005)
+bones/3/rotation = Quaternion(-0.6616956, 0.24931715, -0.24931702, 0.6616956)
+bones/5/rotation = Quaternion(-0.64021456, 0.30020893, -0.30020878, 0.64021456)
+bones/7/position = Vector3(-0.00015603245, 0.002495538, -0.007878005)
+bones/9/rotation = Quaternion(-0.49090636, 0.50893134, -0.5089311, 0.4909063)
+bones/11/position = Vector3(-0.0008355075, 0.004239442, -0.007878005)
+bones/11/rotation = Quaternion(-0.7044092, -0.06170714, 0.061707247, 0.70440906)
+bones/13/position = Vector3(-0.0009103751, 0.0051418166, -0.007878005)
+bones/13/rotation = Quaternion(-0.62901634, 0.32301456, -0.32301444, 0.62901646)
+bones/15/position = Vector3(-0.00085357425, 0.0059513557, -0.007770195)
+bones/15/rotation = Quaternion(-0.6112471, 5.4530446e-08, 5.4996367e-08, 0.7914399)
+bones/17/position = Vector3(-0.00085357425, 0.006442315, -0.0077083586)
+bones/17/rotation = Quaternion(-0.5631156, 5.3907957e-08, 5.458867e-08, 0.82637817)
+bones/19/position = Vector3(-0.00085357425, 0.0067358078, -0.0076742684)
+bones/19/rotation = Quaternion(-0.45994857, 5.2070877e-08, 5.317752e-08, 0.88794565)
+bones/21/position = Vector3(-0.0008535742, 0.006775817, -0.007460852)
+bones/21/rotation = Quaternion(-0.3856366, 5.03836e-08, 5.1772147e-08, 0.9226508)
+bones/23/position = Vector3(-0.0008535742, 0.0071227527, -0.007205863)
+bones/23/rotation = Quaternion(-0.3191619, 4.864797e-08, 5.0273165e-08, 0.94770026)
+bones/25/position = Vector3(-0.0009124194, 0.007495495, -0.006783479)
+bones/25/rotation = Quaternion(-0.22161269, 4.574898e-08, 4.7697352e-08, 0.97513485)
+bones/27/position = Vector3(-0.00091241935, 0.007886111, -0.0062772054)
+bones/27/rotation = Quaternion(-0.15875445, 4.367353e-08, 4.581593e-08, 0.98731816)
+bones/29/position = Vector3(-0.0009124192, 0.008123046, -0.005576102)
+bones/29/rotation = Quaternion(-0.10234976, 4.1678963e-08, 4.39864e-08, 0.9947485)
+bones/31/position = Vector3(-0.00091241894, 0.008280075, -0.0038935496)
+bones/31/rotation = Quaternion(-0.05062917, 3.974265e-08, 4.2194102e-08, 0.99871755)
+bones/33/rotation = Quaternion(-0.0028901994, 3.786537e-08, 4.0443563e-08, 0.9999958)
+bones/35/position = Vector3(0.0028463013, 0.00017790124, -0.007878005)
+bones/35/rotation = Quaternion(-0.70614463, 0.03687569, -0.03687558, 0.70614463)
+bones/37/rotation = Quaternion(1, 0, -2.0498676e-22, 0)
+
+[node name="Marker3D" type="Marker3D" parent="." index="2" unique_id=890610597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11938757, 1.1748517)

@@ -9,13 +9,13 @@ var avanza = false
 var direccion
 var inicio = false
 var danioBala
-
+var es_fantasma: bool = false 
 # solo melee
 @onready var areaMelee = $area_melee
 
 var ya_eliminada: bool = false
 
-func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio) -> void:
+func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio,visual_local: bool = false) -> void:
 	if comp == null:
 		return
 
@@ -25,7 +25,7 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 	danioBala = danio
 	direccion = direccion_inicial.normalized()
 	inicio = true
-
+	es_fantasma = visual_local
 
 func _ready() -> void:
 	add_to_group("bala")
@@ -40,12 +40,6 @@ func _process(_delta: float) -> void:
 		inicio = false
 		tiempoDeVida.start()
 		# Si querés que melee se active una sola vez, no lo llames acá
-
-
-func _physics_process(_delta: float) -> void:
-	if !is_multiplayer_authority():
-		return
-	# lógica de movimiento si la hubiera
 
 
 func activar_melee() -> void:
@@ -72,9 +66,6 @@ func eliminarBala() -> void:
 		return
 	ya_eliminada = true
 
-	if not multiplayer.is_server():
-		return
-
 	queue_free()
 
 
@@ -83,9 +74,9 @@ func _on_tiempo_vida_timeout() -> void:
 
 
 func _on_area_melee_body_entered(_body: Node3D) -> void:
-	if not multiplayer.is_server():
+	if es_fantasma:
+		eliminarBala()
 		return
-
 	# Si ya la estás eliminando, no hagas nada
 	if ya_eliminada:
 		return

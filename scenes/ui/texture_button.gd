@@ -6,7 +6,7 @@ class_name TextureButtonAnimado
 @onready var label: Label = $Label
 
 # Parámetros de animación visual (Hover)
-@export var saturacion_normal: float = 1.0          # Saturación normal
+@export var saturacion_normal: float = 1.0         # Saturación normal
 @export var saturacion_hover: float = 1.5           # Saturación al hover
 @export var brillo_hover: float = 1.2               # Brillo adicional
 @export var velocidad_transicion: float = 10.0      # Velocidad de transición
@@ -26,7 +26,7 @@ class_name TextureButtonAnimado
 @export var duracion_temblor: float = 0.2           # Duración del temblor
 
 # Parámetros de animación de entrada
-@export var tiempo_espera_barras: float = 0.3      # Tiempo que espera a que las barras terminen de entrar
+@export var tiempo_espera_barras: float = 0.3       # Tiempo que espera a que las barras terminen de entrar
 @export var tiempo_espera_base: float = 0.1         # Retraso base propio de los botones
 @export var retraso_por_pantalla_y: float = 0.6     # Intervalo de tiempo entre el primer y último botón según Y
 @export var duracion_animacion_entrada: float = 0.5 # Duración del movimiento de entrada
@@ -42,8 +42,8 @@ var temblando: bool = false
 var tiempo_temblor: float = 0.0
 var mouse_encima: bool = false
 var saturacion_actual: float = 1.0
-var progreso_linea: float = 0.0                    # 0 = oculta, 1 = visible
-var elevacion_actual: float = 0.0                  # Elevación actual del botón
+var progreso_linea: float = 0.0                     # 0 = oculta, 1 = visible
+var elevacion_actual: float = 0.0                   # Elevación actual del botón
 var animando_entrada: bool = true                   # Deshabilita hover/procesos mientras entra
 
 func _ready() -> void:
@@ -55,6 +55,9 @@ func _ready() -> void:
 	
 	# Al presionar, ejecuta la aberración/impacto directo sobre el shader
 	pressed.connect(_on_pressed_impacto)
+	
+	# Conectar sonido de selección al presionar
+	pressed.connect(_on_pressed_audio)
 	
 	set_process(true)
 	_aplicar_saturacion(saturacion_normal)
@@ -84,7 +87,12 @@ func _on_pressed_impacto() -> void:
 	
 	var tween = create_tween()
 	tween.tween_property(mat, "shader_parameter/intensidad", 0.0, 0.25)
-	
+
+# Función de audio al hacer clic (Select)
+func _on_pressed_audio() -> void:
+	if Sonidos.has_method("sonidoSelect"):
+		Sonidos.sonidoSelect()
+
 func _buscar_color_rect(nodo: Node) -> ColorRect:
 	"""Recorre la escena buscando el ColorRect que tiene el ShaderMaterial"""
 	if nodo is ColorRect and nodo.material is ShaderMaterial:
@@ -155,6 +163,10 @@ func _on_mouse_entered() -> void:
 		return
 	mouse_encima = true
 	_iniciar_temblor()
+	
+	# Llamada al sonido de Hover
+	if Sonidos.has_method("sonidoHover"):
+		Sonidos.sonidoHover()
 
 func _on_mouse_exited() -> void:
 	if animando_entrada:
@@ -228,6 +240,7 @@ func cambiar_label(tamanio_nuevo: int = 20, color_nuevo: String = "#ffffff", tex
 	label.queue_redraw()
 
 func activar_hover():
+	print("Intentando reproducir SELECT")
 	_on_mouse_entered()
 
 func desactivar_hover():

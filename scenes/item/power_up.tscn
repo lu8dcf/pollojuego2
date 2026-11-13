@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://lnfka41ohm0k"]
+
+[ext_resource type="PackedScene" uid="uid://crn45wdggktcp" path="res://scenes/environment/power_up_generico.tscn" id="1_jrwio"]
+[ext_resource type="Script" uid="uid://bqdseojfygsae" path="res://scripts/item/power_up.gd" id="1_m5l1u"]
+[ext_resource type="Script" uid="uid://byyqj7nrhmy8t" path="res://scripts/item/power_up_generico.gd" id="3_vc5th"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_50d1r"]
+height = 0.31866455
+radius = 0.20605469
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_m5l1u"]
+properties/0/path = NodePath(".:tipo")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[node name="powerUp" type="Area3D" unique_id=1451276215]
+collision_layer = 32
+collision_mask = 38
+script = ExtResource("1_m5l1u")
+
+[node name="PowerUpGenerico" parent="." unique_id=1812622002 instance=ExtResource("1_jrwio")]
+script = ExtResource("3_vc5th")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1739134601]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17593384, 0)
+shape = SubResource("CylinderShape3D_50d1r")
+debug_color = Color(0.79775673, 0.21879712, 0.8860096, 0.41960785)
+
+[node name="tiempo_vida" type="Timer" parent="." unique_id=677621687]
+wait_time = 10.0
+one_shot = true
+autostart = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1128048415]
+replication_config = SubResource("SceneReplicationConfig_m5l1u")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="tiempo_vida" to="." method="_on_tiempo_vida_timeout"]

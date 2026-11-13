@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://c46wfxec6q4kf"]
+
+[ext_resource type="Script" uid="uid://di5e34wd7b7b5" path="res://scripts/bala/balaEscopeta.gd" id="1_6hnh1"]
+[ext_resource type="PackedScene" uid="uid://e6voal8m8oud" path="res://scenes/bala/bala_modelo.tscn" id="2_keqqc"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_sugfe"]
+radius = 0.22944674
+
+[node name="balaEscopeta" type="Area3D" unique_id=1972517349]
+collision_layer = 16
+collision_mask = 74
+script = ExtResource("1_6hnh1")
+
+[node name="vidaBala" type="Timer" parent="." unique_id=1600472248]
+wait_time = 0.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=793220646]
+transform = Transform3D(0.805, 0, 0, 0, 0.805, 0, 0, 0, 0.805, 0, 0, 0)
+shape = SubResource("SphereShape3D_sugfe")
+
+[node name="pollo_1" parent="." unique_id=1261941554 instance=ExtResource("2_keqqc")]
+transform = Transform3D(3.121, 0, 0, 0, 1.56, 0, 0, 0, 3.772, 0, 0, 0)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="vidaBala" to="." method="_on_vida_bala_timeout"]

@@ -12,9 +12,13 @@ extends CanvasLayer
 # gaficos 
 @onready var check_button: CheckButton = %CheckButton
 
+# --- AGREGADO PARA EL BOTÓN DE VOLUMEN ---
+@onready var boton_volumen: TextureButton = %volumen
+
 # Referencias a paneles
 @onready var panel_un_jugador: Control = %PanelUnJugador
 @onready var panel_multijugador: Control = %PanelMultijugador
+@onready var panel_multijugador_enet: PanelContainer = %PanelMultijugadorEnet
 @onready var panel_opciones: Control = %PanelOpciones
 #@onready var panel_creditos: Control = %PanelCreditos
 
@@ -77,6 +81,11 @@ func conectar_botones()->void:
 	opciones.pressed.connect(_mostrar_opciones)
 	boton_salir.pressed.connect(_boton_salir)
 	check_button.toggled.connect(_boton_requisitos)
+	
+	# --- AGREGADO PARA EL BOTÓN DE VOLUMEN ---
+	boton_volumen.toggle_mode = true
+	if not boton_volumen.toggled.is_connected(_on_volumen_toggled):
+		boton_volumen.toggled.connect(_on_volumen_toggled)
 
 
 func _boton_requisitos(tongle:bool):
@@ -88,6 +97,7 @@ func _boton_requisitos(tongle:bool):
 func _ocultar_todos_los_paneles() -> void:
 	panel_un_jugador.visible = false
 	panel_multijugador.visible = false
+	panel_multijugador_enet.visible = false
 	panel_opciones.visible = false
 	boton_local.visible = false
 	boton_online.visible = false
@@ -168,27 +178,15 @@ func _on_empezar_un_jugador() -> void:
 	get_tree().current_scene.add_child(nuevo_mundo)
 	await get_tree().process_frame
 	
-	if nuevo_mundo.has_method("partida_unsolojugador"):
-		nuevo_mundo.partida_unsolojugador()
 	
-	_crear_jugador_local(nuevo_mundo)
 	hide()
-
-func _crear_jugador_local(mundo_instancia: Node3D) -> void:
-	var jugador = PLAYER.instantiate()
-	jugador.name = "1"
-	mundo_instancia.add_child(jugador)
-	jugador.global_position = Vector3(22, 2, 22)
 
 func _crear_mundo_un_jugador():
 	var nuevo_mundo = MUNDO.instantiate()
 	get_tree().current_scene.add_child(nuevo_mundo)
 	await get_tree().process_frame
 	
-	if nuevo_mundo.has_method("partida_unsolojugador"):
-		nuevo_mundo.partida_unsolojugador()
 	
-	_crear_jugador_local(nuevo_mundo)
 	_limpiar_lobby()
 
 # ------------------------------------------------------------
@@ -418,3 +416,6 @@ func _mostrar_error(mensaje: String, titulo: String = "Error de conexión") -> v
 	
 	if pantalla_carga_actual and pantalla_carga_actual.has_method("mostrar_error"):
 		pantalla_carga_actual.mostrar_error(mensaje, titulo)
+		
+func _on_volumen_toggled(button_pressed: bool) -> void:
+	Sonidos.toggle_silenciar_audio(button_pressed, "Master")

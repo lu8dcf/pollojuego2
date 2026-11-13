@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://bqet3yhj20mdn"]
+
+[ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="1_apaxj"]
+[ext_resource type="Script" uid="uid://do0tqx6qky2bs" path="res://scenes/ui/pantalla_perder.gd" id="1_m8lbx"]
+
+[node name="PantallaPerder" type="Control" unique_id=1845168781]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_m8lbx")
+
+[node name="LabelTitulo" type="Label" parent="." unique_id=313798267]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -101.5
+offset_top = -247.5
+offset_right = 101.5
+offset_bottom = -198.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Perdiste"
+label_settings = ExtResource("1_apaxj")
+horizontal_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=207947869]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=356289951]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -464.0
+offset_bottom = -72.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 20
