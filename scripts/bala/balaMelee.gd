@@ -55,8 +55,10 @@ func activar_melee() -> void:
 	var cuerpos_en_area = areaMelee.get_overlapping_bodies()
 	for cuerpo in cuerpos_en_area:
 		if cuerpo.is_in_group("enemy"):
-			# Acá podés aplicar daño, etc.
-			pass
+			if cuerpo.has_method("recibir_dano"):
+				cuerpo.recibir_dano(danioBala)
+				queue_free()
+
 
 	eliminarBala()
 
@@ -77,9 +79,6 @@ func _on_area_melee_body_entered(_body: Node3D) -> void:
 	if es_fantasma:
 		eliminarBala()
 		return
-	# Si ya la estás eliminando, no hagas nada
+	# Si ya esta siendo eliminada, no hagas nada
 	if ya_eliminada:
 		return
-
-	# Opcional: si querés que el primer contacto mate la bala inmediatamente
-	eliminarBala()

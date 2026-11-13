@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://saahuqra6k4j"]
 
+[ext_resource type="PackedScene" uid="uid://kyxu0tnhsepf" path="res://scenes/item/moneda_modelo.tscn" id="2_lv4g1"]
 [ext_resource type="PackedScene" uid="uid://donw4h8uddm3m" path="res://assets/modelos/power_ups/jeringa_generica.fbx" id="2_uakqo"]
 
 [sub_resource type="Animation" id="Animation_o3wrf"]
@@ -27,6 +28,42 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector3(0, 6.2831855, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("moneda:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 1.7484555e-07, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("moneda:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(1.49, 1.49, 1.49)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("moneda:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0.15978746, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_uakqo"]
@@ -57,6 +94,42 @@ tracks/1/keys = {
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 6.2831855, 0)]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("moneda:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 1.7484555e-07, 0), Vector3(0, 6.2831855, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("moneda:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(5),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(1.49, 1.49, 1.49)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("moneda:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 2.47, 5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.12331924, 0), Vector3(0, 0.15978746, 0), Vector3(0, 0.12331924, 0)]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_0q2ib"]
 _data = {
@@ -66,8 +139,12 @@ _data = {
 
 [node name="moneda" type="Node3D" unique_id=1812622002]
 
+[node name="moneda" parent="." unique_id=869347405 instance=ExtResource("2_lv4g1")]
+transform = Transform3D(1.49, 0, 2.6051987e-07, 0, 1.49, 0, -2.6051987e-07, 0, 1.49, 0, 0.15978746, 0)
+
 [node name="jeringa_generica" parent="." unique_id=623105621 instance=ExtResource("2_uakqo")]
 transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, 0, 0.19218916, 0)
+visible = false
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=105942622]
 libraries/ = SubResource("AnimationLibrary_0q2ib")

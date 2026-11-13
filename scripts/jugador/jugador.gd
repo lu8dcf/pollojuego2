@@ -16,6 +16,11 @@ var resistencia := 0.2
 
 var joystick: Joystick = null
 
+#POWERUPP
+var escudoEscena = preload("res://scenes/habilidad/escudo.tscn")
+@onready var containerHabilidad: Node3D = get_tree().get_first_node_in_group("contenedor_habilidades")
+@onready var timer_powerUp = $powerUp
+
 @onready var camera_3d: Camera3D = $camaraRig/OffsetRig/Camera3D
 @onready var nameplate: Label3D = %Nameplate
 @onready var player_ui: PlayerUI = %Player_UI
@@ -43,6 +48,7 @@ var ultimoEstado : Estado = Estado.OLEADA
 var salud := 100
 var salud_maxima = 100
 var objetivo_actual: Node = null
+var misDatos =[]
 
 #DASH
 const DASH_SPEED := 40.0
@@ -79,6 +85,7 @@ func crear_pollo_en_red(tipo_elegido: int) -> void:
 		self.salud = self.salud_maxima
 		self.velocidad = datos_pollo.get("velocidad")
 		self.resistencia = datos_pollo.get("resistencia")
+		misDatos = [velocidad,resistencia]
 	
 	var peer_id := int(name)
 	if GlobalJuego.un_jugador or multiplayer.is_server():
@@ -96,7 +103,7 @@ func crear_pollo_en_red(tipo_elegido: int) -> void:
 			child.queue_free()
 
 	#instancio el nodo pollo (visual y habilidad)
-	var pollo_nuevo := PolloFactory.crear(tipo_pollo_enum, self)
+	var pollo_nuevo = PolloFactory.crear(tipo_pollo_enum, self)
 
 	if pollo_nuevo == null:
 		return
@@ -503,7 +510,7 @@ func recibir_dano(dano: int):
 	#flash_rojo.rpc(get_multiplayer_authority())  # aviso a todos que brille
 	if vida_actual <= 0:
 		cambiar_estado(Estado.CAIDO)
-	salud = vida_actual
+	salud = int(vida_actual)
 
 	if dano <= 0:
 		return
@@ -538,27 +545,7 @@ func aplicar_salud_local(nueva_salud: int,nueva_salud_maxima: int,mostrar_efecto
 		barraVida.visible = \
 			GlobalJuego.un_jugador \
 			or is_multiplayer_authority()
-
-#@rpc("any_peer", "call_local", "reliable")		
-#func sincronizar_salud_y_efecto(nueva_salud: int):
-	##actualizo vida salud
-	#salud = nueva_salud
-	#
-	##flash rojo
-	#if has_node("pollo"): 
-		#pollo.flash_rojo()
-		#
-	##paso el porcentaje a l abarra para que baje
-	#var porcentaje = float(nueva_salud) / salud_maxima
-	#$barraVida.bajarVida(porcentaje)
-	#
-	## Esto es para que se vea SOLO la barra propia
-	#if is_multiplayer_authority():
-		#$barraVida.visible = true
-	#else:
-		#$barraVida.visible = false
-
-#------------------------------------------------------------------------SERVIDOR
+#--------------------------------------------------SERVIDOR
 
 @rpc("any_peer")
 func pedir_ayuda() -> void:
@@ -609,11 +596,6 @@ func morir():
 	print("jugador ha muerto!")
 	#flash_claro.rpc()
 	
-	#muerto = true
-	#animation_player.play("Death01")
-	#await animation_player.animation_finished
-	#animacion_muerte()
-	# queue_free()
 #-------------------------------------------------------------------SALVADOO
 
 func actualizar_barra():
@@ -630,3 +612,27 @@ func polloSalvado():
 	#salud = salud_maxima
 	var peer_id := int(name)
 	Network.actualizar_salud_jugador(peer_id,salud_maxima,salud_maxima,false)
+	
+#-------------------------------------------------------------------------------POWERUP
+
+func powerup_escudo():
+	
+	var mi_peer_id := multiplayer.get_unique_id()
+	var escudo = escudoEscena.instantiate()
+	escudo.set_multiplayer_authority(mi_peer_id)
+	
+	escudo.tiempo_de_vida = 5.0 
+	containerHabilidad.add_child(escudo, true)
+	escudo.inicializar(self)
+
+func powerup_velocidad():
+	velocidad *=1.5;
+	timer_powerUp.start()
+
+
+
+
+
+func _on_power_up_timeout() -> void:
+	velocidad = misDatos.get(0)
+	resistencia = misDatos.get(1)

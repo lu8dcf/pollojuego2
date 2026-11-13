@@ -95,9 +95,13 @@ shape = SubResource("BoxShape3D_8w0r3")
 [node name="barraVida" parent="." unique_id=1686766715 instance=ExtResource("6_ku1a3")]
 transform = Transform3D(0.085, 0, 0, 0, 0.085, 0, 0, 0, 0.085, 0, 1.925, 0)
 
+[node name="powerUp" type="Timer" parent="." unique_id=1119182551]
+wait_time = 5.0
+
 [connection signal="area_entered" from="DeteccionAyuda" to="." method="_on_deteccion_ayuda_area_entered"]
 [connection signal="timeout" from="timer_caido" to="." method="_on_timer_caido_timeout"]
 [connection signal="timeout" from="timer_salvar" to="." method="_on_timer_salvar_timeout"]
+[connection signal="timeout" from="powerUp" to="." method="_on_power_up_timeout"]
 
 [editable path="brazos"]
 [editable path="camaraRig"]

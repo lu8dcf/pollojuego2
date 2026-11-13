@@ -37,7 +37,7 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 	
 func _ready() -> void:
 	top_level = true
-	
+	Sonidos.sonidoCohete()
 	textureBullet.visible=true
 	#balaExplosiva()
 
@@ -71,12 +71,12 @@ func explosion():
 	if(cuerpos_en_area != null):
 		for cuerpo in cuerpos_en_area:
 			if(cuerpo.is_in_group("enemy") and cuerpo.has_method("recibir_dano")):
-				print(cuerpo)
-				cuerpo.recibir_dano(danioBala)
+				if is_instance_valid(cuerpo) and cuerpo.is_inside_tree():
+					cuerpo.recibir_dano(danioBala)
 	tiempo.start()
 
-#-----------------------------------------------------------------------------comun y explosiva
-func _on_tiempo_vida_timeout() -> void: #tiempo de vida de la bala comun
+#-----------------------------------------------------------------------------cexplosiva
+func _on_tiempo_vida_timeout() -> void:
 	eliminarBala()
 	
 func eliminarBala():

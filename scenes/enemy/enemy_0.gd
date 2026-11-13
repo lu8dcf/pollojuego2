@@ -4,7 +4,7 @@ class_name EnemigoBase
 # Caracteristicas del bicho
 @export var vida := 30  # vida del bicho
 var dano = 10 # daño que hace al jugador
-
+var murio = false
 # IA
 var puede_moverse = false
 
@@ -148,6 +148,10 @@ func tipo_enemigo():
 	
 	
 func recibir_dano(danio):
+	if murio:
+		return
+	if not is_inside_tree():
+		return
 	if not multiplayer.is_server():
 		return
 	var vida_actual = vida - danio
@@ -173,6 +177,7 @@ func morir():
 		# El cliente solo ejecuta la animación, no crea ítems
 		_efecto_muerte()
 		return
+	murio = true
 	$CollisionShape3D.disabled = true  # elimino la collision
 	crearItem()
 	_efecto_muerte()
@@ -184,7 +189,7 @@ func _efecto_muerte():
 	shader_muerte.shader = shader
 	geometry.set_surface_override_material(0, shader_muerte)
 	geometry.material_override = shader_muerte
-				
+	Sonidos.sonidoMuerteBicho()			
 	var tween = create_tween()
 	#tween.set_parallel(true)
 	

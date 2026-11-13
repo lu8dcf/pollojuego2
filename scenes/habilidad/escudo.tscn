@@ -9,17 +9,17 @@ radius = 1.1186941
 radius = 1.0744153
 
 [node name="escudo" type="StaticBody3D" unique_id=2104900375]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+transform = Transform3D(3.31, 0, 0, 0, 3.31, 0, 0, 0, 3.31, 0, 0, 0)
 collision_layer = 128
-collision_mask = 2
+collision_mask = 66
 script = ExtResource("1_papwa")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=961615633]
 shape = SubResource("SphereShape3D_h4t55")
 
 [node name="Area3D" type="Area3D" parent="." unique_id=173383363]
-collision_layer = 64
-collision_mask = 2
+collision_layer = 128
+collision_mask = 66
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=177052794]
 shape = SubResource("SphereShape3D_4e15o")

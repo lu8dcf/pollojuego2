@@ -36,8 +36,8 @@ func crearEscudo(peer_id: int) -> void:
 	#si ya hay escudo colgado del jugador lo elimino primero
 	var nombre_buscado = "Escudo_" + str(peer_id)
 	var escudo_viejo = containerHabilidad.get_node_or_null(nombre_buscado)
-	if escudo_viejo:
-		escudo_viejo.queue_free()
+	#if escudo_viejo:
+		#escudo_viejo.queue_free()
 	
 	
 	var escudo = escudoEscena.instantiate()
@@ -45,7 +45,7 @@ func crearEscudo(peer_id: int) -> void:
 	escudo.set_multiplayer_authority(peer_id)
 	
 	#le paso al dron su tiempo de vida
-	escudo.tiempo_de_vida = 5.0 
+	escudo.tiempo_de_vida = 10.0 
 	
 	containerHabilidad.add_child(escudo, true)
 	escudo.inicializar(jugador_objetivo)

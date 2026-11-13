@@ -963,11 +963,24 @@ func spawnear_jugador_rpc(peer_id: int, _nombre: String, posicion: Vector3,id_po
 	if jugador.has_method("crear_pollo_en_red"):
 		jugador.crear_pollo_en_red(id_pollo)
 		
-		
+@rpc("any_peer","call_local", "reliable")
+func solicitar_sumar_monedas(peer_id: int, cantidad: int) -> void:
+	if not multiplayer.is_server():
+		return
+	if multiplayer.get_remote_sender_id() != peer_id:
+		return
+	if not GlobalJuego.session_info.has(peer_id):
+		return
+	var score_actual: int = int(GlobalJuego.session_info[peer_id].get("score", 0))
+	GlobalJuego.session_info[peer_id]["score"] = score_actual + cantidad
+	GlobalJuego._replicar_session_info.rpc(GlobalJuego.session_info)
+	print("se actualizaron monedas para: ", peer_id, " monedas: ", cantidad)
+
 @rpc("authority","call_local","reliable")
 func _replicar_semilla(semilla:int)->void:
 	GlobalJuego.semilla_mapa = semilla
-
+	
+@rpc("authority","call_local","reliable")
 func _actualizar_oleada_rpc(nueva_oleada:int) ->void:
 	GlobalJuego.oleada = nueva_oleada
 	GlobalSignal.emit_signal("cambia_oleada")
@@ -1260,7 +1273,7 @@ func solicitar_pausa(activar: bool) -> void: # CUALQUIERO PERSONA PUEDE PAUSAR P
 		peer_que_pauso = 0
 		_aplicar_pausa.rpc(false, 0)
 
-@rpc("authority", "call_local", "reliable")
+@rpc("authority", "reliable")
 func _aplicar_pausa(activar: bool, quien_pauso: int) -> void: # el host autoriza la pausa o despausa y actualiza a todos
 	
 	pausa_activa = activar
