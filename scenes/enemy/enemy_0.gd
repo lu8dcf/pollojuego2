@@ -200,7 +200,15 @@ func crearItem():
 	if not multiplayer.is_server():
 		return
 	var numero_aleatorio = randi_range(0, 9)
-	if numero_aleatorio < 5:
+	if numero_aleatorio < 2 : # monedas
+		var item_escena = load("res://scenes/item/moneda.tscn")
+		var item = item_escena.instantiate()
+		item.name = "PowerUp_" + str(randi())  # nombre único para evitar conflictos
+		
+		get_parent().add_child(item) #instancia el item enun nivel superior para que al morirr en enemy no desaparezca el item
+		item.global_position = global_position
+	
+	if numero_aleatorio < 6 and numero_aleatorio > 1: #power ups
 		var item_escena = load("res://scenes/item/power_up.tscn")
 		var item = item_escena.instantiate()
 		item.tipo = numero_aleatorio

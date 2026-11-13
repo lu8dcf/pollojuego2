@@ -6,10 +6,10 @@ func color(opcion: int) -> void:
 	var color_elegido = Color.WHITE
 	
 	match opcion:
-		1: color_elegido = Color.RED
-		2: color_elegido = Color.GREEN
-		3: color_elegido = Color.BLUE
-		4: color_elegido = Color.YELLOW
+		2: color_elegido = Color.RED
+		3: color_elegido = Color.GREEN
+		4: color_elegido = Color.BLUE
+		5: color_elegido = Color.YELLOW
 	
 	# 1. Duplicamos el material para que este item tenga su propio color
 	var material_unico = material_res.duplicate()

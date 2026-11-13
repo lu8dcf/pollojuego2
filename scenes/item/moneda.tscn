@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://viyc4t6ee6ob"]
+
+[ext_resource type="Script" uid="uid://bfg1pyed57bdd" path="res://scripts/item/moneda.gd" id="1_d22gr"]
+[ext_resource type="PackedScene" uid="uid://saahuqra6k4j" path="res://scenes/environment/moneda.tscn" id="2_jty0b"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_0oapf"]
+height = 0.31549072
+radius = 0.2475586
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_k3173"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[node name="moneda" type="Area3D" unique_id=181884213]
+collision_layer = 32
+collision_mask = 38
+script = ExtResource("1_d22gr")
+tipo = null
+
+[node name="moneda" parent="." unique_id=1812622002 instance=ExtResource("2_jty0b")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=939883844]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18899536, 0)
+shape = SubResource("CylinderShape3D_0oapf")
+
+[node name="tiempo_vida" type="Timer" parent="." unique_id=366766397]
+wait_time = 38.022
+one_shot = true
+autostart = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1264126931]
+replication_config = SubResource("SceneReplicationConfig_k3173")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="tiempo_vida" to="." method="_on_tiempo_vida_timeout"]

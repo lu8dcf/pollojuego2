@@ -30,7 +30,7 @@ shape = SubResource("CylinderShape3D_50d1r")
 debug_color = Color(0.79775673, 0.21879712, 0.8860096, 0.41960785)
 
 [node name="tiempo_vida" type="Timer" parent="." unique_id=677621687]
-wait_time = 8.0
+wait_time = 10.0
 one_shot = true
 autostart = true
 
