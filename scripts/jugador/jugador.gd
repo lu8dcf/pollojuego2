@@ -626,7 +626,7 @@ func powerup_escudo():
 	escudo.inicializar(self)
 
 func powerup_velocidad():
-	velocidad *0.2;
+	velocidad *2;
 	timer_powerUp.start()
 
 
