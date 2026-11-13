@@ -71,7 +71,7 @@ func spawn_enemy():
 	instanciar_enemigo()
 
 func instanciar_enemigo():
-	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < GlobalJuego.cant_enemigos * GlobalJuego.cant_jugadres:
+	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < GlobalJuego.cant_enemigos * GlobalJuego.cant_jugadores:
 		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = fabrica_enemigos(0)
 			
