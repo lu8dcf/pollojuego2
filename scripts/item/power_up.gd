@@ -21,6 +21,21 @@ func _on_body_entered(body: Node3D) -> void:
 		
 		#  Obtenemos el peer_id del jugador que colisionó
 		var peer_id_jugador = body.get_multiplayer_authority()
+		
+		if GlobalJuego.session_info.has(peer_id_jugador): #Verificamos que el peer_id exista en el diccionario
+			
+			match tipo:
+				2: # rojo suma +10 vida
+					GlobalJuego.session_info[peer_id_jugador]["salud"] += 10
+				3: # verde aumento de velocidad 
+					pass
+				4: # azul repulsion
+					pass
+				5: # amarillo cadencia de la armas
+					pass
+					
+		else:
+			push_error("No se encontró al jugador con peer_id: " + str(peer_id_jugador))
 		#print("El jugador con Peer ID: ", peer_id_jugador, " recogió el ítem.",tipo)	
 		
 		
