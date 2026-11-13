@@ -562,8 +562,10 @@ func pedir_salvar(objetivo_id: int) -> void:
 #------------------------------------------------------------DETECCION DE AYUDA
 
 func _on_deteccion_ayuda_area_entered(area: Area3D) -> void:
-	if estadoActual != Estado.CAIDO:
-		objetivo_actual = area.get_parent()
+	var otro_jugador = area.get_parent()
+   
+	if otro_jugador is Jugador and otro_jugador != self and otro_jugador.estadoActual == Estado.CAIDO:
+		objetivo_actual = otro_jugador
 
 
 func _on_deteccion_ayuda_area_exited(area: Area3D) -> void:
