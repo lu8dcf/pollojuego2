@@ -38,7 +38,7 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 func _ready() -> void:
 	add_to_group("bala")
 	top_level = true
-	#textureBullet.visible=true
+	Sonidos.sonidoEscopeta()
 
 func _process(_delta: float) -> void:
 	if(inicio):

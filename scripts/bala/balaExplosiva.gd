@@ -37,7 +37,7 @@ func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inic
 	
 func _ready() -> void:
 	top_level = true
-	
+	Sonidos.sonidoCohete()
 	textureBullet.visible=true
 	#balaExplosiva()
 

@@ -18,6 +18,7 @@ var joystick: Joystick = null
 
 #POWERUPP
 var escudoEscena = preload("res://scenes/habilidad/escudo.tscn")
+@onready var containerHabilidad: Node3D = get_tree().get_first_node_in_group("contenedor_habilidades")
 @onready var timer_powerUp = $powerUp
 
 @onready var camera_3d: Camera3D = $camaraRig/OffsetRig/Camera3D
@@ -84,7 +85,7 @@ func crear_pollo_en_red(tipo_elegido: int) -> void:
 		self.salud = self.salud_maxima
 		self.velocidad = datos_pollo.get("velocidad")
 		self.resistencia = datos_pollo.get("resistencia")
-		misDatos = [salud_maxima,salud,velocidad,resistencia]
+		misDatos = [velocidad,resistencia]
 	
 	var peer_id := int(name)
 	if GlobalJuego.un_jugador or multiplayer.is_server():
@@ -621,12 +622,11 @@ func powerup_escudo():
 	escudo.set_multiplayer_authority(mi_peer_id)
 	
 	escudo.tiempo_de_vida = 5.0 
-	
-	#containerHabilidad.add_child(escudo, true)
+	containerHabilidad.add_child(escudo, true)
 	escudo.inicializar(self)
 
 func powerup_velocidad():
-	velocidad *2;
+	velocidad *0.2;
 	timer_powerUp.start()
 
 
@@ -634,5 +634,5 @@ func powerup_velocidad():
 
 
 func _on_power_up_timeout() -> void:
-	velocidad = misDatos.get(1)
-	resistencia = misDatos.get(2)
+	velocidad = misDatos.get(0)
+	resistencia = misDatos.get(1)
