@@ -26,14 +26,20 @@ func _on_body_entered(body: Node3D) -> void:
 			
 			match tipo:
 				2: # rojo suma +10 vida
-					GlobalJuego.session_info[peer_id_jugador]["salud"] += 10
+					if body.has_method("recibir_dano"):
+						body.recibir_dano(-10)
+			
+					#GlobalJuego.session_info[peer_id_jugador]["salud"] += 10
 				3: # verde aumento de velocidad 
-					pass
+					if body.has_method("powerup_velocidad"):
+						body.powerup_velocidad()
 				4: # azul repulsion
-					pass
+					if body.has_method("powerup_escudo"):
+						body.powerup_escudo()
 				5: # amarillo cadencia de la armas
-					pass
-					
+					if GlobalJuego.session_info.has(peer_id_jugador):
+						var score = GlobalJuego.session_info[peer_id_jugador]["score"]
+						GlobalJuego.session_info[peer_id_jugador]["score"] = score * 2
 		else:
 			push_error("No se encontró al jugador con peer_id: " + str(peer_id_jugador))
 		#print("El jugador con Peer ID: ", peer_id_jugador, " recogió el ítem.",tipo)	
