@@ -21,29 +21,30 @@ func _on_tiempo_vida_timeout() -> void:
 # Si un jugador lo captura
 func _on_body_entered(body: Node3D) -> void:
 	
-	if is_multiplayer_authority() and body.is_in_group("Jugadores") and libre:
-		
-		# recolectar item
-		libre = false
-		
-		#  Obtenemos el peer_id del jugador que colisionó
-		var peer_id_jugador = body.get_multiplayer_authority()
-		
-		if GlobalJuego.session_info.has(peer_id_jugador): #Verificamos que el peer_id exista en el diccionario
-			# 2. Sumamos la cantidad al score actual
-			GlobalJuego.session_info[peer_id_jugador]["score"] += 10
-			# Si esto corre en el servidor, ya sabemos qué jugador fue.
-			# Opcional: imprimir para verificar
-			# print("Jugador ", peer_id_jugador, " ahora tiene ", GlobalJuego.session_info[peer_id_jugador]["score"], " puntos.")
-		else:
-			push_error("No se encontró al jugador con peer_id: " + str(peer_id_jugador))
-		#aplicar_power_up(peer_id_jugador)
-		#print ("item capturado")
-		 # Llamamos a la función por RPC para que TODOS vean la animación
-		# Usamos "call_local" para que también se ejecute en la máquina que detectó la colisión
-		rpc("animar_y_eliminar")
+	if not body.is_in_group("Jugadores"): #debe estar en el gruppo de jugadores
+		return
+	if not libre:
+		return
 
-@rpc("authority", "call_local", "reliable")
+	# solo el dueño de ese jugador procesa su propia colision
+	if not body.is_multiplayer_authority():
+		return
+
+	libre = false
+
+	var peer_id_jugador: int = multiplayer.get_unique_id()
+
+	if GlobalJuego.un_jugador or multiplayer.is_server():
+		# host: modifico y replico directo
+		GlobalJuego.session_info[peer_id_jugador]["score"] = \
+			int(GlobalJuego.session_info[peer_id_jugador].get("score", 0)) + 10
+		GlobalJuego._replicar_session_info.rpc(GlobalJuego.session_info)
+	else:
+		# cliente: le pido al host
+		Network.solicitar_sumar_monedas.rpc_id(1, peer_id_jugador, 10)
+	rpc("animar_y_eliminar")
+
+@rpc("any_peer", "call_local", "reliable")
 func animar_y_eliminar() -> void:
 	# 1. Desactivamos la colisión
 	$CollisionShape3D.set_deferred("disabled", true)
