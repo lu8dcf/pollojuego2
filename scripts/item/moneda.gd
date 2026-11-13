@@ -48,7 +48,7 @@ func _on_body_entered(body: Node3D) -> void:
 func animar_y_eliminar() -> void:
 	# 1. Desactivamos la colisión
 	$CollisionShape3D.set_deferred("disabled", true)
-	
+	Sonidos.sonidoRecoleccionMonedas()
 	# 2. Guardamos la posición Y actual en una variable local
 	var posicion_y_actual = self.global_position.y
 	var nueva_posicion = Vector3(self.global_position.x, posicion_y_actual + 4.0, self.global_position.z)

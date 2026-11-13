@@ -27,19 +27,17 @@ func _on_body_entered(body: Node3D) -> void:
 			match tipo:
 				2: # rojo suma +10 vida
 					if body.has_method("recibir_dano"):
-						body.recibir_dano(-10)
+						item_rojo(body)
 			
 					#GlobalJuego.session_info[peer_id_jugador]["salud"] += 10
 				3: # verde aumento de velocidad 
 					if body.has_method("powerup_velocidad"):
-						body.powerup_velocidad()
+						item_verde(body)
 				4: # azul repulsion
 					if body.has_method("powerup_escudo"):
-						body.powerup_escudo()
+						item_azul(body)
 				5: # amarillo cadencia de la armas
-					if GlobalJuego.session_info.has(peer_id_jugador):
-						var score = GlobalJuego.session_info[peer_id_jugador]["score"]
-						GlobalJuego.session_info[peer_id_jugador]["score"] = score * 2
+					item_amarillo(peer_id_jugador)
 		else:
 			push_error("No se encontró al jugador con peer_id: " + str(peer_id_jugador))
 		#print("El jugador con Peer ID: ", peer_id_jugador, " recogió el ítem.",tipo)	
@@ -51,7 +49,30 @@ func _on_body_entered(body: Node3D) -> void:
 		#print ("item capturado")
 		rpc("animar_y_eliminar")
 
+@rpc("authority", "call_local", "reliable")
+func item_amarillo(peer_id_jugador):
+	if GlobalJuego.session_info.has(peer_id_jugador):
+		var score = GlobalJuego.session_info[peer_id_jugador]["score"]
+		GlobalJuego.session_info[peer_id_jugador]["score"] = score * 2
+		Sonidos.sonidoRecoleccionMonedas()
 
+
+@rpc("authority", "call_local", "reliable")
+func item_rojo(bodya):
+	bodya.recibir_dano(-10)
+	Sonidos.sonidoRecoleccionMonedas()
+
+
+@rpc("authority", "call_local", "reliable")
+func item_azul(bodya):
+	bodya.powerup_escudo()
+	Sonidos.sonidoRecoleccionMonedas()
+	
+@rpc("authority", "call_local", "reliable")
+func item_verde(bodya):
+	bodya.powerup_velocidad()
+	Sonidos.sonidoRecoleccionMonedas()
+	
 func _on_tiempo_vida_timeout() -> void:
 	#print ("tiempo elimidado")
 	eliminar()

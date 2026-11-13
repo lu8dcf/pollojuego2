@@ -184,7 +184,7 @@ func _efecto_muerte():
 	shader_muerte.shader = shader
 	geometry.set_surface_override_material(0, shader_muerte)
 	geometry.material_override = shader_muerte
-				
+	Sonidos.sonidoMuerteBicho()			
 	var tween = create_tween()
 	#tween.set_parallel(true)
 	
