@@ -150,6 +150,8 @@ func tipo_enemigo():
 func recibir_dano(danio):
 	if murio:
 		return
+	if not is_inside_tree():
+		return
 	if not multiplayer.is_server():
 		return
 	var vida_actual = vida - danio
