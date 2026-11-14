@@ -112,6 +112,37 @@ func flash_rojo():
 				
 	haciendo_flash = false
 
+
+func flash_verde():
+	# Si ya estaba parpadeando, evitamos sobreescribir los materiales originales
+	if haciendo_flash:
+		return
+		
+	var meshes = modelo.find_children("*", "MeshInstance3D", true, false)
+	var materiales_originales = []
+	haciendo_flash = true
+	
+	var rojo := StandardMaterial3D.new()
+	rojo.albedo_color = Color.GREEN
+	
+	#estado actual y aplicamos el rojo
+	for mesh in meshes:
+		materiales_originales.append(mesh.get_surface_override_material(0))
+		mesh.set_surface_override_material(0, rojo)
+	
+	# 0.2 segundos una sola vez
+	await get_tree().create_timer(0.2).timeout
+	
+	#limpio el override correctamente
+	for i in range(meshes.size()):
+		if is_instance_valid(meshes[i]):
+			if materiales_originales[i] == null:
+				# Forzamos a Godot a remover por completo el override material
+				meshes[i].set_surface_override_material(0, null)
+			else:
+				meshes[i].set_surface_override_material(0, materiales_originales[i])
+				
+	haciendo_flash = false
 	
 func mirar_hacia(direction: Vector3, delta: float) -> void:
 	if direction.length_squared() < 0.001:

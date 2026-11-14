@@ -1,81 +1,43 @@
 extends Node3D
 
-var tipoComportamiento = comportamientoArma
-@onready var tiempoDeVida = $tiempoVida
-var posicionInicio
-
-# común y explosiva
-var avanza = false
-var direccion
-var inicio = false
-var danioBala
-var es_fantasma: bool = false 
-# solo melee
-@onready var areaMelee = $area_melee
-
-var ya_eliminada: bool = false
-
-func iniciar(comp: comportamientoArma, posicion_inicial: Vector3, direccion_inicial: Vector3, danio,visual_local: bool = false) -> void:
-	if comp == null:
-		return
-
-	global_position = posicion_inicial
-	posicionInicio = posicion_inicial
-	tipoComportamiento = comp
-	danioBala = danio
-	direccion = direccion_inicial.normalized()
-	inicio = true
-	es_fantasma = visual_local
+var danioBala: float = 0.0
+var es_fantasma: bool = false
+@onready var areaMelee: Area3D = $area_melee
+var ya_golpeo: bool = false
 
 func _ready() -> void:
-	add_to_group("bala")
 	top_level = true
-	# Iniciar lógica melee una sola vez
-   # if tipoComportamiento == comportamientoArma.MELEE: # ajustá según tu enum/const
-	activar_melee()
+	add_to_group("bala")
 
+# Ahora recibe 3 parámetros: posición, daño y si es solo visual local
+func iniciar(posicion_inicial: Vector3, danio: float, visual_local: bool = false) -> void:
+	global_position = posicion_inicial
+	danioBala = danio
+	es_fantasma = visual_local
 
-func _process(_delta: float) -> void:
-	if inicio:
-		inicio = false
-		tiempoDeVida.start()
-		# Si querés que melee se active una sola vez, no lo llames acá
+	ejecutar_golpe()
 
-
-func activar_melee() -> void:
-	if ya_eliminada:
+func ejecutar_golpe() -> void:
+	if ya_golpeo:
 		return
+	ya_golpeo = true
 
 	areaMelee.visible = true
-	await get_tree().create_timer(0.2).timeout
+	areaMelee.monitoring = true
 
-	var cuerpos_en_area = areaMelee.get_overlapping_bodies()
-	for cuerpo in cuerpos_en_area:
-		if cuerpo.is_in_group("enemy"):
-			if cuerpo.has_method("recibir_dano"):
-				cuerpo.recibir_dano(danioBala)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
 
+	# LA REGLA DE ORO: Solo el servidor (o si juegas solo offline) aplica daño real. 
+	# Si es un fantasma visual del cliente, NO hace daño para evitar duplicarlo.
+	var es_servidor = not multiplayer.has_multiplayer_peer() or multiplayer.is_server()
 
-	eliminarBala()
+	if es_servidor and not es_fantasma:
+		var cuerpos = areaMelee.get_overlapping_bodies()
+		for cuerpo in cuerpos:
+			if cuerpo.is_in_group("enemy") and cuerpo.has_method("recibir_dano"):
+				if is_instance_valid(cuerpo) and cuerpo.is_inside_tree():
+					cuerpo.recibir_dano(danioBala)
 
-
-func eliminarBala() -> void:
-	if ya_eliminada:
-		return
-	ya_eliminada = true
-
+	await get_tree().create_timer(0.15).timeout
 	queue_free()
-
-
-func _on_tiempo_vida_timeout() -> void:
-	eliminarBala()
-
-
-func _on_area_melee_body_entered(_body: Node3D) -> void:
-	if es_fantasma:
-		eliminarBala()
-		return
-	activar_melee()
-	# Si ya esta siendo eliminada, no hagas nada
-	if ya_eliminada:
-		return

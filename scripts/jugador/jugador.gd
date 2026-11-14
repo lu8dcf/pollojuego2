@@ -39,7 +39,8 @@ CAIDO,
 MUERTE,
 TIENDA,
 DASH,
-AYUDANDO
+AYUDANDO,
+RECIBIENDO_AYUDA
 }
 
 @export var estadoActual: Estado = Estado.OLEADA
@@ -189,7 +190,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not puede_interactuar():
 		return
 
-	if event.is_action_pressed("attack2"): #click derecho (o izq?)
+	if event.is_action_pressed("ayudar"): #l
 		if estadoActual == Estado.CAIDO:
 			return
 		if objetivo_actual == null:
@@ -214,11 +215,8 @@ func _process(_delta: float) -> void:
 		return
 		
 	if Input.is_action_just_pressed("test_caido"): # M
-		cambiar_estado(Estado.CAIDO) #aca
-		pedir_ayuda()
+		self.recibir_dano(1000) #aca
 
-	if Input.is_action_just_pressed("crearArma"): # L
-		GlobalSignal.emit_signal("equiparArma", 3)
 #-------------------------------------------------------------------------MENU
 func open_menu(current_visibility: bool) -> void:
 	player_ui.menu.visible = !current_visibility
@@ -248,6 +246,8 @@ func puede_recibir_danio():
 
 func puede_cambiar_arma():
 	return estadoActual == Estado.OLEADA
+func puede_recibir_ayuda():
+	return estadoActual == Estado.CAIDO
 	
 func esta_vivo() -> bool:
 	return estadoActual != Estado.MUERTE
@@ -269,6 +269,9 @@ func entrar_oleada() -> void:
 	timer_caido.stop()
 
 func entrar_tienda() -> void:
+	velocity = Vector3.ZERO
+
+func entrar_recibiendo_ayuda():
 	velocity = Vector3.ZERO
 
 func entrar_dash() -> void:
@@ -329,11 +332,13 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 		Estado.CAIDO:
 			entrar_caido()
 			pollo.cambiarAnimacion("esqueleto de pollo1|muerte")
+			print("ESTADO: Caido" , mi_peer_id)
 		Estado.MUERTE:
 			entrar_muerte()
 		Estado.OLEADA:
 			entrar_oleada()
 			pollo.cambiarAnimacion("esqueleto de pollo1|caminar")
+			print("ESTADO: Oleada" , mi_peer_id)
 		Estado.TIENDA:
 			entrar_tienda()
 		Estado.DASH:
@@ -342,6 +347,16 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 		Estado.AYUDANDO:
 			entrar_ayudando()
 			pollo.cambiarAnimacion("esqueleto de pollo1|volar")
+			print("ESTADO: ayudando" , mi_peer_id)
+		Estado.RECIBIENDO_AYUDA:
+			#entrar_recibiendo_ayuda()
+			#if pollo != null and pollo.has_method("flash_verde"):
+				#pollo.flash_verde()
+			#if timer_caido != null:
+				#timer_caido.stop()
+			recibiendoAyuda()
+			print("ESTADO: Recibiendo_ayuda", mi_peer_id)
+
 
 
 
@@ -359,7 +374,6 @@ func procesar_dash(delta: float) -> void:
 	move_and_slide()
 	if tiempo_dash <= 0.0:
 		terminar_dash()
-
 
 func terminar_dash() -> void:
 	velocity = Vector3.ZERO
@@ -407,7 +421,8 @@ func _physics_process(delta: float) -> void:
 		Estado.AYUDANDO:
 			procesar_ayudando()
 			procesar_salvar()
-
+		Estado.RECIBIENDO_AYUDA:
+			procesar_recibiendo_ayuda()
 #----------------------------------------------------------------------MOVIMIENTO NORMAL
 
 func procesar_movimiento(delta: float) -> void:
@@ -454,13 +469,16 @@ func procesar_tienda() -> void:
 	
 func procesar_ayudando() -> void:
 	velocity = Vector3.ZERO
+
+func procesar_recibiendo_ayuda() -> void:
+	velocity = Vector3.ZERO
 #---------------------------------------------------------------#SISTEMA DE SALVAR
 
 func procesar_salvar() -> void:
 	if timer_salvar.is_stopped(): #si no se hizo durante el tiempo definidp
 		cancelar_salvar()
 		return
-	if not Input.is_action_pressed("attack2"): #mouse derecho
+	if not Input.is_action_pressed("ayudar"): #L
 		cancelar_salvar()
 		return
 	if objetivo_actual == null: #
@@ -468,7 +486,6 @@ func procesar_salvar() -> void:
 		return
 	if estadoActual != Estado.AYUDANDO:#
 		cancelar_salvar()
-
 
 func empezar_salvar() -> void:
 	if estadoActual == Estado.OLEADA:
@@ -480,24 +497,135 @@ func empezar_salvar() -> void:
 	if not timer_salvar.is_stopped():
 		return
 	timer_salvar.start()
+	
+	#Aviso al servidor que este objetivo recibe ayuda
+	var objetivo_id := int(objetivo_actual.name)
+	solicitar_recibir_ayuda_rpc.rpc_id(1, objetivo_id)
 
+@rpc("any_peer", "reliable")
+func solicitar_recibir_ayuda_rpc(objetivo_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+	# Buscamos al jugador objetivo y le cambiamos el estado a RECIBIENDO_AYUDA desde el servidor
+	var jugador_objetivo = GlobalJuego._obtener_jugador(objetivo_id)
+	if jugador_objetivo != null:
+		jugador_objetivo.cambiar_estado(Estado.RECIBIENDO_AYUDA)
 
+func recibiendoAyuda() -> void:
+	if pollo != null and pollo.has_method("flash_verde"):
+		pollo.flash_verde()
+	if timer_caido != null:
+		timer_caido.stop()
+	print("ESTADO: Recibiendo_ayuda", mi_peer_id)
+	
 func cancelar_salvar() -> void:
 	if timer_salvar.is_stopped():
 		return
 	timer_salvar.stop()
+
+	if objetivo_actual != null:
+		var objetivo_id := int(objetivo_actual.name)
+		solicitar_cancelar_ayuda_rpc.rpc_id(1, objetivo_id)
+		
 	cambiar_estado(Estado.OLEADA)
+	objetivo_actual = null #limpio objetivo actual
+
+@rpc("any_peer", "reliable")
+func solicitar_cancelar_ayuda_rpc(objetivo_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+	var jugador_objetivo = GlobalJuego._obtener_jugador(objetivo_id)
+	if jugador_objetivo != null:
+		# Si cancela,el objetivo debe volver a CAIDO y reinciar su timer de muerte
+		jugador_objetivo.cambiar_estado(Estado.CAIDO)
+		if jugador_objetivo.has_node("timer_caido"):
+			jugador_objetivo.timer_caido.start()
+		
 
 func _on_timer_salvar_timeout() -> void:
 	if objetivo_actual == null:
 		return
 	if estadoActual != Estado.AYUDANDO:
 		return
-	if not Input.is_action_pressed("attack2"):
+	if not Input.is_action_pressed("ayudar"):
 		return
 	var objetivo_id := int(objetivo_actual.name)
 	pedir_salvar(objetivo_id)
 	cambiar_estado(Estado.OLEADA)
+	
+
+@rpc("any_peer")
+func pedir_ayuda() -> void:
+	print("Ayuda!")
+
+
+func pedir_salvar(objetivo_id: int) -> void:
+	if multiplayer.is_server():
+		Network.procesar_salvar(multiplayer.get_unique_id(), objetivo_id) #si es el server esto
+	else:
+		Network.pedir_salvar_rpc.rpc_id(1, objetivo_id) #si es cliente, esto
+	objetivo_actual = null
+
+
+#------------------------------------------------------------DETECCION DE AYUDA
+
+func _on_deteccion_ayuda_area_entered(area: Area3D) -> void:
+	var otro_jugador = area.get_parent()
+   
+	if otro_jugador is Jugador and otro_jugador != self and otro_jugador.estadoActual == Estado.CAIDO:
+		objetivo_actual = otro_jugador
+
+
+func _on_deteccion_ayuda_area_exited(area: Area3D) -> void:
+	if objetivo_actual == area.get_parent():
+		objetivo_actual = null
+		
+
+#------------------------------------------------------------------------TIMER CAIDO y morir
+func _on_timer_caido_timeout() -> void:
+	if not is_multiplayer_authority():
+		return
+	if estadoActual != Estado.CAIDO:
+		return
+	morir_rpc.rpc(int(name))
+
+@rpc("any_peer", "call_local", "reliable")
+func morir_rpc(jugador_id: int) -> void:
+	var jugador := GlobalJuego._obtener_jugador(jugador_id)
+	if jugador == null:
+		return
+	cambiar_estado(Estado.MUERTE)
+	jugador.morir()
+
+@rpc("any_peer", "call_local", "reliable")
+func estado_caido_rpc() -> void:
+	timer_caido.start()
+	barraVida.visible = false
+
+func morir():
+	print("jugador ha muerto!")
+	#flash_claro.rpc()
+	
+#-------------------------------------------------------------------SALVADOO
+
+func actualizar_barra():
+	barraVida.reiniciar_barra()
+	
+
+func polloSalvado():
+	if timer_caido != null:
+		timer_caido.stop()
+	if pollo != null:
+		pollo.cambiarAnimacion("esqueleto de pollo1|volar")
+	
+	# El servidor ejecuta la animacion y luego va a oleada
+	if multiplayer.is_server():
+		await get_tree().create_timer(1.8).timeout
+		
+		cambiar_estado(Estado.OLEADA)
+		var peer_id := int(name)
+		Network.actualizar_salud_jugador(peer_id, salud_maxima, salud_maxima, false)
+	
 #--------------------------------------------------------------------------DANIO
 
 func recibir_dano(dano: int):
@@ -550,81 +678,10 @@ func aplicar_salud_local(nueva_salud: int,nueva_salud_maxima: int,mostrar_efecto
 		barraVida.visible = \
 			GlobalJuego.un_jugador \
 			or is_multiplayer_authority()
-#--------------------------------------------------SERVIDOR
 
-@rpc("any_peer")
-func pedir_ayuda() -> void:
-	print("Ayuda!")
-
-
-func pedir_salvar(objetivo_id: int) -> void:
-	if multiplayer.is_server():
-		Network.procesar_salvar(multiplayer.get_unique_id(), objetivo_id) #si es el server esto
-	else:
-		Network.pedir_salvar_rpc.rpc_id(1, objetivo_id) #si es cliente, esto
-	objetivo_actual = null
-
-#------------------------------------------------------------DETECCION DE AYUDA
-
-func _on_deteccion_ayuda_area_entered(area: Area3D) -> void:
-	var otro_jugador = area.get_parent()
-   
-	if otro_jugador is Jugador and otro_jugador != self and otro_jugador.estadoActual == Estado.CAIDO:
-		objetivo_actual = otro_jugador
-
-
-func _on_deteccion_ayuda_area_exited(area: Area3D) -> void:
-	if objetivo_actual == area.get_parent():
-		objetivo_actual = null
-		
-		
-#------------------------------------------------------------------------TIMER CAIDO y morir
-func _on_timer_caido_timeout() -> void:
-	if not is_multiplayer_authority():
-		return
-	if estadoActual != Estado.CAIDO:
-		return
-	morir_rpc.rpc(int(name))
-
-@rpc("any_peer", "call_local", "reliable")
-func morir_rpc(jugador_id: int) -> void:
-	var jugador := GlobalJuego._obtener_jugador(jugador_id)
-	if jugador == null:
-		return
-	cambiar_estado(Estado.MUERTE)
-	jugador.morir()
-
-@rpc("any_peer", "call_local", "reliable")
-func estado_caido_rpc() -> void:
-	timer_caido.start()
-	barraVida.visible = false
-
-func morir():
-	print("jugador ha muerto!")
-	#flash_claro.rpc()
-	
-#-------------------------------------------------------------------SALVADOO
-
-func actualizar_barra():
-	barraVida.reiniciar_barra()
-	
-
-func polloSalvado():
-	pollo.cambiarAnimacion("esqueleto de pollo1|volar")
-	if( timer_caido):
-		timer_caido.stop()
-	if not GlobalJuego.un_jugador and not multiplayer.is_server():
-		return
-	cambiar_estado(Estado.OLEADA)
-	#salud = salud_maxima
-	var peer_id := int(name)
-	Network.actualizar_salud_jugador(peer_id,salud_maxima,salud_maxima,false)
-	
 #-------------------------------------------------------------------------------POWERUP
 
 func powerup_escudo():
-	
-	var mi_peer_id := multiplayer.get_unique_id()
 	var escudo = escudoEscena.instantiate()
 	escudo.set_multiplayer_authority(mi_peer_id)
 	
@@ -636,10 +693,6 @@ func powerup_velocidad():
 	velocidad *=1.5;
 	timer_powerUp.start()
 
-
-
-
-
 func _on_power_up_timeout() -> void:
-	velocidad = misDatos.get(0)
-	resistencia = misDatos.get(1)
+	velocidad = misDatos[0]
+	resistencia = misDatos[1]
