@@ -288,6 +288,9 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 	# proceso el cambio directo si somos server
 	if multiplayer.is_server():
 		servidor_procesar_cambio_estado(nuevo_estado)
+		# comprobar si todos los jugadores murieron
+		if nuevo_estado == Estado.MUERTE:
+			GlobalJuego.chequear_fin_multijugador()
 	else:
 		# Si somos un Cliente, le pido al Servidor
 		solicitar_cambio_estado_rpc.rpc_id(1, nuevo_estado)
@@ -523,6 +526,8 @@ func recibir_dano(dano: int):
 
 	if nueva_salud <= 0:
 		cambiar_estado(Estado.CAIDO)
+		if GlobalJuego.un_jugador:
+			GlobalJuego.terminar_partida_un_jugador()
 
 
 

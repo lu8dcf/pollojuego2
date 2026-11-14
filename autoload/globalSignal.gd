@@ -47,6 +47,7 @@ signal solicitar_crear_tube(nombre: String)
 @warning_ignore("unused_signal") 
 signal solicitar_crear_partida_un_jugador()
 
+
 # ===== SEÑALES DE PANTALLA DE CARGA =====
 @warning_ignore("unused_signal") 
 signal cancelado
@@ -108,6 +109,9 @@ signal juego_pausado()
 signal juego_reanudado()
 @warning_ignore("unused_signal")
 signal cambia_oleada()
+@warning_ignore("unused_signal")
+signal partida_perdida(puntajes:Array) # este será un diccionario donde se sabrá e peer id, el nombre de usuario y el score de los perosnajes
+
 
 # ===== SEÑALES DE PUNTAJE =====
 @warning_ignore("unused_signal")

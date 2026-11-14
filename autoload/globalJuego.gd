@@ -34,6 +34,7 @@ var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
 var cant_jugadores:int = 0 # minimo de jugadores (ni bien se conecte uno se suma)
 var max_cant_jugadores:int = 4 # maximo de jugadores en una partida
+var en_pantalla_perder = true
 
 var oleada:int = 1
 var menu_abierto: bool = false
@@ -162,25 +163,6 @@ func reiniciar_vida_todos()->void:
 	#for i in GlobalJuego.session_info.keys():
 		#print("DESPUES DE REINICIAR i: ",i, "Global: ", GlobalJuego.session_info[i])
 
-func dañar_jugador(peer_id: int, cantidad_daño: int):
-	"""Aplica daño a un jugador específico"""
-	if not session_info.has(peer_id):
-		return
-	
-	var salud_actual = session_info[peer_id]["salud"]
-	var nueva_salud = max(0, salud_actual - abs(cantidad_daño))
-	
-	session_info[peer_id]["salud"] = nueva_salud
-	_replicar_session_info.rpc(session_info)
-	
-	# Emitir señales globales
-	GlobalSignal.jugador_recibio_daño.emit(peer_id, cantidad_daño)
-	GlobalSignal.salud_jugador_cambiada.emit(nueva_salud)
-	
-	# Verificar si murió
-	if nueva_salud <= 0:
-		_jugador_murio(peer_id)
-
 func curar_jugador(peer_id: int, cantidad: int):
 	"""Cura a un jugador específico"""
 	if not session_info.has(peer_id):
@@ -195,27 +177,44 @@ func curar_jugador(peer_id: int, cantidad: int):
 	# Emitir señal de salud actualizada
 	GlobalSignal.salud_jugador_cambiada.emit(nueva_salud)
 
-func _jugador_murio(peer_id: int):# maneja la muerte de un jugador
-	
-	# Emitir señal global de muerte
-	GlobalSignal.jugador_muerto.emit(peer_id)
-	
-	# Respawn con salud completa
-	if session_info.has(peer_id):
-		session_info[peer_id]["salud"] = SALUD_DEFAULT
 
-# ===== FUNCIONES DE PUNTAJE =====
-func agregar_punto(peer_id: int):
-	"""Agrega un punto al jugador"""
-	if not session_info.has(peer_id):
+# ===== FUNCIONES DE FIN PARTIDA =====
+func _contruir_puntajes_ordenados() -> Array:
+	var lista:Array = []
+	for peer_id in session_info.keys():
+		var info:Dictionary = session_info[peer_id]
+		lista.append({
+			"peer_id":peer_id,
+			"username":info.get("username"),
+			"score":info.get("score",0),
+			"personaje":int(info.get("personaje",0)),
+		})
+	lista.sort_custom(func(a,b):return["score"]>b["score"])
+	return lista # se devuelve la lsita ordenadade mayor a menor
+
+func terminar_partida_un_jugador():
+	if not un_jugador:
 		return
-	
-	session_info[peer_id]["score"] = session_info[peer_id]["score"] + 1
-	_replicar_session_info.rpc(session_info)
-	
-	# Emitir señal de puntaje actualizado
-	GlobalSignal.puntaje_actualizado.emit(peer_id, session_info[peer_id]["score"])
+	var puntajes:=_contruir_puntajes_ordenados()
+	Network._mostrar_pantalla_perder_rpc.rpc(puntajes) # dado que es single player el peer id es 1
 
+func chequear_fin_multijugador():
+	if un_jugador or not multiplayer.is_server():
+		return
+	#se recorre a todos los jugadores del mundo y se verifica que esten muertos
+	var jugadores :=get_tree().get_nodes_in_group("Jugadores") # al obtener solo el grupo evitamos usar el session_info
+	if jugadores.is_empty():
+		return
+	for jugador in jugadores:
+		if not is_instance_valid(jugador):
+			continue 
+		if jugador.estadoActual != Jugador.Estado.MUERTE:
+			return # revisa si queda alguno vivo
+		
+		#si estan todos muertos entonces se crean los puntajes y se reedirije a la pantalla
+		var puntajes:= _contruir_puntajes_ordenados()
+		Network._mostrar_pantalla_perder_rpc.rpc(puntajes)
+	
 # ===== REPLICACIÓN DE RED =====
 @rpc("authority", "call_local")
 func _replicar_session_info(info: Dictionary):
@@ -243,4 +242,11 @@ func configurar_singleplayer():
 	}
 	
 	GlobalSignal.sesion_actualizada.emit(session_info)
+	
+	
+	
+	
+	
+	
+	
 	

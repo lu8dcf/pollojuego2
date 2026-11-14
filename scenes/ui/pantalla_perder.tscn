@@ -2,18 +2,13 @@
 
 [ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="1_apaxj"]
 [ext_resource type="Script" uid="uid://do0tqx6qky2bs" path="res://scenes/ui/pantalla_perder.gd" id="1_m8lbx"]
+[ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_ksyn8"]
 
-[node name="PantallaPerder" type="Control" unique_id=1845168781]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="PantallaPerder" type="CanvasLayer" unique_id=859307828]
 script = ExtResource("1_m8lbx")
 
 [node name="LabelTitulo" type="Label" parent="." unique_id=313798267]
-layout_mode = 1
+unique_name_in_owner = true
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -30,15 +25,14 @@ label_settings = ExtResource("1_apaxj")
 horizontal_alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=207947869]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=356289951]
-layout_mode = 1
+[node name="VBoxContenedorPuntajes" type="VBoxContainer" parent="." unique_id=1573700677]
+unique_name_in_owner = true
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
@@ -48,3 +42,19 @@ offset_bottom = -72.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 20
+
+[node name="BotonLobby" parent="." unique_id=1088779155 instance=ExtResource("3_ksyn8")]
+unique_name_in_owner = true
+offset_left = 72.0
+offset_top = 562.0
+offset_right = 284.0
+offset_bottom = 602.0
+texto = "ir al lobby"
+
+[node name="BotonMenu" parent="." unique_id=1696459137 instance=ExtResource("3_ksyn8")]
+unique_name_in_owner = true
+offset_left = 843.0
+offset_top = 561.0
+offset_right = 1055.0
+offset_bottom = 601.0
+texto = "ir al Menu"

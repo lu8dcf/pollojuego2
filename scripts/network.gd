@@ -558,10 +558,12 @@ func _on_peer_disconnected_partida(peer_id: int):
 	eliminar_jugador(peer_id)
 
 func _on_server_disconnected():
-	# cunado se pierde la conexion
+	# cunado se pierde la conexion con el host se reenvia al menu
 	if multiplayer.is_server():
 		return
-	
+	# si estamos en la pantalla de perder no quiero que se regrese al menu por desconexion
+	if GlobalJuego.en_pantalla_perder:
+		return	
 	_volver_al_menu_por_desconexion_host()
 
 func _volver_al_menu_por_desconexion_host():
@@ -589,6 +591,7 @@ func leave_server():
 	# resetear variables
 	_uniendo_sesion = false
 	_creando_sesion = false
+	GlobalJuego.en_pantalla_perder =false 
 	
 	if tube_enabled:
 		tube_client.leave_session()
@@ -1065,6 +1068,8 @@ func _aplicar_datos_pollo_localmente(peer_id: int,	id_personaje: int,	nueva_salu
 		GlobalJuego.session_info
 	)
 
+# SALUD DEL JUGADOR
+
 func actualizar_salud_jugador(peer_id:int, nueva_salud:int,nueva_salud_maxima:int,mostrar_efecto:bool=false)->void:
 	if not GlobalJuego.un_jugador and not multiplayer.is_server():
 		return
@@ -1236,8 +1241,15 @@ func host_mensaje_sistema(texto:String)->void:
 		return
 	_replicar_mensaje_chat(0,"",texto,true)
 
-	
-	
+
+# ------------------------------------------------------------
+# MANEJAR PANTALLA DE PERDER CN EL SCORE
+# ------------------------------------------------------------
+
+@rpc("authority")
+func _mostrar_pantalla_perder_rpc(puntajes:Array) ->void:
+	GlobalJuego.en_pantalla_perder = true
+	GlobalSignal.partida_perdida.emit(puntajes)
 
 
 # ------------------------------------------------------------

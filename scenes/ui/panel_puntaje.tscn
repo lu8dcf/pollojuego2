@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dqorb8dwmqjen"]
 
 [ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="1_bicdw"]
+[ext_resource type="Script" uid="uid://bivmp80husl5p" path="res://scripts/ui/panel_puntaje.gd" id="1_tchlw"]
 [ext_resource type="Texture2D" uid="uid://bhhw8ihihl4ib" path="res://assets/ui/lobby/personajes/idle1.png" id="2_tchlw"]
 [ext_resource type="Texture2D" uid="uid://bhsw7bb8gny5f" path="res://assets/ui/lobby/personajes/idle2.png" id="3_3nr7p"]
 [ext_resource type="Texture2D" uid="uid://c31q5hfwsb75k" path="res://assets/ui/lobby/personajes/idle3.png" id="4_c1knf"]
@@ -500,35 +501,55 @@ animations = [{
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 1.0
 offset_right = -952.0
-offset_bottom = -328.0
+offset_bottom = -299.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_tchlw")
 
-[node name="NombreUsuario" type="Label" parent="." unique_id=569264831]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -53.5
-offset_right = 53.5
-offset_bottom = 25.0
-grow_horizontal = 2
-text = "Nombre Usuario"
-label_settings = ExtResource("1_bicdw")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="PuntajeTotal" type="Label" parent="." unique_id=354336311]
+[node name="LabelPosicion" type="Label" parent="." unique_id=1512371173]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -76.0
-offset_top = 63.0
+offset_top = 1.0
 offset_right = 76.0
-offset_bottom = 88.0
+offset_bottom = 26.0
+grow_horizontal = 2
+text = "1°"
+label_settings = ExtResource("1_bicdw")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelUsuario" type="Label" parent="." unique_id=569264831]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -76.0
+offset_top = 35.0
+offset_right = 76.0
+offset_bottom = 60.0
+grow_horizontal = 2
+text = "Nombre Usuario"
+label_settings = ExtResource("1_bicdw")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelScore" type="Label" parent="." unique_id=354336311]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -76.0
+offset_top = 98.0
+offset_right = 76.0
+offset_bottom = 141.0
 grow_horizontal = 2
 text = "Puntaje total:
 45"
@@ -547,7 +568,7 @@ anchor_bottom = 0.5
 offset_left = -86.0
 offset_top = -64.0
 offset_right = 98.0
-offset_bottom = 48.0
+offset_bottom = 125.0
 grow_horizontal = 2
 grow_vertical = 2
 
