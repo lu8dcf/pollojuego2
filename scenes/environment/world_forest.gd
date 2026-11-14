@@ -49,10 +49,9 @@ func disable_menu_mode() -> void:
 	# Reactivar el timer si es necesario
 	if timer_enemy and not timer_enemy.is_stopped():
 		pass  # El timer ya está corriendo
-
 func agregar_mapa():
-	var mapa = load("res://scenes/environment/generador_mapa.tscn")
-	var mapa_actual = mapa.instantiate()
+	var mapa2 = load("res://scenes/environment/generador_mapa.tscn")
+	var mapa_actual = mapa2.instantiate()
 	add_child(mapa_actual)
 	
 func spawn_enemy():
