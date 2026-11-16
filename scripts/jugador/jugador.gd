@@ -345,13 +345,13 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 		Estado.CAIDO:
 			entrar_caido()
 			pollo.cambiarAnimacion("esqueleto de pollo1|muerte")
-			print("ESTADO: Caido" , mi_peer_id)
+			#print("ESTADO: Caido" , mi_peer_id)
 		Estado.MUERTE:
 			entrar_muerte()
 		Estado.OLEADA:
 			entrar_oleada()
 			pollo.cambiarAnimacion("esqueleto de pollo1|caminar")
-			print("ESTADO: Oleada" , mi_peer_id)
+			#print("ESTADO: Oleada" , mi_peer_id)
 		Estado.TIENDA:
 			entrar_tienda()
 		Estado.DASH:
@@ -360,7 +360,7 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 		Estado.AYUDANDO:
 			entrar_ayudando()
 			pollo.cambiarAnimacion("esqueleto de pollo1|volar")
-			print("ESTADO: ayudando" , mi_peer_id)
+			#print("ESTADO: ayudando" , mi_peer_id)
 		Estado.RECIBIENDO_AYUDA:
 			#entrar_recibiendo_ayuda()
 			#if pollo != null and pollo.has_method("flash_verde"):
@@ -368,7 +368,7 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 			#if timer_caido != null:
 				#timer_caido.stop()
 			recibiendoAyuda()
-			print("ESTADO: Recibiendo_ayuda", mi_peer_id)
+			#print("ESTADO: Recibiendo_ayuda", mi_peer_id)
 
 
 
@@ -533,7 +533,7 @@ func recibiendoAyuda() -> void:
 		pollo.flash_verde()
 	if timer_caido != null:
 		timer_caido.stop()
-	print("ESTADO: Recibiendo_ayuda", mi_peer_id)
+	#print("ESTADO: Recibiendo_ayuda", mi_peer_id)
 	
 func cancelar_salvar() -> void:
 	if timer_salvar.is_stopped():
