@@ -47,19 +47,13 @@ radius = 17.664063
 height = 1.5380859
 radius = 1.5854492
 
+[sub_resource type="BlackboardPlan" id="BlackboardPlan_levhw"]
+
 [node name="enemy0" type="CharacterBody3D" unique_id=447184950]
 process_mode = 1
 collision_layer = 2
 collision_mask = 31
 script = ExtResource("1_qypkf")
-vida = null
-tipo = null
-animacion_ataque = null
-velocidad_base = null
-velocidad_giro = null
-distancia_frenado = null
-distancia_llegada = null
-rot_byte = null
 
 [node name="cruz" type="MeshInstance3D" parent="." unique_id=169745912]
 transform = Transform3D(2.964562, 0, 0, 0, 0.029198525, 2.0934258, 0, -2.201264, 0.027768113, -0.0014315248, 0.17043361, 0.00023493171)
@@ -109,6 +103,9 @@ collision_mask = 12
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23095703, 0)
 shape = SubResource("CylinderShape3D_50d1r")
 debug_color = Color(3.85046e-07, 0.10259024, 0.7831983, 0.41960785)
+
+[node name="BTPlayer" type="BTPlayer" parent="." unique_id=301618528]
+blackboard_plan = SubResource("BlackboardPlan_levhw")
 
 [connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]
 [connection signal="body_exited" from="vision" to="." method="_on_vision_body_exited"]

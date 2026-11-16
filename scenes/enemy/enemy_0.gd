@@ -1,6 +1,20 @@
 extends CharacterBody3D
 class_name EnemigoBase
 
+# LimboAI
+@onready var bt_player = $BTPlayer
+
+var health = 100
+var max_health = 100
+var player = null
+var can_see_player = false
+var distance_to_player = 0.0
+var target_position = Vector3.ZERO
+var is_damaged = false
+var is_attacking = false
+
+var last_known_position = Vector3.ZERO
+
 # Caracteristicas del bicho
 @export var vida := 30  # vida del bicho
 var dano = 10 # daño que hace al jugador
@@ -20,7 +34,7 @@ var ver_modelo = false
 @onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
 var animation_player : AnimationPlayer
 
-@export var tipo: int = 1 # tipo d enemigo
+@export var tipo: int = 1 # tipo d enemigo aca seleccione si es babosa u otra cosa
 @export var animacion_ataque=false
 
 var is_dying := false
