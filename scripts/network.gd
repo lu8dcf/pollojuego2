@@ -798,6 +798,11 @@ func resetear_vida_todos_rpc() ->void:
 		var salud_max:int = info.get("salud_maxima",GlobalJuego.SALUD_DEFAULT)
 		jugador.aplicar_salud_local(salud_max,salud_max,false)
 		
+		if jugador.estadoActual == Jugador.Estado.CAIDO or jugador.estadoActual == Jugador.Estado.MUERTE:
+			jugador.revivir_para_tienda()
+		else:
+			jugador.cambiar_estado(Jugador.Estado.OLEADA)
+		
 		
 		
 
@@ -1246,7 +1251,7 @@ func host_mensaje_sistema(texto:String)->void:
 # MANEJAR PANTALLA DE PERDER CN EL SCORE
 # ------------------------------------------------------------
 
-@rpc("authority")
+@rpc("authority","call_local","reliable")
 func _mostrar_pantalla_perder_rpc(puntajes:Array) ->void:
 	GlobalJuego.en_pantalla_perder = true
 	GlobalSignal.partida_perdida.emit(puntajes)

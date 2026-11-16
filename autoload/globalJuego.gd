@@ -189,7 +189,7 @@ func _contruir_puntajes_ordenados() -> Array:
 			"score":info.get("score",0),
 			"personaje":int(info.get("personaje",0)),
 		})
-	lista.sort_custom(func(a,b):return["score"]>b["score"])
+	lista.sort_custom(func(a, b): return int(a["score"]) > int(b["score"]))
 	return lista # se devuelve la lsita ordenadade mayor a menor
 
 func terminar_partida_un_jugador():
@@ -208,12 +208,14 @@ func chequear_fin_multijugador():
 	for jugador in jugadores:
 		if not is_instance_valid(jugador):
 			continue 
-		if jugador.estadoActual != Jugador.Estado.MUERTE:
+		if jugador.estadoActual != Jugador.Estado.MUERTE or jugador.estadoActual != Jugador.Estado.CAIDO:
 			return # revisa si queda alguno vivo
 		
 		#si estan todos muertos entonces se crean los puntajes y se reedirije a la pantalla
 		var puntajes:= _contruir_puntajes_ordenados()
 		Network._mostrar_pantalla_perder_rpc.rpc(puntajes)
+		print("chequeando fin multijugador es: ", jugador.estadoActual)
+
 	
 # ===== REPLICACIÓN DE RED =====
 @rpc("authority", "call_local")

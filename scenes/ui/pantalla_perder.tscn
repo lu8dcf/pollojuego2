@@ -4,8 +4,23 @@
 [ext_resource type="Script" uid="uid://do0tqx6qky2bs" path="res://scenes/ui/pantalla_perder.gd" id="1_m8lbx"]
 [ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_ksyn8"]
 
+[sub_resource type="Gradient" id="Gradient_ksyn8"]
+offsets = PackedFloat32Array(0.68045115, 0.9962406, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.029506508, 0.029506575, 0.029506557, 1, 0.017020682, 0.017020678, 0.017020678, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_bpyjm"]
+gradient = SubResource("Gradient_ksyn8")
+
 [node name="PantallaPerder" type="CanvasLayer" unique_id=859307828]
 script = ExtResource("1_m8lbx")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=207947869]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture1D_bpyjm")
 
 [node name="LabelTitulo" type="Label" parent="." unique_id=313798267]
 unique_name_in_owner = true
@@ -14,34 +29,29 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -101.5
-offset_top = -247.5
-offset_right = 101.5
-offset_bottom = -198.5
+offset_left = -104.0
+offset_top = -276.0
+offset_right = 99.0
+offset_bottom = -227.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Perdiste"
 label_settings = ExtResource("1_apaxj")
 horizontal_alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="." unique_id=207947869]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+metadata/_edit_use_anchors_ = true
 
 [node name="VBoxContenedorPuntajes" type="VBoxContainer" parent="." unique_id=1573700677]
 unique_name_in_owner = true
-anchors_preset = 12
-anchor_top = 1.0
+anchors_preset = -1
+anchor_top = 0.19800001
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -464.0
-offset_bottom = -72.0
+anchor_bottom = 0.804
+offset_top = -0.3040161
+offset_bottom = -0.9920044
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 20
+alignment = 1
 
 [node name="BotonLobby" parent="." unique_id=1088779155 instance=ExtResource("3_ksyn8")]
 unique_name_in_owner = true

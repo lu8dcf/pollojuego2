@@ -16,7 +16,12 @@ func _ready() -> void:
 	# conectar botones
 	boton_menu.pressed.connect(_on_boton_menu_pressed)
 	boton_lobby.pressed.connect(_on_boton_lobby_pressed)
-
+	
+	if GlobalJuego.un_jugador:
+		boton_lobby.hide()
+	else:
+		boton_lobby.show()
+	
 func _on_partida_perdida(puntajes:Array):
 	show()
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -34,7 +39,10 @@ func _on_partida_perdida(puntajes:Array):
 			posicion+=1
 
 func _on_boton_menu_pressed():
-	Network.leave_server()
+	# volver al menu principal y cerrar conexion
+	Network.leave_server() 
+	
 
 func _on_boton_lobby_pressed():
+	# quedarse 
 	hide()
