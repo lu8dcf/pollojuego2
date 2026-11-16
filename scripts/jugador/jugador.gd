@@ -289,8 +289,8 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 	if multiplayer.is_server():
 		servidor_procesar_cambio_estado(nuevo_estado)
 		# comprobar si todos los jugadores murieron
-		if nuevo_estado == Estado.MUERTE:
-			GlobalJuego.chequear_fin_multijugador()
+		#if nuevo_estado == Estado.MUERTE:
+			#GlobalJuego.chequear_fin_multijugador()
 	else:
 		# Si somos un Cliente, le pido al Servidor
 		solicitar_cambio_estado_rpc.rpc_id(1, nuevo_estado)
@@ -317,7 +317,7 @@ func servidor_procesar_cambio_estado(nuevo_estado: Estado) -> void:
 func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 	#SOLO el Servidor tiene permitido ejecutar la logica
 	if not multiplayer.is_server():
-		# Si un cliente recibe esto desde la red, verifica si quien lo envio fue el Servidor
+		# si un cliente recibe esto desde la red, verifica si quien lo envio fue el Servidor
 		if multiplayer.get_remote_sender_id() != 1:
 			return
 	var estado_anterior = estadoActual
@@ -342,7 +342,10 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 		Estado.AYUDANDO:
 			entrar_ayudando()
 			pollo.cambiarAnimacion("esqueleto de pollo1|volar")
-
+	
+	if multiplayer.is_server():
+		if estadoActual == Estado.CAIDO or estadoActual == Estado.MUERTE:
+			GlobalJuego.chequear_fin_multijugador()
 
 
 #-----------------------------------------------------------------------------DASH
