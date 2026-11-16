@@ -708,7 +708,13 @@ func host_iniciar_tienda() -> void:
 	GlobalJuego.reiniciar_vida_todos()
 	resetear_vida_todos_rpc.rpc()
 	cambiar_fase_rpc.rpc(GlobalJuego.FaseJuego.TIENDA)
+	# puntajes para la tienda
+	var puntajes := GlobalJuego._contruir_puntajes_ordenados()
+	_tienda_abierta_rpc.rpc(puntajes)
 
+@rpc("authority", "call_local", "reliable")
+func _tienda_abierta_rpc(puntajes: Array) -> void:
+	GlobalSignal.tienda_abierta.emit(puntajes)
 
 # el host llama a esto cuando el timer de tienda llega a 0
 func host_iniciar_carga_nueva_oleada() -> void:

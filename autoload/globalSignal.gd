@@ -111,6 +111,8 @@ signal juego_reanudado()
 signal cambia_oleada()
 @warning_ignore("unused_signal")
 signal partida_perdida(puntajes:Array) # este será un diccionario donde se sabrá e peer id, el nombre de usuario y el score de los perosnajes
+@warning_ignore("unused_signal")
+signal tienda_abierta(puntajes: Array)
 
 
 # ===== SEÑALES DE PUNTAJE =====

@@ -5,14 +5,13 @@ const PANEL_TIENDA_ALIADOS = preload("res://scenes/ui/panel_tienda_aliados.tscn"
 
 func _ready() -> void:
 	hide() # se muestra solo cuano llega la señal
-	if not GlobalSignal.partida_perdida.is_connected(_on_partida_terminada_tienda):
-		GlobalSignal.partida_perdida.connect(_on_partida_terminada_tienda)
+	if not GlobalSignal.tienda_abierta.is_connected(_on_oleada_terminada_tienda):
+		GlobalSignal.tienda_abierta.connect(_on_oleada_terminada_tienda)
 	if not GlobalSignal.cambia_oleada.is_connected(_on_cambia_oleada):
 		GlobalSignal.cambia_oleada.connect(_on_cambia_oleada)
 
 
-func _on_partida_terminada_tienda(puntajes:Array):
-	print("llego")
+func _on_oleada_terminada_tienda(puntajes:Array):
 	show()
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	for child in v_box_contenedor_puntajes.get_children():
