@@ -677,6 +677,7 @@ func _error_lobby_lleno() -> void:
 # MANEJO DE FASES DEL JUEGI
 # ------------------------------------------------------------
  # solo el host pide a todos cambiar de fase
+
 @rpc("authority","call_local","reliable")
 func cambiar_fase_rpc(nueva_fase:int)->void:
 	GlobalJuego.fase_actual = nueva_fase as GlobalJuego.FaseJuego
@@ -1072,6 +1073,45 @@ func _aplicar_datos_pollo_localmente(peer_id: int,	id_personaje: int,	nueva_salu
 	GlobalSignal.sesion_actualizada.emit(
 		GlobalJuego.session_info
 	)
+
+
+# ------------------------------------------------------------
+# MANEJO DE PANTALLA DE PERDER (MANEJO DE PUNTOS Y REEDIRECION)
+# ------------------------------------------------------------
+@rpc("authority","call_local","reliable")
+func volver_al_lobby_rpc()->void:
+	GlobalJuego.en_pantalla_perder = false
+	
+	# resetear session_info
+	for peer_id in GlobalJuego.session_info.keys():
+		GlobalJuego.session_info[peer_id] = { # data default
+			"score": 0,
+			"username": GlobalJuego.session_info[peer_id].get("username", "Jugador"),
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"salud_maxima": GlobalJuego.SALUD_DEFAULT,
+			"velocidad": 5.0,
+			"resistencia": 0.0,
+			"personaje": 0,
+			"estado": Jugador.Estado.OLEADA,
+			"ping": 0,
+			"inventario": [],
+			"armas_actuales": []
+		}
+	# resetear oleada
+	GlobalJuego.oleada = 1
+	GlobalJuego.fase_actual = GlobalJuego.FaseJuego.LOBBY
+	
+	# limpiar los listos
+	jugadores_listos.clear()
+	for peer_id in GlobalJuego.session_info.keys():
+		jugadores_listos[peer_id]=false
+	
+	#eliminar el mundo (enemigos, jugadores todo)
+	var mundo = obtener_mundo_actual()
+	if mundo:
+		mundo.queue_free()
+	#cargar la escena del lobby
+	get_tree().reload_current_scene()
 
 # SALUD DEL JUGADOR
 

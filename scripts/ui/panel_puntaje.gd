@@ -10,7 +10,7 @@ func configurar(posicion:int,datos:Dictionary,es_local:bool)->void:
 	label_score.text = "monedas totales: "+ "%d" % int(datos.get("score",0))
 	label_usuario.text = datos.get("username","jugador") 
 	var id = datos.get("personaje",0)
-	print("hola: ", posicion, datos.get("username","jugador") , " id: ", id)
+	#print("hola: ", posicion, datos.get("username","jugador") , " id: ", id)
 	sprite_personaje.play("idle" + str(id))
 	if es_local:
 		pass  

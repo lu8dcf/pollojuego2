@@ -40,17 +40,17 @@ label_settings = ExtResource("1_apaxj")
 horizontal_alignment = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="VBoxContenedorPuntajes" type="VBoxContainer" parent="." unique_id=1573700677]
+[node name="HBoxContenedorPuntajes" type="HBoxContainer" parent="." unique_id=779678556]
 unique_name_in_owner = true
-anchors_preset = -1
-anchor_top = 0.19800001
+anchors_preset = 14
+anchor_top = 0.5
 anchor_right = 1.0
-anchor_bottom = 0.804
-offset_top = -0.3040161
-offset_bottom = -0.9920044
+anchor_bottom = 0.5
+offset_top = -123.0
+offset_bottom = -123.0
 grow_horizontal = 2
-grow_vertical = 0
-theme_override_constants/separation = 20
+grow_vertical = 2
+theme_override_constants/separation = 200
 alignment = 1
 
 [node name="BotonLobby" parent="." unique_id=1088779155 instance=ExtResource("3_ksyn8")]
