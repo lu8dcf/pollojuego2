@@ -2,7 +2,7 @@ extends CanvasLayer
 
 const PANEL_PUNTAJE = preload("res://scenes/ui/panel_puntaje.tscn")
 @onready var label_titulo: Label = %LabelTitulo
-@onready var v_box_contenedor_puntajes: VBoxContainer = %VBoxContenedorPuntajes
+@onready var v_box_contenedor_puntajes: HBoxContainer = %HBoxContenedorPuntajes
 @onready var boton_lobby: TextureButtonAnimado = %BotonLobby
 @onready var boton_menu: TextureButtonAnimado = %BotonMenu
 
@@ -16,7 +16,18 @@ func _ready() -> void:
 	# conectar botones
 	boton_menu.pressed.connect(_on_boton_menu_pressed)
 	boton_lobby.pressed.connect(_on_boton_lobby_pressed)
-
+	
+	if GlobalJuego.un_jugador:
+		boton_lobby.hide()
+	else:
+		if multiplayer.is_server():
+			boton_lobby.cambiar_texto("Ir al lobby")
+		else:
+			boton_lobby.cambiar_texto("Esperar al HOST")
+			boton_lobby.disabled = true
+			
+		boton_lobby.show()
+	
 func _on_partida_perdida(puntajes:Array):
 	show()
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -25,16 +36,23 @@ func _on_partida_perdida(puntajes:Array):
 	var mi_id:=1
 	if multiplayer.has_multiplayer_peer():
 		mi_id = multiplayer.get_unique_id() # si es multijugador entonces cambia el 1 por el peer del mutiplayer
-		var posicion:=1
-		for datos in puntajes:
-			var panel = PANEL_PUNTAJE.instantiate()
-			v_box_contenedor_puntajes.add_child(panel)
-			var es_local:bool =(datos.get("peer_id",1)==mi_id) #devuelve true o false para saber si es su panel
-			panel.configurar(posicion, datos,es_local)
-			posicion+=1
+	var posicion:=1
+	for datos in puntajes:
+		var panel = PANEL_PUNTAJE.instantiate()
+		v_box_contenedor_puntajes.add_child(panel)
+		var es_local:bool =(datos.get("peer_id",1)==mi_id) #devuelve true o false para saber si es su panel
+		panel.configurar(posicion, datos,es_local)
+		posicion+=1
 
 func _on_boton_menu_pressed():
-	Network.leave_server()
+	# volver al menu principal y cerrar conexion
+	Network.leave_server() 
+	
 
 func _on_boton_lobby_pressed():
-	hide()
+	# quedarse 
+	if multiplayer.is_server():
+		print("regresar al lobby")
+		Network._volver_al_lobby_rpc.rpc()
+	else:
+		return

@@ -34,13 +34,14 @@ var spawn_container: Node3D # donde spawnean los jugadores
 var un_jugador:bool = true # si es true es singleplayer
 var cant_jugadores:int = 0 # minimo de jugadores (ni bien se conecte uno se suma)
 var max_cant_jugadores:int = 4 # maximo de jugadores en una partida
-var en_pantalla_perder = true
+var en_pantalla_perder = false
+
 
 var oleada:int = 1
 var menu_abierto: bool = false
 
 # ===== TIPO DE JUEGO =====
-var duracion_oleada:float=90.0
+var duracion_oleada:float=10.0
 var duracion_tienda:float=15.0
 # estados del ciclo
 enum FaseJuego{
@@ -189,7 +190,7 @@ func _contruir_puntajes_ordenados() -> Array:
 			"score":info.get("score",0),
 			"personaje":int(info.get("personaje",0)),
 		})
-	lista.sort_custom(func(a,b):return["score"]>b["score"])
+	lista.sort_custom(func(a, b): return int(a["score"]) > int(b["score"]))
 	return lista # se devuelve la lsita ordenadade mayor a menor
 
 func terminar_partida_un_jugador():
@@ -205,15 +206,20 @@ func chequear_fin_multijugador():
 	var jugadores :=get_tree().get_nodes_in_group("Jugadores") # al obtener solo el grupo evitamos usar el session_info
 	if jugadores.is_empty():
 		return
+	var todos_fuera:=true
 	for jugador in jugadores:
 		if not is_instance_valid(jugador):
 			continue 
-		if jugador.estadoActual != Jugador.Estado.MUERTE:
-			return # revisa si queda alguno vivo
+		if jugador.estadoActual != Jugador.Estado.MUERTE and jugador.estadoActual != Jugador.Estado.CAIDO:
+			todos_fuera = false
+			break # revisa si queda alguno vivo
 		
 		#si estan todos muertos entonces se crean los puntajes y se reedirije a la pantalla
+	if todos_fuera:
 		var puntajes:= _contruir_puntajes_ordenados()
 		Network._mostrar_pantalla_perder_rpc.rpc(puntajes)
+		print("chequeando fin multijugador es: todos muertos")
+
 	
 # ===== REPLICACIÓN DE RED =====
 @rpc("authority", "call_local")

@@ -215,7 +215,10 @@ func _process(_delta: float) -> void:
 		return
 		
 	if Input.is_action_just_pressed("test_caido"): # M
-		self.recibir_dano(1000) #aca
+
+		cambiar_estado(Estado.CAIDO) 
+		pedir_ayuda()
+
 
 #-------------------------------------------------------------------------MENU
 func open_menu(current_visibility: bool) -> void:
@@ -291,9 +294,7 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 	# proceso el cambio directo si somos server
 	if multiplayer.is_server():
 		servidor_procesar_cambio_estado(nuevo_estado)
-		# comprobar si todos los jugadores murieron
-		if nuevo_estado == Estado.MUERTE:
-			GlobalJuego.chequear_fin_multijugador()
+		
 	else:
 		# Si somos un Cliente, le pido al Servidor
 		solicitar_cambio_estado_rpc.rpc_id(1, nuevo_estado)
@@ -309,6 +310,18 @@ func solicitar_cambio_estado_rpc(nuevo_estado: int) -> void:
 		
 	servidor_procesar_cambio_estado(nuevo_estado as Estado)
 
+func revivir_para_tienda()->void:
+	if timer_caido:
+		timer_caido.stop() # parar el timer de caido si lo estaba durante la tienda
+	
+	if barraVida:
+		barraVida.reiniciar_barra()
+		
+	
+	cambiar_estado(Estado.OLEADA)
+	if pollo and pollo.has_method("cambiarAnimacion"):
+		pollo.cambiarAnimacion("esqueleto de pollo1|caminar")
+
 
 #El servidor aplica el cambio y lo comparte
 func servidor_procesar_cambio_estado(nuevo_estado: Estado) -> void:
@@ -320,7 +333,7 @@ func servidor_procesar_cambio_estado(nuevo_estado: Estado) -> void:
 func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 	#SOLO el Servidor tiene permitido ejecutar la logica
 	if not multiplayer.is_server():
-		# Si un cliente recibe esto desde la red, verifica si quien lo envio fue el Servidor
+		# si un cliente recibe esto desde la red, verifica si quien lo envio fue el Servidor
 		if multiplayer.get_remote_sender_id() != 1:
 			return
 	var estado_anterior = estadoActual
@@ -359,7 +372,11 @@ func sincronizar_estado_en_red(nuevo_estado: int) -> void:
 
 
 
-
+	# comprobar si todos los jugadores murieron
+	if multiplayer.is_server():
+		if estadoActual == Estado.CAIDO or estadoActual == Estado.MUERTE:
+			GlobalJuego.chequear_fin_multijugador()
+			
 #-----------------------------------------------------------------------------DASH
 
 func iniciar_dash() -> void:
