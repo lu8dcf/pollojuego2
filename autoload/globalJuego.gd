@@ -7,7 +7,7 @@ var semilla_mapa: int = 123456
 var carga_mapa_simple:bool=true
 
 # ===== INVENTARIO GLOBAL =====
-var inventario_jugador = [1, 7, 12, 9, null, null] # inventario de maximo 6 slots
+var inventario_jugador = [1, 7, 12, 9, 0, null] # inventario de maximo 6 slots
 
 # ===== SELECCIÓN DE PERSONAJE =====
 var polloBasico = "res://scenes/pollos/pollo_modelo_1.tscn"
@@ -41,7 +41,7 @@ var oleada:int = 1
 var menu_abierto: bool = false
 
 # ===== TIPO DE JUEGO =====
-var duracion_oleada:float=10.0
+var duracion_oleada:float=90.0
 var duracion_tienda:float=15.0
 # estados del ciclo
 enum FaseJuego{

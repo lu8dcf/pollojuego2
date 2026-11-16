@@ -33,7 +33,7 @@ func _enter_tree() -> void:
 		
 		if jugador != null:
 			top_level = true
-			# Ahora sí calculamos la posición exacta de spawn en el cliente
+			# Ahora s calculamos la posicion exacta de spawn en el cliente
 			global_position = calcular_posicion_objetivo()
 
 func inicializar(p_jugador: Jugador, p_posicion_inicial: Vector3, p_lado: int) -> void:

@@ -1206,7 +1206,7 @@ func procesar_salvar(salvador_id: int, objetivo_id: int) -> void:
 		print("objetivo no encontrado: ", objetivo_id)
 		return
 
-	if objetivo.estadoActual != Jugador.Estado.CAIDO:
+	if not objetivo.estadoActual in [Jugador.Estado.CAIDO, Jugador.Estado.RECIBIENDO_AYUDA]:
 		print("El jugador: ", objetivo,"no está caido")
 		return
 
