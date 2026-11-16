@@ -41,7 +41,7 @@ var oleada:int = 1
 var menu_abierto: bool = false
 
 # ===== TIPO DE JUEGO =====
-var duracion_oleada:float=10.0
+var duracion_oleada:float=90.0
 var duracion_tienda:float=15.0
 # estados del ciclo
 enum FaseJuego{
