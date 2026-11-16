@@ -558,10 +558,12 @@ func _on_peer_disconnected_partida(peer_id: int):
 	eliminar_jugador(peer_id)
 
 func _on_server_disconnected():
-	# cunado se pierde la conexion
+	# cunado se pierde la conexion con el host se reenvia al menu
 	if multiplayer.is_server():
 		return
-	
+	# si estamos en la pantalla de perder no quiero que se regrese al menu por desconexion
+	if GlobalJuego.en_pantalla_perder:
+		return	
 	_volver_al_menu_por_desconexion_host()
 
 func _volver_al_menu_por_desconexion_host():
@@ -589,6 +591,7 @@ func leave_server():
 	# resetear variables
 	_uniendo_sesion = false
 	_creando_sesion = false
+	GlobalJuego.en_pantalla_perder =false 
 	
 	if tube_enabled:
 		tube_client.leave_session()
@@ -674,6 +677,7 @@ func _error_lobby_lleno() -> void:
 # MANEJO DE FASES DEL JUEGI
 # ------------------------------------------------------------
  # solo el host pide a todos cambiar de fase
+
 @rpc("authority","call_local","reliable")
 func cambiar_fase_rpc(nueva_fase:int)->void:
 	GlobalJuego.fase_actual = nueva_fase as GlobalJuego.FaseJuego
@@ -794,6 +798,11 @@ func resetear_vida_todos_rpc() ->void:
 		var info:Dictionary = GlobalJuego.session_info[peer_id]
 		var salud_max:int = info.get("salud_maxima",GlobalJuego.SALUD_DEFAULT)
 		jugador.aplicar_salud_local(salud_max,salud_max,false)
+		
+		if jugador.estadoActual == Jugador.Estado.CAIDO or jugador.estadoActual == Jugador.Estado.MUERTE:
+			jugador.revivir_para_tienda()
+		else:
+			jugador.cambiar_estado(Jugador.Estado.OLEADA)
 		
 		
 		
@@ -1065,6 +1074,47 @@ func _aplicar_datos_pollo_localmente(peer_id: int,	id_personaje: int,	nueva_salu
 		GlobalJuego.session_info
 	)
 
+
+# ------------------------------------------------------------
+# MANEJO DE PANTALLA DE PERDER (MANEJO DE PUNTOS Y REEDIRECION)
+# ------------------------------------------------------------
+@rpc("authority","call_local","reliable")
+func volver_al_lobby_rpc()->void:
+	GlobalJuego.en_pantalla_perder = false
+	
+	# resetear session_info
+	for peer_id in GlobalJuego.session_info.keys():
+		GlobalJuego.session_info[peer_id] = { # data default
+			"score": 0,
+			"username": GlobalJuego.session_info[peer_id].get("username", "Jugador"),
+			"salud": GlobalJuego.SALUD_DEFAULT,
+			"salud_maxima": GlobalJuego.SALUD_DEFAULT,
+			"velocidad": 5.0,
+			"resistencia": 0.0,
+			"personaje": 0,
+			"estado": Jugador.Estado.OLEADA,
+			"ping": 0,
+			"inventario": [],
+			"armas_actuales": []
+		}
+	# resetear oleada
+	GlobalJuego.oleada = 1
+	GlobalJuego.fase_actual = GlobalJuego.FaseJuego.LOBBY
+	
+	# limpiar los listos
+	jugadores_listos.clear()
+	for peer_id in GlobalJuego.session_info.keys():
+		jugadores_listos[peer_id]=false
+	
+	#eliminar el mundo (enemigos, jugadores todo)
+	var mundo = obtener_mundo_actual()
+	if mundo:
+		mundo.queue_free()
+	#cargar la escena del lobby
+	get_tree().reload_current_scene()
+
+# SALUD DEL JUGADOR
+
 func actualizar_salud_jugador(peer_id:int, nueva_salud:int,nueva_salud_maxima:int,mostrar_efecto:bool=false)->void:
 	if not GlobalJuego.un_jugador and not multiplayer.is_server():
 		return
@@ -1150,7 +1200,7 @@ func procesar_salvar(salvador_id: int, objetivo_id: int) -> void:
 		print("objetivo no encontrado: ", objetivo_id)
 		return
 
-	if objetivo.estadoActual != Jugador.Estado.CAIDO:
+	if not objetivo.estadoActual in [Jugador.Estado.CAIDO, Jugador.Estado.RECIBIENDO_AYUDA]:
 		print("El jugador: ", objetivo,"no está caido")
 		return
 
@@ -1236,8 +1286,15 @@ func host_mensaje_sistema(texto:String)->void:
 		return
 	_replicar_mensaje_chat(0,"",texto,true)
 
-	
-	
+
+# ------------------------------------------------------------
+# MANEJAR PANTALLA DE PERDER CN EL SCORE
+# ------------------------------------------------------------
+
+@rpc("authority","call_local","reliable")
+func _mostrar_pantalla_perder_rpc(puntajes:Array) ->void:
+	GlobalJuego.en_pantalla_perder = true
+	GlobalSignal.partida_perdida.emit(puntajes)
 
 
 # ------------------------------------------------------------

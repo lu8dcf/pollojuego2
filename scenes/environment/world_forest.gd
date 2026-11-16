@@ -5,6 +5,7 @@ extends Node3D
 @onready var timer_enemy: Timer = %TimerEnemy
 @onready var menu_camera: MenuCameraController = $Camera3D
 #@onready var contenedor_mapa: Node3D = $Conteendor_mapa
+const PANTALLA_PERDER = preload("uid://bqet3yhj20mdn")
 
 @onready var mapa: Node3D = %mapa
 
@@ -18,7 +19,7 @@ var variedad_enemigos=0
 func _ready() -> void:
 	GlobalJuego.mundo = self
 	GlobalJuego.spawn_container = spawn_container
-		
+	agregar_pantalla_perder()
 	timer_enemy.timeout.connect(spawn_enemy)
 	
 	# Configurar la cámara
@@ -51,9 +52,13 @@ func disable_menu_mode() -> void:
 		pass  # El timer ya está corriendo
 
 func agregar_mapa():
-	var mapa = load("res://scenes/environment/generador_mapa.tscn")
-	var mapa_actual = mapa.instantiate()
+	var mapa2 = load("res://scenes/environment/generador_mapa.tscn")
+	var mapa_actual = mapa2.instantiate()
 	add_child(mapa_actual)
+
+func agregar_pantalla_perder():
+	var instancia_pantalla_perder = PANTALLA_PERDER.instantiate()
+	add_child(instancia_pantalla_perder)
 	
 func spawn_enemy():
 	

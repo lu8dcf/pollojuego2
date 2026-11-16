@@ -10,14 +10,15 @@ radius = 0.22944674
 
 [node name="balaExplosiva" type="Area3D" unique_id=1972517349]
 collision_layer = 16
-collision_mask = 72
+collision_mask = 74
 script = ExtResource("1_8udgy")
 
 [node name="explosiva" parent="." unique_id=896676526 instance=ExtResource("2_8udgy")]
 
 [node name="area_explosion" type="Area3D" parent="." unique_id=1832871902]
+visible = false
 collision_layer = 16
-collision_mask = 2
+collision_mask = 66
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="area_explosion" unique_id=1600623139]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -0.011737466, 0)

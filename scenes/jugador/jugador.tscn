@@ -73,11 +73,11 @@ unique_name_in_owner = true
 [node name="DeteccionAyuda" type="Area3D" parent="." unique_id=224189718]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DeteccionAyuda" unique_id=493757298]
-transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0.47852877, 0)
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0)
 shape = SubResource("CylinderShape3D_8w0r3")
 
 [node name="timer_caido" type="Timer" parent="." unique_id=523117100]
-wait_time = 10.0
+wait_time = 15.0
 
 [node name="timer_salvar" type="Timer" parent="." unique_id=2130058164]
 wait_time = 2.0
@@ -88,7 +88,7 @@ wait_time = 2.0
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RecepcionDanio" unique_id=1479857195]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.5012207, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.311, 0)
 shape = SubResource("BoxShape3D_8w0r3")
 
 [node name="barraVida" parent="." unique_id=1686766715 instance=ExtResource("6_ku1a3")]
