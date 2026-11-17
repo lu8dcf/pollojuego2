@@ -50,7 +50,7 @@ offset_top = -123.0
 offset_bottom = -123.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 200
+theme_override_constants/separation = 230
 alignment = 1
 
 [node name="BotonLobby" parent="." unique_id=1088779155 instance=ExtResource("3_ksyn8")]

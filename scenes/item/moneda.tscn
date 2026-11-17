@@ -10,7 +10,7 @@ radius = 0.2475586
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_k3173"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
-properties/0/replication_mode = 1
+properties/0/replication_mode = 2
 
 [node name="moneda" type="Area3D" unique_id=181884213]
 collision_layer = 32

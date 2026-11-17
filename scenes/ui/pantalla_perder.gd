@@ -2,7 +2,7 @@ extends CanvasLayer
 
 const PANEL_PUNTAJE = preload("res://scenes/ui/panel_puntaje.tscn")
 @onready var label_titulo: Label = %LabelTitulo
-@onready var v_box_contenedor_puntajes: HBoxContainer = %HBoxContenedorPuntajes
+@onready var h_box_contenedor_puntajes: HBoxContainer = %HBoxContenedorPuntajes
 @onready var boton_lobby: TextureButtonAnimado = %BotonLobby
 @onready var boton_menu: TextureButtonAnimado = %BotonMenu
 
@@ -17,21 +17,14 @@ func _ready() -> void:
 	boton_menu.pressed.connect(_on_boton_menu_pressed)
 	boton_lobby.pressed.connect(_on_boton_lobby_pressed)
 	
-	if GlobalJuego.un_jugador:
-		boton_lobby.hide()
-	else:
-		if multiplayer.is_server():
-			boton_lobby.cambiar_texto("Ir al lobby")
-		else:
-			boton_lobby.cambiar_texto("Esperar al HOST")
-			boton_lobby.disabled = true
-			
-		boton_lobby.show()
+	
 	
 func _on_partida_perdida(puntajes:Array):
 	show()
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	for child in v_box_contenedor_puntajes.get_children():
+	_configurar_botones()
+	for child in h_box_contenedor_puntajes.get_children():
+		h_box_contenedor_puntajes.remove_child(child)
 		child.queue_free()
 	var mi_id:=1
 	if multiplayer.has_multiplayer_peer():
@@ -39,7 +32,7 @@ func _on_partida_perdida(puntajes:Array):
 	var posicion:=1
 	for datos in puntajes:
 		var panel = PANEL_PUNTAJE.instantiate()
-		v_box_contenedor_puntajes.add_child(panel)
+		h_box_contenedor_puntajes.add_child(panel)
 		var es_local:bool =(datos.get("peer_id",1)==mi_id) #devuelve true o false para saber si es su panel
 		panel.configurar(posicion, datos,es_local)
 		posicion+=1
@@ -51,8 +44,39 @@ func _on_boton_menu_pressed():
 
 func _on_boton_lobby_pressed():
 	# quedarse 
-	if multiplayer.is_server():
-		print("regresar al lobby")
-		Network._volver_al_lobby_rpc.rpc()
-	else:
+	if not multiplayer.has_multiplayer_peer():
 		return
+	if not multiplayer.is_server():
+		return
+	Network.host_volver_al_lobby()
+
+
+func _configurar_botones() -> void:
+	# Single player
+	if GlobalJuego.un_jugador:
+		boton_lobby.hide()
+		boton_menu.show()
+		boton_menu.disabled = false
+		return
+
+	# Multijugador: hay peer?
+	var hay_peer := multiplayer.has_multiplayer_peer()
+	var soy_host := hay_peer and multiplayer.is_server()
+
+	if soy_host:
+		# hostt: puede ir al lobby (no al menú, para no cortar la partida)
+		boton_lobby.cambiar_texto("Ir al lobby")
+		boton_lobby.disabled = false
+		boton_lobby.show()
+
+		boton_menu.hide() 
+		# boton_menu.show()
+		# boton_menu.disabled = false
+	else:
+		# Cliente: no puede ir al lobby (lo decide el host)
+		boton_lobby.cambiar_texto("Esperar al HOST")
+		boton_lobby.disabled = true
+		boton_lobby.show()
+
+		boton_menu.show()
+		boton_menu.disabled = false
