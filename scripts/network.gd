@@ -146,6 +146,8 @@ func _actualizar_ip_local() -> void:
 	#else:
 		#print("la ip elegida por el usuario es: ", ip_local)
 
+
+#aca comienza el servidor LAN
 func empezar_servidor_lan(puerto: int = 9999):
 	_limpiar_multiplayer_peer()
 	en_lobby = true
