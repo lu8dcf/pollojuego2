@@ -1084,8 +1084,38 @@ func _aplicar_datos_pollo_localmente(peer_id: int,	id_personaje: int,	nueva_salu
 # ------------------------------------------------------------
 # MANEJO DE PANTALLA DE PERDER (MANEJO DE PUNTOS Y REEDIRECION)
 # ------------------------------------------------------------
+
+func host_volver_al_lobby()->void:
+	if not multiplayer.has_multiplayer_peer():
+		return
+	if not multiplayer.is_server():
+		return
+
+	# se rehabilita las señales que se habian quitado
+	# iniciar_partida_desde_lobby(), porque vamos a volver a entrar al lobby.
+	if not multiplayer.peer_connected.is_connected(_on_peer_connected_lobby):
+		multiplayer.peer_connected.connect(_on_peer_connected_lobby)
+	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected_lobby):
+		multiplayer.peer_disconnected.connect(_on_peer_disconnected_lobby)
+
+	# desconectar las señales de partida que ya no aplican, porque estamso en lobby.
+	if multiplayer.peer_connected.is_connected(_on_peer_connected_partida):
+		multiplayer.peer_connected.disconnect(_on_peer_connected_partida)
+	if multiplayer.peer_disconnected.is_connected(_on_peer_disconnected_partida):
+		multiplayer.peer_disconnected.disconnect(_on_peer_disconnected_partida)
+
+	# marcar que volvemos al lobby
+	en_lobby = true
+	pausa_activa = false
+	peer_que_pauso = 0
+
+	# Disparar el RPC para que TODOS recarguen a la escena del lobby.
+	# call_local hace que el host también ejecute _volver_al_lobby_rpc()
+	# y recargue su propia escena.
+	_volver_al_lobby_rpc.rpc()
+
 @rpc("authority","call_local","reliable")
-func volver_al_lobby_rpc()->void:
+func _volver_al_lobby_rpc()->void:
 	GlobalJuego.en_pantalla_perder = false
 	
 	# resetear session_info

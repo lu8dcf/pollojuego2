@@ -1,5 +1,5 @@
 extends PanelContainer
-
+# panel_usuario.gd
 @onready var contenedor_personaje: Control = %ContenedorPersonaje
 @onready var sprite_personaje: AnimatedSprite2D = %SpritePersonaje
 @onready var aro: NinePatchRect = %Aro

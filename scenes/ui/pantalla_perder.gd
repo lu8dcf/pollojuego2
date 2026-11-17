@@ -1,5 +1,5 @@
 extends CanvasLayer
-
+# pantalla perder
 const PANEL_PUNTAJE = preload("res://scenes/ui/panel_puntaje.tscn")
 @onready var label_titulo: Label = %LabelTitulo
 @onready var h_box_contenedor_puntajes: HBoxContainer = %HBoxContenedorPuntajes
@@ -64,13 +64,13 @@ func _configurar_botones() -> void:
 	var soy_host := hay_peer and multiplayer.is_server()
 
 	if soy_host:
-		# hostt: puede ir al lobby (no al menú, para no cortar la partida)
+		# hostt: puede ir al lobby, ir al menu cortaria la partida
 		boton_lobby.cambiar_texto("Ir al lobby")
 		boton_lobby.disabled = false
 		boton_lobby.show()
 
-		boton_menu.hide() 
-		# boton_menu.show()
+		#boton_menu.hide() 
+		boton_menu.show()
 		# boton_menu.disabled = false
 	else:
 		# Cliente: no puede ir al lobby (lo decide el host)
