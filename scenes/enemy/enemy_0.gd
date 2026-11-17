@@ -152,7 +152,7 @@ func recibir_dano(danio):
 		return
 	if not is_inside_tree():
 		return
-	if not multiplayer.is_server():
+	if not es_servidor_activo():
 		return
 	var vida_actual = vida - danio
 	flash_rojo.rpc()  # aviso a todos que brille
@@ -173,7 +173,7 @@ func flash_rojo():
 
 @rpc("authority", "call_local", "reliable")		
 func morir():
-	if not multiplayer.is_server():
+	if not es_servidor_activo():
 		# El cliente solo ejecuta la animación, no crea ítems
 		_efecto_muerte()
 		return
@@ -202,7 +202,7 @@ func _efecto_muerte():
 	queue_free()
 	
 func crearItem():
-	if not multiplayer.is_server():
+	if not es_servidor_activo():
 		return
 	var numero_aleatorio = randi_range(0, 9)
 	if numero_aleatorio < 2 : # monedas
@@ -241,7 +241,7 @@ func _physics_process(delta: float) -> void:
 		#  interpolando localmente:
 	modelo.rotation.y = lerp_angle(rotacion_actual, angulo_recibido, velocidad_giro * delta)
 	
-	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+	if not es_servidor_activo(): # solo el servidor puede mover los enemigos
 		return
 	
 
@@ -422,7 +422,7 @@ func mostrar_cruz(): # titila la cruz
 	
 # player entra al area de vision
 func _on_vision_body_entered(body: Node3D) -> void: 
-	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+	if not es_servidor_activo(): # solo el servidor puede mover los enemigos
 		return
 	jugador = body
 	if body.is_in_group("Jugadores"):
@@ -445,7 +445,7 @@ func _on_vision_body_entered(body: Node3D) -> void:
 
 
 func _on_vision_body_exited(_body: Node3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+	if not es_servidor_activo(): # solo el servidor puede mover los enemigos
 		return
 	
 	if _body == jugador:
@@ -456,7 +456,7 @@ func _on_vision_body_exited(_body: Node3D) -> void:
 
 
 func _on_bigote_area_entered(_area: Area3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+	if not es_servidor_activo(): # solo el servidor puede mover los enemigos
 		return
 	if !posicionado:
 		queue_free()
@@ -466,13 +466,13 @@ func _on_bigote_area_entered(_area: Area3D) -> void:
 	
 
 func _on_bigote_area_exited(_area: Area3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+	if not es_servidor_activo(): # solo el servidor puede mover los enemigos
 		return
 	evadir_obstaculo=false
 	evasion._verificar_salida()
 
 func _on_bigote_body_entered(body: Node3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+	if not es_servidor_activo(): # solo el servidor puede mover los enemigos
 		return
 	if !posicionado:
 		queue_free()
@@ -488,7 +488,7 @@ func _on_bigote_body_entered(body: Node3D) -> void:
 	
 
 func _on_bigote_body_exited(body: Node3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+	if not es_servidor_activo():
 		return
 	
 	if body.is_in_group("Jugadores"):
@@ -502,9 +502,19 @@ func _on_bigote_body_exited(body: Node3D) -> void:
 
 
 func _on_danio_area_entered(_area: Area3D) -> void:
-	if not multiplayer.is_server(): # solo el servidor puede mover los enemigos
+	if not es_servidor_activo():
 		return
 	estado_actual = estado.INACTIVO
 	puede_moverse = false
 	jugador = null
 	queue_free()
+	
+#Verifica que halla servidor
+func es_servidor_activo() -> bool:
+	var peer = multiplayer.multiplayer_peer
+
+	if peer == null:
+		return false
+
+	return multiplayer.is_server()
+	

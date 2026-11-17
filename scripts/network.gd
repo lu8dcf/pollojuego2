@@ -146,11 +146,13 @@ func _actualizar_ip_local() -> void:
 	#else:
 		#print("la ip elegida por el usuario es: ", ip_local)
 
+
+#aca comienza el servidor LAN
 func empezar_servidor_lan(puerto: int = 9999):
 	_limpiar_multiplayer_peer()
 	en_lobby = true
 	puerto_actual=puerto
-	_conectar_señales_lobby()
+	_conectar_señales_lobby() #CONECTA SEÑALES DE CUANDO UN JUGADOR SE CONECTA Y CUANDO UN JUGADOR SE DESCONECTA 
 	
 	var error = enet_peer.create_server(puerto_actual)
 	if error != OK:
@@ -183,7 +185,7 @@ func unirse_servidor_lan(direccion_ip:String, puerto:int)-> bool:
 				mensaje += "Ya hay una conexión activa."
 			_:
 				mensaje += "Código de error: " + str(error)
-		GlobalSignal.error_conexion.emit(mensaje)
+		GlobalSignal.errour_conexion.emit(mensaje)
 		return false
 		
 	multiplayer.multiplayer_peer = enet_peer
@@ -293,7 +295,6 @@ func _solicitar_info_jugadores():
 		return
 	
 	var solicitante_id = multiplayer.get_remote_sender_id()
-	print("[NETWORK] _solicitar_info_jugadores de ", solicitante_id)
 	var lobby = get_tree().get_first_node_in_group("lobby")
 	if not lobby:
 		return

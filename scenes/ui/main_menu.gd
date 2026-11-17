@@ -222,10 +222,12 @@ func _on_crear_lan(puerto: int, nombre: String) -> void:
 	if temp_mundo:
 		temp_mundo.queue_free()
 	
+	#Aca inicia la rer LAn soo envia el p
+	#uerto y usa la ip lñocal
 	if not await Network.empezar_servidor_lan(puerto):
 		_ocultar_pantalla_carga()
 		return
-	
+	# SI NO HAY ERRORES SE OCULTA PANTALLA DE CARGA Y SE REDIRIGE AL LOBBY
 	await get_tree().create_timer(0.3).timeout
 	_ocultar_pantalla_carga()
 	_ir_al_lobby()

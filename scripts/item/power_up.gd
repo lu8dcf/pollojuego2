@@ -108,3 +108,11 @@ func animar_y_eliminar() -> void:
 		
 	await tween_achicar.finished
 	queue_free()
+	
+func es_servidor_activo() -> bool:
+	var peer = multiplayer.multiplayer_peer
+
+	if peer == null:
+		return false
+
+	return multiplayer.is_server()
