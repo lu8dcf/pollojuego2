@@ -1,6 +1,6 @@
 [gd_resource type="StandardMaterial3D" format=3 uid="uid://blh60f5rkssxd"]
 
-[ext_resource type="Texture2D" uid="uid://dh5gcay1w7qa3" path="res://assets/modelos/mapas/alfa_plantas.png" id="1_tsxmb"]
+[ext_resource type="Texture2D" uid="uid://ddpkfnym3vpm3" path="res://assets/modelos/mapas/alfa_plantas.png" id="1_tsxmb"]
 
 [resource]
 transparency = 1

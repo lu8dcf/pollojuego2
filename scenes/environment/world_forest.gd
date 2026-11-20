@@ -8,8 +8,8 @@ extends Node3D
 
 @onready var mapa: Node3D = %mapa
 
-const enemigo_base = preload("uid://b8go34qeye00a") # Escena enemy0
-
+const enemigo_base = preload("res://scenes/enemy/enemy_0.tscn") # Escena enemy0
+const enemigo_babosa = preload("res://scenes/enemy/arbol/enemy_1.tscn") # Escena enemy0
 
 var is_menu_mode: bool = false
 var ya_hizo=false
@@ -71,7 +71,7 @@ func spawn_enemy():
 	instanciar_enemigo()
 
 func instanciar_enemigo():
-	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 50:
+	if is_multiplayer_authority() and get_tree().get_node_count_in_group('enemy') < 5:
 		for player in get_tree().get_node_count_in_group("Jugadores"):
 			var new_target = fabrica_enemigos(0)
 			
@@ -93,8 +93,8 @@ func fabrica_enemigos(tipo):
 		if variedad_enemigos==GlobalJuego.cant_tipo_enemigos:
 			variedad_enemigos=0
 			 
-	var nuevo_enemigo = enemigo_base.instantiate()
-	nuevo_enemigo.tipo = tipo
+	var nuevo_enemigo = enemigo_babosa.instantiate()
+	#nuevo_enemigo.tipo = tipo
 	
 	return nuevo_enemigo
 

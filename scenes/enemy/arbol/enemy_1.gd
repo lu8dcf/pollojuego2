@@ -15,7 +15,8 @@ var player
 
 func _ready():
 	player = get_tree().get_first_node_in_group("Jugadores")
-
+	add_to_group('enemy')
+	
 func _physics_process(delta):
 
 	if player == null:

@@ -109,8 +109,6 @@ blackboard_plan = SubResource("BlackboardPlan_levhw")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=2121873874]
 
-[node name="LimboHSM" type="LimboHSM" parent="." unique_id=1136860130]
-
 [connection signal="body_entered" from="vision" to="." method="_on_vision_body_entered"]
 [connection signal="body_exited" from="vision" to="." method="_on_vision_body_exited"]
 [connection signal="area_entered" from="bigote" to="." method="_on_bigote_area_entered"]
