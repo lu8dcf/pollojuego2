@@ -1,0 +1,54 @@
+[gd_resource type="BehaviorTree" format=3 uid="uid://c2r7i5i1kstm0"]
+
+[ext_resource type="Script" uid="uid://fy3k0mxs8tsw" path="res://AI/tasks/Condicion/CanSeePlayer.gd" id="1_bhobq"]
+[ext_resource type="Script" uid="uid://ca0fiji81633" path="res://AI/tasks/Condicion/CanAttack.gd" id="2_hkwas"]
+[ext_resource type="Script" uid="uid://bjfkh33dpes24" path="res://AI/tasks/Actions/Attack.gd" id="3_ry6kr"]
+[ext_resource type="Script" uid="uid://payh8ypagw8v" path="res://AI/tasks/Actions/Chase.gd" id="4_45vlr"]
+[ext_resource type="Script" uid="uid://da2jm5nycbbv8" path="res://AI/tasks/Actions/Idle.gd" id="5_jhsjf"]
+
+[sub_resource type="BlackboardPlan" id="BlackboardPlan_uiu6j"]
+var/player/name = &"player"
+var/player/type = 24
+var/player/hint = 0
+var/player/hint_string = ""
+var/can_see_player/name = &"can_see_player"
+var/can_see_player/type = 1
+var/can_see_player/value = false
+var/can_see_player/hint = 0
+var/can_see_player/hint_string = ""
+var/distance_to_player/name = &"distance_to_player"
+var/distance_to_player/type = 3
+var/distance_to_player/value = 0.0
+var/distance_to_player/hint = 0
+var/distance_to_player/hint_string = ""
+
+[sub_resource type="BTCondition" id="BTCondition_pnly3"]
+script = ExtResource("1_bhobq")
+
+[sub_resource type="BTCondition" id="BTCondition_4wwj1"]
+script = ExtResource("2_hkwas")
+
+[sub_resource type="BTAction" id="BTAction_nqmbv"]
+script = ExtResource("3_ry6kr")
+
+[sub_resource type="BTSequence" id="BTSequence_8qea5"]
+children = [SubResource("BTCondition_4wwj1"), SubResource("BTAction_nqmbv")]
+
+[sub_resource type="BTAction" id="BTAction_veg4h"]
+script = ExtResource("4_45vlr")
+
+[sub_resource type="BTSelector" id="BTSelector_ahqdo"]
+children = [SubResource("BTSequence_8qea5"), SubResource("BTAction_veg4h")]
+
+[sub_resource type="BTSequence" id="BTSequence_uiu6j"]
+children = [SubResource("BTCondition_pnly3"), SubResource("BTSelector_ahqdo")]
+
+[sub_resource type="BTAction" id="BTAction_loejm"]
+script = ExtResource("5_jhsjf")
+
+[sub_resource type="BTSelector" id="BTSelector_ooj3l"]
+children = [SubResource("BTSequence_uiu6j"), SubResource("BTAction_loejm")]
+
+[resource]
+blackboard_plan = SubResource("BlackboardPlan_uiu6j")
+root_task = SubResource("BTSelector_ooj3l")

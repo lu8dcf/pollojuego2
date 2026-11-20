@@ -42,6 +42,7 @@ enabled=PackedStringArray("res://addons/tile-run-instances/plugin.cfg", "res://a
 [file_customization]
 
 folder_colors={
+"res://AI/": "teal",
 "res://assets/": "green",
 "res://autoload/": "purple",
 "res://resources/": "blue",
@@ -162,6 +163,10 @@ pointing/emulate_touch_from_mouse=true
 3d_physics/layer_6="PowerUp"
 3d_physics/layer_7="dañoenemigo"
 3d_physics/layer_8="escudo"
+
+[limbo_ai]
+
+behavior_tree/user_task_dirs=PackedStringArray("res://AI/tasks")
 
 [physics]
 
