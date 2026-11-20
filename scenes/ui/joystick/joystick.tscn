@@ -1,11 +1,18 @@
 [gd_scene format=3 uid="uid://c6ohglddwi5dl"]
 
 [ext_resource type="Script" uid="uid://bheyu52c5hpp4" path="res://scenes/ui/joystick/joystick.gd" id="1_4a20h"]
-[ext_resource type="Texture2D" uid="uid://bqhbv44wxl4eq" path="res://assets/ui/joystick_redondel.png" id="2_evor0"]
-[ext_resource type="Texture2D" uid="uid://df4owisch7ucy" path="res://icon.svg" id="3_uxt7q"]
+[ext_resource type="Texture2D" uid="uid://ba7ejm52pbhl6" path="res://assets/ui/atlas_botones.png" id="2_mmekg"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_k1rfm"]
-radius = 82.0
+radius = 96.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u1tme"]
+atlas = ExtResource("2_mmekg")
+region = Rect2(33, 17, 14, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v85wu"]
+atlas = ExtResource("2_mmekg")
+region = Rect2(53, 21, 6, 6)
 
 [node name="Joystick" type="Area2D" unique_id=254397830]
 script = ExtResource("1_4a20h")
@@ -16,11 +23,10 @@ shape = SubResource("CircleShape2D_k1rfm")
 
 [node name="SpriteRango" type="Sprite2D" parent="." unique_id=801723901]
 unique_name_in_owner = true
-position = Vector2(1.9073486e-06, 1.9073486e-06)
-scale = Vector2(1.2578125, 1.2578125)
-texture = ExtResource("2_evor0")
+scale = Vector2(13.557408, 13.557408)
+texture = SubResource("AtlasTexture_u1tme")
 
 [node name="SpritePalanca" type="Sprite2D" parent="." unique_id=1308324412]
 unique_name_in_owner = true
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("3_uxt7q")
+scale = Vector2(7.1999993, 7.1999993)
+texture = SubResource("AtlasTexture_v85wu")
