@@ -1367,7 +1367,7 @@ func solicitar_pausa(activar: bool) -> void: # CUALQUIERO PERSONA PUEDE PAUSAR P
 		peer_que_pauso = 0
 		_aplicar_pausa.rpc(false, 0)
 
-@rpc("authority", "reliable")
+@rpc("authority", "reliable","call_local")
 func _aplicar_pausa(activar: bool, quien_pauso: int) -> void: # el host autoriza la pausa o despausa y actualiza a todos
 	
 	pausa_activa = activar

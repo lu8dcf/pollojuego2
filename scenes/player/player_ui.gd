@@ -377,7 +377,7 @@ func _get_fade_progress() -> float:
 func _verificar_si_es_mobile() -> void:
 	if OS.has_feature("mobile"):
 		var ui_movil = preload("uid://wsf5ahon4ims")
-		var ui_movil_actual = ui_movil.instanciate()
+		var ui_movil_actual = ui_movil.instantiate()
 		add_child(ui_movil_actual)
 
 # ===== MANEJO DE ACTUALIZAR INFO EN PANTALLA =====
@@ -537,39 +537,109 @@ func host_iniciar_carga_nueva_oleada():
 	
 # ===== MANEJO DE LA PAUSA =====
 # para manejar la pausa se debe usar el rpc en network
+#func _on_boton_pausa_pressed() -> void:
+	## Si ya está pausado y NO soy el que pausó, no permitir
+	#print("fuciona")
+	#if Network.pausa_activa and not yo_pause:
+		#return
+	#
+	## Si está pausado y soy yo, despausar
+	#if Network.pausa_activa and yo_pause:
+		#Network.solicitar_pausa.rpc(false)
+		#return
+	#
+	## Pausar
+	#Network.solicitar_pausa.rpc(true)
+#
+#func _on_boton_regresar_pressed() -> void:
+	## Solo puede despausar quien pausó
+	#if not yo_pause:
+		#return
+	#Network.solicitar_pausa.rpc(false)
+	#
+	#menu.visible = false
+	#Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+#
+#func _on_pausa_cambiada(esta_pausado: bool, quien_pauso: int) -> void:
+	#peer_que_pauso = quien_pauso
+	#yo_pause = (quien_pauso == multiplayer.get_unique_id())
+	#
+	#pausa_panel.visible = esta_pausado
+	#
+	#if esta_pausado:
+		#
+		#GlobalJuego.fase_antes_de_pausa = GlobalJuego.fase_actual
+		#GlobalJuego.esta_pausado = true
+		#_pausar_timer_fase()
+		#
+		#var nombre_pausador = "Alguien"
+		#if GlobalJuego.session_info.has(quien_pauso):
+			#nombre_pausador = GlobalJuego.session_info[quien_pauso].get("username", "Jugador " + str(quien_pauso))
+		#
+		#if yo_pause:
+			#label_texto_informa.text = "Pausaste el juego.\nPresiona el botón para continuar."
+			#boton_regresar.visible = true
+		#else:
+			#label_texto_informa.text = nombre_pausador + " ha pausado el juego.\nEspera a que continúe."
+			#boton_regresar.visible = false
+	#else:
+		## reanudar la partida
+		#GlobalJuego.fase_actual = GlobalJuego.fase_antes_de_pausa # se retoma la fase anteiorr  a la pausa ( puede ser oleada o tienda)
+		#GlobalJuego.esta_pausado = false
+		#_reanudar_timer_fase()
+		#label_texto_informa.text = ""
+		#boton_regresar.visible = false
+
+
+# ===== MANEJO DE LA PAUSA =====
 func _on_boton_pausa_pressed() -> void:
 	# Si ya está pausado y NO soy el que pausó, no permitir
 	if Network.pausa_activa and not yo_pause:
 		return
 	
-	# Si está pausado y soy yo, despausar
-	if Network.pausa_activa and yo_pause:
-		Network.solicitar_pausa.rpc(false)
-		return
+	var nuevo_estado: bool = not Network.pausa_activa
 	
-	# Pausar
-	Network.solicitar_pausa.rpc(true)
+	if GlobalJuego.un_jugador:
+		# En un solo jugador no usamos .rpc(), llamamos directamente al cambio de pausa
+		Network.pausa_activa = nuevo_estado
+		_on_pausa_cambiada(nuevo_estado, 1)
+	else:
+		Network.solicitar_pausa.rpc(nuevo_estado)
 
 func _on_boton_regresar_pressed() -> void:
 	# Solo puede despausar quien pausó
 	if not yo_pause:
 		return
-	Network.solicitar_pausa.rpc(false)
+		
+	if GlobalJuego.un_jugador:
+		Network.pausa_activa = false
+		_on_pausa_cambiada(false, 1)
+	else:
+		Network.solicitar_pausa.rpc(false)
 	
-	menu.visible = false
-	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+	if not OS.has_feature("mobile"):
+		menu.visible = false
+		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 
 func _on_pausa_cambiada(esta_pausado: bool, quien_pauso: int) -> void:
 	peer_que_pauso = quien_pauso
-	yo_pause = (quien_pauso == multiplayer.get_unique_id())
 	
+	if GlobalJuego.un_jugador:
+		yo_pause = true
+	else:
+		yo_pause = (quien_pauso == multiplayer.get_unique_id())
+	
+	# Detiene o reanuda físicamente el juego (enemigos, jugador, proyectiles)
+	get_tree().paused = esta_pausado
 	pausa_panel.visible = esta_pausado
 	
 	if esta_pausado:
-		
 		GlobalJuego.fase_antes_de_pausa = GlobalJuego.fase_actual
 		GlobalJuego.esta_pausado = true
 		_pausar_timer_fase()
+		
+		if not OS.has_feature("mobile"):
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		
 		var nombre_pausador = "Alguien"
 		if GlobalJuego.session_info.has(quien_pauso):
@@ -582,9 +652,12 @@ func _on_pausa_cambiada(esta_pausado: bool, quien_pauso: int) -> void:
 			label_texto_informa.text = nombre_pausador + " ha pausado el juego.\nEspera a que continúe."
 			boton_regresar.visible = false
 	else:
-		# reanudar la partida
-		GlobalJuego.fase_actual = GlobalJuego.fase_antes_de_pausa # se retoma la fase anteiorr  a la pausa ( puede ser oleada o tienda)
+		# Reanudar la partida
+		GlobalJuego.fase_actual = GlobalJuego.fase_antes_de_pausa
 		GlobalJuego.esta_pausado = false
 		_reanudar_timer_fase()
 		label_texto_informa.text = ""
 		boton_regresar.visible = false
+		
+		if not OS.has_feature("mobile"):
+			Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
