@@ -76,7 +76,7 @@ func _ready() -> void:
 	if OS.has_feature("mobile") :
 		await get_tree().process_frame 
 		var instancia_panel_ui_movil = PANEL_UI_MOVIL.instantiate()
-		get_tree().root.add_child(instancia_panel_ui_movil)
+		add_child(instancia_panel_ui_movil)
 		ui_movil_actual = instancia_panel_ui_movil
 		menu.show()
 		
