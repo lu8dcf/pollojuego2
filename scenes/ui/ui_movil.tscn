@@ -84,7 +84,7 @@ position = Vector2(1261, 110.00001)
 scale = Vector2(0.28896645, 0.2655367)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
-action = "slot_1"
+action = "slot_2"
 
 [node name="TextureRect2" type="TextureRect" parent="TouchButtonArma2" unique_id=748605486]
 anchors_preset = -1
@@ -107,7 +107,7 @@ position = Vector2(1261, 162)
 scale = Vector2(0.28896645, 0.2655367)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
-action = "slot_1"
+action = "slot_3"
 
 [node name="TextureRect3" type="TextureRect" parent="TouchButtonArma3" unique_id=1439427713]
 anchors_preset = -1
@@ -130,7 +130,7 @@ position = Vector2(1261, 215)
 scale = Vector2(0.28896645, 0.2655367)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
-action = "slot_1"
+action = "slot_4"
 
 [node name="TextureRect4" type="TextureRect" parent="TouchButtonArma4" unique_id=1580475648]
 anchors_preset = -1
@@ -153,7 +153,7 @@ position = Vector2(1261, 269)
 scale = Vector2(0.28896645, 0.2655367)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
-action = "slot_1"
+action = "slot_5"
 
 [node name="TextureRect5" type="TextureRect" parent="TouchButtonArma5" unique_id=1333026580]
 anchors_preset = -1
@@ -176,7 +176,7 @@ position = Vector2(1261, 322)
 scale = Vector2(0.28896645, 0.2655367)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
-action = "slot_1"
+action = "slot_6"
 
 [node name="TextureRect6" type="TextureRect" parent="." unique_id=406255145]
 anchors_preset = -1

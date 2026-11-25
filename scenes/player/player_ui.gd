@@ -62,6 +62,9 @@ var _fase_para_reanudar:int = GlobalJuego.FaseJuego.OLEADA
 # tween activo (para cancelar si se dispara otro fade antes de que termine)
 var _tween_fade: Tween = null
 
+var ui_movil_actual: CanvasLayer = null
+
+
 var COLORS: Array[Color] =[ # colores de la barra de vida
 	Color.MAGENTA,
 	Color.CRIMSON,
@@ -74,6 +77,7 @@ func _ready() -> void:
 		await get_tree().process_frame 
 		var instancia_panel_ui_movil = PANEL_UI_MOVIL.instantiate()
 		get_tree().root.add_child(instancia_panel_ui_movil)
+		ui_movil_actual = instancia_panel_ui_movil
 		menu.show()
 		
 	else:
@@ -89,7 +93,7 @@ func _ready() -> void:
 	# BOTON REGRESAR
 	boton_regresar.pressed.connect(_on_boton_regresar_pressed)
 	pausa_panel.visible = false # NO MOSTRAR LA PAUSA
-	
+	GlobalSignal.partida_perdida.connect(_ocultar_ui_completa)
 	multiplayer.peer_disconnected.connect(_on_jugador_desconectado)
 	multiplayer.server_disconnected.connect(_on_server_desconectado)
 	#var es_host = multiplayer.is_server()
@@ -130,6 +134,17 @@ func _ready() -> void:
 	_actualizar_paneles_aliados(GlobalJuego.session_info)
 	
 	process_mode = Node.PROCESS_MODE_ALWAYS 
+
+
+func _ocultar_ui_completa() -> void:
+	hide()
+	if ui_movil_actual and is_instance_valid(ui_movil_actual):
+		ui_movil_actual.visible = false
+
+func _mostrar_ui_completa() -> void:
+	show()
+	if ui_movil_actual and is_instance_valid(ui_movil_actual):
+		ui_movil_actual.visible = true
 
 # MANEJO DE FASES
 
@@ -219,12 +234,14 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 	match nueva_fase:
 		GlobalJuego.FaseJuego.OLEADA:
 			# mostrar ui de oleada, ocultar tienda
+			_mostrar_ui_completa()
 			fade_out()
 			_mostrar_ui_oleada()
 			if mundo.has_method("reanudar_gameplay"):
 				mundo.reanudar_gameplay()
 			Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 		GlobalJuego.FaseJuego.TIENDA:
+			_ocultar_ui_completa()
 			# mostrar ui de tienda, ocultar oleada
 			fade_in()
 			_mostrar_ui_tienda()
@@ -233,6 +250,7 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 		GlobalJuego.FaseJuego.CARGANDO:
+			_ocultar_ui_completa()
 			# ocultar ui de juego, mostrar pantalla de carga
 			_mostrar_ui_carga()
 		GlobalJuego.FaseJuego.MENU, GlobalJuego.FaseJuego.LOBBY:

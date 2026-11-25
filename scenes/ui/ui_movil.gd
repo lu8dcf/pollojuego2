@@ -11,7 +11,7 @@ extends CanvasLayer
 @onready var touch_button_arma_6: TouchScreenButton = %TouchButtonArma6
 
 func _ready() -> void:
-	if DisplayServer.is_touchscreen_available():
+	if OS.has_feature("mobile"):
 		layer = 100
 		visible = true
 		await get_tree().process_frame
