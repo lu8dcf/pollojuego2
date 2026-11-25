@@ -1,4 +1,3 @@
-# texture_button_animado.gd
 extends TextureButton
 class_name TextureButtonAnimado
 
@@ -50,6 +49,9 @@ func _ready() -> void:
 	posicion_original = position
 	disabled = true
 	
+	# 1. Resetea cualquier distorsión que haya quedado pegada de una escena anterior
+	_resetear_shader_distorsion()
+	
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	
@@ -67,12 +69,24 @@ func _ready() -> void:
 	await get_tree().process_frame
 	animar_entrada_cascada()
 
+# 2. Si el botón se destruye al cambiar de escena en medio de la animación, limpia el shader
+func _exit_tree() -> void:
+	_resetear_shader_distorsion()
+
+func _resetear_shader_distorsion() -> void:
+	var tree = get_tree()
+	if not tree or not tree.current_scene:
+		return
+	var color_rect = _buscar_color_rect(tree.current_scene)
+	if color_rect and color_rect.material is ShaderMaterial:
+		(color_rect.material as ShaderMaterial).set_shader_parameter("intensidad", 0.0)
+
 func _on_pressed_impacto() -> void:
 	if not is_inside_tree():
 		return
 	
 	var tree = get_tree()
-	if not tree:
+	if not tree or not tree.current_scene:
 		return
 	
 	var color_rect = _buscar_color_rect(tree.current_scene)
@@ -85,7 +99,9 @@ func _on_pressed_impacto() -> void:
 	var mat = color_rect.material as ShaderMaterial
 	mat.set_shader_parameter("intensidad", 0.08)
 	
-	var tween = create_tween()
+	# 3. Vincula el tween al color_rect y permite que corra incluso si el juego está en pausa
+	var tween = color_rect.create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(mat, "shader_parameter/intensidad", 0.0, 0.25)
 
 # Función de audio al hacer clic (Select)

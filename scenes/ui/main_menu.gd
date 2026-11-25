@@ -7,13 +7,19 @@ extends CanvasLayer
 @onready var creditos: TextureButtonAnimado = %creditos
 @onready var boton_salir: TextureButtonAnimado = %BotonSalir
 # Botones de selección
-@onready var boton_online: TextureButton = %BotonOnline
-@onready var boton_local: TextureButton = %BotonLocal
+#@onready var boton_online: TextureButton = %BotonOnline
+#@onready var boton_local: TextureButton = %BotonLocal
+@onready var boton_local: TouchScreenButton = %BotonLocalTouch
+@onready var boton_online: TouchScreenButton = %BotonOnlineTouch
+
+
+
 # gaficos 
 @onready var check_button: CheckButton = %CheckButton
 
 # --- AGREGADO PARA EL BOTÓN DE VOLUMEN ---
 @onready var boton_volumen: TextureButton = %volumen
+@onready var boton_musica: TextureButton = %musica
 
 # Referencias a paneles
 @onready var panel_un_jugador: Control = %PanelUnJugador
@@ -84,9 +90,11 @@ func conectar_botones()->void:
 	
 	# --- AGREGADO PARA EL BOTÓN DE VOLUMEN ---
 	boton_volumen.toggle_mode = true
+	boton_musica.toggle_mode = true
 	if not boton_volumen.toggled.is_connected(_on_volumen_toggled):
 		boton_volumen.toggled.connect(_on_volumen_toggled)
-
+	if not boton_musica.toggled.is_connected(_on_musica_toggled):
+		boton_musica.toggled.connect(_on_musica_toggled)
 
 func _boton_requisitos(tongle:bool):
 	GlobalJuego.carga_mapa_simple =tongle
@@ -421,3 +429,6 @@ func _mostrar_error(mensaje: String, titulo: String = "Error de conexión") -> v
 		
 func _on_volumen_toggled(button_pressed: bool) -> void:
 	Sonidos.toggle_silenciar_audio(button_pressed, "Master")
+	
+func _on_musica_toggled(button_pressed: bool) -> void:
+	Sonidos.toggle_silenciar_audio(button_pressed, "Music")

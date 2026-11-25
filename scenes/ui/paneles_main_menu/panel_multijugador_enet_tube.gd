@@ -6,11 +6,6 @@ extends PanelContainer
 @onready var sub_panel_online: Control = %PanelMultijugador
 @onready var sub_panel_local: Control = %PanelMultijugadorEnet
 
-# Botones de selección
-@onready var boton_online: TextureButton = %BotonOnline
-@onready var boton_local: TextureButton = %BotonLocal
-#@onready var boton_volver: Button = %BotonVolver
-
 # online tube
 @onready var edit_nombre_tube: LineEdit = %EditNombreTube
 @onready var edit_sesion: LineEdit = %EditSesion
@@ -26,6 +21,9 @@ extends PanelContainer
 # solo en caso de ser web, esconder modo enet
 @onready var label_web: Label = %LabelWeb
 @onready var h_box_container: HBoxContainer = %HBoxContainer
+@onready var boton_local: TouchScreenButton = %BotonLocalTouch
+@onready var boton_online: TouchScreenButton = %BotonOnlineTouch
+
 
 func _ready() -> void:
 	sub_panel_online.visible = false

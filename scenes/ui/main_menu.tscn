@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cyavwb4iw6rub" path="res://scenes/ui/main_menu.gd" id="1_sl1te"]
 [ext_resource type="Texture2D" uid="uid://b4o7vx0n8db1s" path="res://addons/tube/icons/tube_client.svg" id="2_fe2o3"]
+[ext_resource type="PackedScene" uid="uid://mqtfixjknxmy" path="res://scenes/ui/boton_touch.tscn" id="2_y1h5l"]
 [ext_resource type="PackedScene" uid="uid://yubh30707eb7" path="res://scenes/environment/world_forest.tscn" id="3_1g8jr"]
 [ext_resource type="PackedScene" uid="uid://b6hkal1627qjh" path="res://scenes/ui/texture_button.tscn" id="3_m1kxf"]
 [ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="3_wb0q5"]
@@ -16,19 +17,27 @@
 [ext_resource type="Script" uid="uid://u58yougmjulp" path="res://scenes/ui/fondo_movil.gd" id="10_otr3d"]
 [ext_resource type="Texture2D" uid="uid://dx2wxef0utuvw" path="res://assets/ui/menu/texto.png" id="11_n4uci"]
 [ext_resource type="Shader" uid="uid://bxv8phnk55knj" path="res://scenes/ui/aberracion_cromatica.gdshader" id="13_8ekit"]
-[ext_resource type="Texture2D" uid="uid://dr8nm0n8hpcqx" path="res://assets/ui/menu/sonido.png" id="16_y2j7i"]
+[ext_resource type="Texture2D" uid="uid://djj4c1jkf6hj5" path="res://assets/ui/menu/atlas_botones.png" id="17_y1h5l"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dklp6"]
 shader = ExtResource("13_8ekit")
 shader_parameter/intensidad = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dklp6"]
-atlas = ExtResource("16_y2j7i")
-region = Rect2(0, 0, 826, 825)
+atlas = ExtResource("17_y1h5l")
+region = Rect2(2, 2, 237, 236)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_fodb4"]
-atlas = ExtResource("16_y2j7i")
-region = Rect2(1095, 0, 825, 825)
+[sub_resource type="AtlasTexture" id="AtlasTexture_ut8vo"]
+atlas = ExtResource("17_y1h5l")
+region = Rect2(242, 2, 237, 237)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0ki8k"]
+atlas = ExtResource("17_y1h5l")
+region = Rect2(723, 3, 237, 237)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pw7m1"]
+atlas = ExtResource("17_y1h5l")
+region = Rect2(483, 3, 237, 237)
 
 [node name="MainMenu" type="CanvasLayer" unique_id=1482325763]
 script = ExtResource("1_sl1te")
@@ -42,8 +51,37 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="BotonLocalTouch" parent="Control" unique_id=1249943919 instance=ExtResource("2_y1h5l")]
+unique_name_in_owner = true
+position = Vector2(610, 312)
+
+[node name="Label" type="Label" parent="Control/BotonLocalTouch" unique_id=1871888394]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Local"
+label_settings = ExtResource("4_q85j6")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BotonOnlineTouch" parent="Control" unique_id=1492977940 instance=ExtResource("2_y1h5l")]
+unique_name_in_owner = true
+position = Vector2(614, 210)
+
+[node name="Label" type="Label" parent="Control/BotonOnlineTouch" unique_id=1098263411]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Online"
+label_settings = ExtResource("4_q85j6")
+
 [node name="BotonOnline" parent="Control" unique_id=1088779155 instance=ExtResource("3_m1kxf")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.707
@@ -52,14 +90,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 38.53601
 offset_top = 14.8880005
-offset_right = -87.0
-offset_bottom = -20.0
+offset_right = 38.53601
+offset_bottom = 14.887939
 grow_horizontal = 0
 grow_vertical = 0
 texto = "Online"
 
 [node name="BotonLocal" parent="Control" unique_id=208812627 instance=ExtResource("3_m1kxf")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 0
 offset_left = 529.0
 offset_top = 204.0
@@ -588,8 +627,10 @@ texto = "SALIR"
 material = SubResource("ShaderMaterial_dklp6")
 layout_mode = 1
 anchors_preset = -1
-anchor_right = 0.5277778
-anchor_bottom = 1.0
+anchor_left = -0.0017361107
+anchor_top = 0.016975308
+anchor_right = 0.5260417
+anchor_bottom = 1.0169753
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(1.9211432, 1.031997)
@@ -619,12 +660,26 @@ unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1097.0
 offset_top = 593.0
-offset_right = 1137.0
-offset_bottom = 633.0
+offset_right = 1918.9534
+offset_bottom = 1411.4854
 scale = Vector2(0.057423208, 0.057423208)
 toggle_mode = true
 texture_normal = SubResource("AtlasTexture_dklp6")
-texture_pressed = SubResource("AtlasTexture_fodb4")
+texture_pressed = SubResource("AtlasTexture_ut8vo")
+stretch_mode = 0
+
+[node name="musica" type="TextureButton" parent="Control" unique_id=978060836]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1040.0
+offset_top = 593.0
+offset_right = 1859.4774
+offset_bottom = 1411.4854
+scale = Vector2(0.057423208, 0.057423208)
+toggle_mode = true
+texture_normal = SubResource("AtlasTexture_0ki8k")
+texture_pressed = SubResource("AtlasTexture_pw7m1")
+stretch_mode = 0
 
 [node name="MundoTemporal" parent="." unique_id=451922858 instance=ExtResource("3_1g8jr")]
 unique_name_in_owner = true

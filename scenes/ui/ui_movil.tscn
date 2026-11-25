@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bvgqf8vjq4mb1" path="res://scenes/ui/ui_movil.gd" id="1_ahvyb"]
 [ext_resource type="PackedScene" uid="uid://c6ohglddwi5dl" path="res://scenes/ui/joystick/joystick.tscn" id="2_7nd03"]
-[ext_resource type="Texture2D" uid="uid://u0dmicrdqtvj" path="res://assets/ui/atlas_botones.png" id="3_7nd03"]
+[ext_resource type="Texture2D" uid="uid://djj4c1jkf6hj5" path="res://assets/ui/menu/atlas_botones.png" id="3_qjrit"]
 [ext_resource type="Texture2D" uid="uid://cpq2nnp1n1dou" path="res://assets/ui/lobby/armas/armas1.png" id="4_5ya24"]
 [ext_resource type="Texture2D" uid="uid://bsv8h60l5go3b" path="res://assets/ui/menu/4.png" id="4_qjrit"]
 [ext_resource type="Texture2D" uid="uid://b6bp2had3p2es" path="res://assets/ui/lobby/armas/armas2.png" id="5_qjrit"]
@@ -10,21 +10,21 @@
 [ext_resource type="Texture2D" uid="uid://83egla0k7x8l" path="res://assets/ui/lobby/armas/armas4.png" id="7_0ki8k"]
 [ext_resource type="Texture2D" uid="uid://bgu0tuoa28r1t" path="res://assets/ui/lobby/armas/armas5.png" id="8_pw7m1"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_0rl2u"]
-atlas = ExtResource("3_7nd03")
-region = Rect2(33, 0, 14, 15)
+[sub_resource type="AtlasTexture" id="AtlasTexture_5dct7"]
+atlas = ExtResource("3_qjrit")
+region = Rect2(722, 242, 238, 238)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_62p37"]
-atlas = ExtResource("3_7nd03")
-region = Rect2(49, 3, 14, 13)
+atlas = ExtResource("3_qjrit")
+region = Rect2(483, 242, 236, 238)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_4olny"]
-atlas = ExtResource("3_7nd03")
-region = Rect2(1, 0, 14, 15)
+atlas = ExtResource("3_qjrit")
+region = Rect2(242, 241, 238, 239)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_i0ncf"]
-atlas = ExtResource("3_7nd03")
-region = Rect2(17, 3, 14, 13)
+atlas = ExtResource("3_qjrit")
+region = Rect2(2, 240, 237, 240)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_c2doj"]
 atlas = ExtResource("4_qjrit")
@@ -37,35 +37,43 @@ region = Rect2(3310, 1389, 178, 178)
 [node name="UIMovil" type="CanvasLayer" unique_id=2004051786]
 script = ExtResource("1_ahvyb")
 
-[node name="Joystick" parent="." unique_id=254397830 instance=ExtResource("2_7nd03")]
+[node name="HUD" type="Control" parent="." unique_id=657479289]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Joystick" parent="HUD" unique_id=254397830 instance=ExtResource("2_7nd03")]
 unique_name_in_owner = true
 position = Vector2(165, 505)
 
-[node name="TouchButtonRevivir" type="TouchScreenButton" parent="." unique_id=1375605167]
+[node name="TouchButtonRevivir" type="TouchScreenButton" parent="HUD" unique_id=1375605167]
 unique_name_in_owner = true
-position = Vector2(1048, 496)
-scale = Vector2(6.8571434, 5.8285723)
-texture_normal = SubResource("AtlasTexture_0rl2u")
+position = Vector2(1034, 473)
+scale = Vector2(0.43697473, 0.37142855)
+texture_normal = SubResource("AtlasTexture_5dct7")
 texture_pressed = SubResource("AtlasTexture_62p37")
 action = "ayudar"
 
-[node name="TouchButtonHabilidad" type="TouchScreenButton" parent="." unique_id=1662281386]
+[node name="TouchButtonHabilidad" type="TouchScreenButton" parent="HUD" unique_id=1662281386]
 unique_name_in_owner = true
-position = Vector2(1048, 376.00003)
-scale = Vector2(6.857134, 6.1321425)
+position = Vector2(1033, 364)
+scale = Vector2(0.43697459, 0.39077404)
 texture_normal = SubResource("AtlasTexture_4olny")
 texture_pressed = SubResource("AtlasTexture_i0ncf")
 action = "habilidad"
 
-[node name="TouchButtonArma1" type="TouchScreenButton" parent="." unique_id=468624825]
+[node name="TouchButtonArma1" type="TouchScreenButton" parent="HUD" unique_id=468624825]
 unique_name_in_owner = true
-position = Vector2(484.00015, 552.00006)
+position = Vector2(382.00015, 552.00006)
 scale = Vector2(0.38497642, 0.33898315)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
 action = "slot_1"
 
-[node name="TextureRect" type="TextureRect" parent="TouchButtonArma1" unique_id=467310383]
+[node name="TextureRect" type="TextureRect" parent="HUD/TouchButtonArma1" unique_id=467310383]
 anchors_preset = -1
 anchor_right = 1.3395165
 anchor_bottom = 0.870589
@@ -78,15 +86,15 @@ expand_mode = 3
 stretch_mode = 4
 metadata/_edit_use_anchors_ = true
 
-[node name="TouchButtonArma2" type="TouchScreenButton" parent="." unique_id=1037870599]
+[node name="TouchButtonArma2" type="TouchScreenButton" parent="HUD" unique_id=1037870599]
 unique_name_in_owner = true
-position = Vector2(571.00006, 552)
+position = Vector2(469.00003, 552)
 scale = Vector2(0.37558684, 0.33898324)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
 action = "slot_2"
 
-[node name="TextureRect2" type="TextureRect" parent="TouchButtonArma2" unique_id=748605486]
+[node name="TextureRect2" type="TextureRect" parent="HUD/TouchButtonArma2" unique_id=748605486]
 anchors_preset = -1
 anchor_left = -0.26000002
 anchor_top = 0.23400001
@@ -101,15 +109,15 @@ expand_mode = 3
 stretch_mode = 4
 metadata/_edit_use_anchors_ = true
 
-[node name="TouchButtonArma3" type="TouchScreenButton" parent="." unique_id=1159654699]
+[node name="TouchButtonArma3" type="TouchScreenButton" parent="HUD" unique_id=1159654699]
 unique_name_in_owner = true
-position = Vector2(657.00006, 552)
+position = Vector2(555, 552)
 scale = Vector2(0.37558693, 0.35593227)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
 action = "slot_3"
 
-[node name="TextureRect3" type="TextureRect" parent="TouchButtonArma3" unique_id=1439427713]
+[node name="TextureRect3" type="TextureRect" parent="HUD/TouchButtonArma3" unique_id=1439427713]
 anchors_preset = -1
 anchor_left = -0.27600002
 anchor_top = 0.17
@@ -124,15 +132,15 @@ expand_mode = 3
 stretch_mode = 4
 metadata/_edit_use_anchors_ = true
 
-[node name="TouchButtonArma4" type="TouchScreenButton" parent="." unique_id=295075730]
+[node name="TouchButtonArma4" type="TouchScreenButton" parent="HUD" unique_id=295075730]
 unique_name_in_owner = true
-position = Vector2(742.0001, 552.00006)
+position = Vector2(640.0001, 552.00006)
 scale = Vector2(0.38733777, 0.3559319)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
 action = "slot_4"
 
-[node name="TextureRect4" type="TextureRect" parent="TouchButtonArma4" unique_id=1580475648]
+[node name="TextureRect4" type="TextureRect" parent="HUD/TouchButtonArma4" unique_id=1580475648]
 anchors_preset = -1
 anchor_left = -0.35700002
 anchor_top = 0.23400001
@@ -147,38 +155,38 @@ expand_mode = 3
 stretch_mode = 4
 metadata/_edit_use_anchors_ = true
 
-[node name="TouchButtonArma5" type="TouchScreenButton" parent="." unique_id=1440174017]
+[node name="TouchButtonArma5" type="TouchScreenButton" parent="HUD" unique_id=1440174017]
 unique_name_in_owner = true
-position = Vector2(827.9999, 552.00006)
+position = Vector2(725.9999, 552.00006)
 scale = Vector2(0.38733768, 0.35593188)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
 action = "slot_5"
 
-[node name="TextureRect5" type="TextureRect" parent="TouchButtonArma5" unique_id=1333026580]
+[node name="TextureRect5" type="TextureRect" parent="HUD/TouchButtonArma5" unique_id=1333026580]
 anchors_preset = -1
-anchor_left = -0.19500001
-anchor_top = 0.23400001
-anchor_right = 1.251
+anchor_left = -0.195
+anchor_top = 0.107015856
+anchor_right = 1.5988935
 anchor_bottom = 0.82800007
-offset_left = -20.42651
+offset_left = -41.080326
 offset_top = 3.534298
-offset_right = -20.429901
+offset_right = -41.08371
 offset_bottom = 3.5661163
 texture = ExtResource("8_pw7m1")
 expand_mode = 3
 stretch_mode = 4
 metadata/_edit_use_anchors_ = true
 
-[node name="TouchButtonArma6" type="TouchScreenButton" parent="." unique_id=52996839]
+[node name="TouchButtonArma6" type="TouchScreenButton" parent="HUD" unique_id=52996839]
 unique_name_in_owner = true
-position = Vector2(920.00006, 552)
+position = Vector2(818.0001, 552.00006)
 scale = Vector2(0.3755867, 0.35593188)
 texture_normal = SubResource("AtlasTexture_c2doj")
 texture_pressed = SubResource("AtlasTexture_a8hm0")
 action = "slot_6"
 
-[node name="TextureRect6" type="TextureRect" parent="TouchButtonArma6" unique_id=406255145]
+[node name="TextureRect6" type="TextureRect" parent="HUD/TouchButtonArma6" unique_id=406255145]
 anchors_preset = -1
 anchor_top = -0.040123455
 anchor_right = 0.039051373

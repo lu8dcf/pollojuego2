@@ -18,6 +18,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
 
 [node name="BotonEmpezar" parent="." unique_id=1660084449 instance=ExtResource("3_rqagm")]
 unique_name_in_owner = true
@@ -44,6 +45,7 @@ offset_right = -0.55200195
 offset_bottom = -0.072021484
 grow_horizontal = 0
 grow_vertical = 0
+metadata/_edit_use_anchors_ = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginBotonEmpezar" unique_id=528599260]
 layout_mode = 2
@@ -59,6 +61,7 @@ vertical_alignment = 1
 [node name="MarginBoton" type="MarginContainer" parent="." unique_id=753761136]
 offset_right = 219.0
 offset_bottom = 60.0
+metadata/_edit_use_anchors_ = true
 
 [node name="RegresarBoton" parent="MarginBoton" unique_id=1088779155 instance=ExtResource("3_rqagm")]
 layout_mode = 2
@@ -69,10 +72,11 @@ metadata/_edit_use_anchors_ = true
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -45.0
-offset_right = 45.0
+offset_left = -299.5
+offset_right = 391.5
 offset_bottom = 60.0
 grow_horizontal = 2
+metadata/_edit_use_anchors_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginTitulo" unique_id=775771326]
 layout_mode = 2
@@ -131,6 +135,7 @@ offset_top = -8.840027
 offset_right = -27.432007
 offset_bottom = -9.0
 grow_vertical = 0
+metadata/_edit_use_anchors_ = true
 
 [node name="ChatHistorial" type="RichTextLabel" parent="." unique_id=689493186]
 unique_name_in_owner = true
@@ -147,6 +152,7 @@ theme_override_colors/default_color = Color(1, 1, 1, 1)
 theme_override_colors/table_border = Color(0.15686275, 0, 0, 0)
 theme_override_fonts/normal_font = ExtResource("5_rqagm")
 theme_override_styles/normal = SubResource("StyleBoxFlat_2rbxb")
+metadata/_edit_use_anchors_ = true
 
 [node name="ChatEnviar" type="Button" parent="." unique_id=1562956397]
 unique_name_in_owner = true
@@ -164,3 +170,4 @@ theme_override_font_sizes/font_size = 11
 text = "Enviar"
 
 [connection signal="pressed" from="MarginBoton/RegresarBoton" to="." method="_on_regresar_boton_pressed"]
+[connection signal="text_changed" from="ChatInput" to="." method="_on_chat_input_text_changed"]

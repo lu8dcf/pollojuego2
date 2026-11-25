@@ -180,6 +180,7 @@ func morir():
 	murio = true
 	$CollisionShape3D.disabled = true  # elimino la collision
 	crearItem()
+	Sonidos.sonidoMuerteBicho() # sonido de la muerte del bicho
 	_efecto_muerte()
 		
 	

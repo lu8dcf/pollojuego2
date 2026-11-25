@@ -31,7 +31,7 @@ var paneles_usuarios:Dictionary = {}
 @onready var label_ping: Label = %LabelPing
 
 # panel de ui mobile
-const PANEL_UI_MOVIL = preload("uid://wsf5ahon4ims")
+const PANEL_UI_MOVIL = preload("res://scenes/ui/ui_movil.tscn")
 
 # panel de tienda
 var tienda_actual = null

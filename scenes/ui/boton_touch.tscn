@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://mqtfixjknxmy"]
+
+[ext_resource type="Script" uid="uid://bfbj4opiygom2" path="res://scripts/ui/boton_touch.gd" id="1_pjyxg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_y1h5l"]
+size = Vector2(200, 60)
+
+[node name="BotonTouch" type="TouchScreenButton" unique_id=1249943919]
+shape = SubResource("RectangleShape2D_y1h5l")
+script = ExtResource("1_pjyxg")
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]

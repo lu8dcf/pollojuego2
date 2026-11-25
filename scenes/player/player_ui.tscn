@@ -66,8 +66,18 @@ shader_parameter/progress = 0.0
 process_mode = 3
 script = ExtResource("1_m6sn8")
 
-[node name="LabelFPS" type="Label" parent="." unique_id=165403976]
+[node name="HUD" type="Control" parent="." unique_id=955347733]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="LabelFPS" type="Label" parent="HUD" unique_id=165403976]
 unique_name_in_owner = true
+layout_mode = 0
 offset_right = 94.0
 offset_bottom = 20.0
 text = "fps:"
@@ -83,6 +93,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
 
 [node name="MarginContainer" type="MarginContainer" parent="Menu" unique_id=682346232]
 layout_mode = 0
@@ -117,6 +128,7 @@ offset_left = 74.0
 offset_top = 8.0
 offset_right = 337.0
 offset_bottom = 48.0
+metadata/_edit_use_anchors_ = true
 
 [node name="ListaUsuarios" type="HBoxContainer" parent="UsuariosVida" unique_id=970163798]
 unique_name_in_owner = true
@@ -136,6 +148,7 @@ theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
+metadata/_edit_use_anchors_ = true
 
 [node name="ControlVida" type="VBoxContainer" parent="ArribaCentro" unique_id=1544861557]
 unique_name_in_owner = true
@@ -207,6 +220,7 @@ theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
+metadata/_edit_use_anchors_ = true
 
 [node name="ControlsRoot" type="VBoxContainer" parent="TopLeft" unique_id=927941885]
 unique_name_in_owner = true
@@ -255,6 +269,7 @@ offset_right = -0.13604736
 offset_bottom = 0.24798584
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
 
 [node name="PanelContainer" type="PanelContainer" parent="Pausa" unique_id=1799027910]
 layout_mode = 2
@@ -295,3 +310,4 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+metadata/_edit_use_anchors_ = true

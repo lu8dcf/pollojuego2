@@ -8,11 +8,14 @@
 [ext_resource type="Texture2D" uid="uid://c31q5hfwsb75k" path="res://assets/ui/lobby/personajes/idle3.png" id="5_7rgl2"]
 [ext_resource type="Texture2D" uid="uid://crbrs4ib5uc28" path="res://assets/ui/lobby/personajes/idle4.png" id="6_bmp6k"]
 [ext_resource type="Texture2D" uid="uid://cd85mjdrm67ti" path="res://assets/ui/lobby/personajes/idle5.png" id="7_atqr2"]
+[ext_resource type="Texture2D" uid="uid://83egla0k7x8l" path="res://assets/ui/lobby/armas/armas4.png" id="7_cxe5k"]
 [ext_resource type="Texture2D" uid="uid://b1t8eqspo4bb6" path="res://assets/keyboard-&-mouse_sheet_default.png" id="8_bmp6k"]
+[ext_resource type="Texture2D" uid="uid://bgu0tuoa28r1t" path="res://assets/ui/lobby/armas/armas5.png" id="8_gcqmv"]
 [ext_resource type="Texture2D" uid="uid://cpq2nnp1n1dou" path="res://assets/ui/lobby/armas/armas1.png" id="10_e002p"]
 [ext_resource type="Texture2D" uid="uid://b6bp2had3p2es" path="res://assets/ui/lobby/armas/armas2.png" id="11_5glau"]
 [ext_resource type="Texture2D" uid="uid://berrepcqp5ej4" path="res://assets/ui/lobby/armas/armas3.png" id="12_cxe5k"]
 [ext_resource type="Texture2D" uid="uid://ctxaojw7wgybe" path="res://assets/ui/lobby/personajes/idle6.png" id="13_e002p"]
+[ext_resource type="Script" uid="uid://n7y07rnk81pb" path="res://scripts/ui/botones_personaje.gd" id="14_e002p"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8fbuy"]
 atlas = ExtResource("8_bmp6k")
@@ -22,23 +25,31 @@ region = Rect2(328, 904, 48, 48)
 atlas = ExtResource("8_bmp6k")
 region = Rect2(392, 904, 48, 48)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_iedqo"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_e002p"]
 atlas = ExtResource("10_e002p")
-region = Rect2(0, 0, 128, 128)
+region = Rect2(0, 0, 843, 296)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_lljtg"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_gyjd6"]
 atlas = ExtResource("11_5glau")
-region = Rect2(0, 0, 128, 128)
+region = Rect2(0, 0, 1422, 500)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_2bsgv"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_h5sui"]
 atlas = ExtResource("12_cxe5k")
-region = Rect2(0, 0, 128, 128)
+region = Rect2(0, 0, 1422, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a5r5q"]
+atlas = ExtResource("7_cxe5k")
+region = Rect2(0, 0, 1422, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lc556"]
+atlas = ExtResource("8_gcqmv")
+region = Rect2(0, 0, 1422, 500)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_62p37"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_iedqo")
+"texture": SubResource("AtlasTexture_e002p")
 }],
 "loop": 1,
 "name": &"arma1",
@@ -46,7 +57,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_lljtg")
+"texture": SubResource("AtlasTexture_gyjd6")
 }],
 "loop": 1,
 "name": &"arma2",
@@ -54,10 +65,26 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_2bsgv")
+"texture": SubResource("AtlasTexture_h5sui")
 }],
 "loop": 1,
 "name": &"arma3",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a5r5q")
+}],
+"loop": 1,
+"name": &"arma4",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lc556")
+}],
+"loop": 1,
+"name": &"arma5",
 "speed": 5.0
 }]
 
@@ -608,9 +635,9 @@ vertical_alignment = 1
 [node name="ArmaEleccion" type="TextureButton" parent="." unique_id=1328631955]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 156.0
+offset_left = 189.0
 offset_top = 45.0
-offset_right = 196.0
+offset_right = 229.0
 offset_bottom = 85.0
 texture_normal = SubResource("AtlasTexture_8fbuy")
 texture_hover = SubResource("AtlasTexture_t14ga")
@@ -619,17 +646,17 @@ stretch_mode = 0
 
 [node name="SpriteArmaMostrar" type="AnimatedSprite2D" parent="." unique_id=873614928]
 unique_name_in_owner = true
-position = Vector2(120, 64)
-scale = Vector2(0.6152344, 0.6152344)
+position = Vector2(136, 64)
+scale = Vector2(0.18752342, 0.1875234)
 sprite_frames = SubResource("SpriteFrames_62p37")
 animation = &"arma1"
 
 [node name="PersonajeEleccion" type="TextureButton" parent="." unique_id=1356171905]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 51.0
+offset_left = 18.0
 offset_top = 46.0
-offset_right = 91.0
+offset_right = 58.0
 offset_bottom = 86.0
 texture_normal = SubResource("AtlasTexture_ui5wk")
 texture_hover = SubResource("AtlasTexture_b5x2r")
@@ -668,15 +695,15 @@ grow_vertical = 2
 
 [node name="SpritePersonaje" type="AnimatedSprite2D" parent="ContenedorPersonaje" unique_id=1191032090]
 unique_name_in_owner = true
-position = Vector2(89, 38)
+position = Vector2(89.00001, 38)
 scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_0rl2u")
 animation = &"idle5"
 
 [node name="SpriteArma" type="AnimatedSprite2D" parent="ContenedorPersonaje" unique_id=1574071833]
 unique_name_in_owner = true
-position = Vector2(89, 56)
-scale = Vector2(1.125, 1.125)
+position = Vector2(94, 53.000004)
+scale = Vector2(0.310576, 0.31057596)
 sprite_frames = SubResource("SpriteFrames_62p37")
 animation = &"arma1"
 
@@ -767,6 +794,7 @@ texture_normal = SubResource("AtlasTexture_jpjro")
 texture_hover = SubResource("AtlasTexture_5h4x4")
 ignore_texture_size = true
 stretch_mode = 0
+script = ExtResource("14_e002p")
 
 [node name="CambiarAdelantePersonaje" type="TextureButton" parent="." unique_id=431456567]
 unique_name_in_owner = true
@@ -787,6 +815,7 @@ texture_normal = SubResource("AtlasTexture_s8xn3")
 texture_hover = SubResource("AtlasTexture_x6hcr")
 ignore_texture_size = true
 stretch_mode = 0
+script = ExtResource("14_e002p")
 
 [node name="IndicadorListo" type="Label" parent="." unique_id=790417070]
 layout_mode = 1
@@ -803,3 +832,5 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [connection signal="pressed" from="ContenedorBoton/EstoyListoBoton" to="." method="_on_estoy_listo_boton_pressed"]
+[connection signal="pressed" from="CambiarAtrasPersonaje" to="CambiarAtrasPersonaje" method="_on_pressed"]
+[connection signal="pressed" from="CambiarAdelantePersonaje" to="CambiarAdelantePersonaje" method="_on_pressed"]

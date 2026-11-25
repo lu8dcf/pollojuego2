@@ -3,8 +3,10 @@ extends CanvasLayer
 const PANEL_PUNTAJE = preload("res://scenes/ui/panel_puntaje.tscn")
 @onready var label_titulo: Label = %LabelTitulo
 @onready var h_box_contenedor_puntajes: HBoxContainer = %HBoxContenedorPuntajes
-@onready var boton_lobby: TextureButtonAnimado = %BotonLobby
-@onready var boton_menu: TextureButtonAnimado = %BotonMenu
+#@onready var boton_lobby: TextureButtonAnimado = %BotonLobby
+#@onready var boton_menu: TextureButtonAnimado = %BotonMenu
+@onready var boton_lobby: TouchScreenButton = %BotonLobbyTouch
+@onready var boton_menu: TouchScreenButton = %BotonMenuTouch
 
 
 func _ready() -> void:

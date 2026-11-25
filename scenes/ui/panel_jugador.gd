@@ -355,7 +355,7 @@ func marcar_no_listo():
 	esta_listo = false
 	_actualizar_indicador()
 	if estoy_listo_boton:
-		estoy_listo_boton.cambiar_texto("¿Listo?")
+		estoy_listo_boton.cambiar_texto("¿Estás Listo?")
 	_habilitar_deshabilitar_botones(false)
 	Network._notificar_estado_listo.rpc(peer_id, false)
 
@@ -366,5 +366,7 @@ func _on_estoy_listo_boton_pressed() -> void:
 	
 	if esta_listo:
 		marcar_no_listo()
+		Sonidos.sonidoClick()
 	else:
 		marcar_listo()
+		Sonidos.sonidoPing()

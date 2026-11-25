@@ -55,6 +55,9 @@ func _ready() -> void:
 	
 	if GlobalJuego.un_jugador:
 		_inicilizar_un_jugador()
+		chat_input.visible = false
+		chat_enviar.visible = false
+		chat_historial.visible = false
 		return
 	
 	# APARTADO DE MULTIJUGADOR
@@ -92,9 +95,7 @@ func _ready() -> void:
 		_enviar_mi_info_al_host()
 	
 	lobby_inicializado = true
-	if GlobalJuego.un_jugador:
-		chat_input.visible = false
-		chat_enviar.visible = false
+		
 		
 	if chat_enviar and not GlobalJuego.un_jugador:
 		chat_enviar.pressed.connect(_on_chat_enviar_pressed)
@@ -577,6 +578,7 @@ func _on_chat_enviar_pressed()->void:
 	
 	# mandamos por rpc (el host lo reemite a todos)
 	Network._enviar_mensaje_chat.rpc(texto)
+	Sonidos.sonidoClick()
 
 func _recibir_mensaje_chat(id:int,emisor_nombre:String, texto: String, es_sistema: bool) -> void:
 	if not chat_historial:
@@ -592,6 +594,7 @@ func _recibir_mensaje_chat(id:int,emisor_nombre:String, texto: String, es_sistem
 	chat_historial.append_text("[color=%s]%s:[/color] [color=%s]%s[/color]\n" % [
 		color_nombre, emisor_nombre, color_texto, texto
 	])
+	Sonidos.sonidoPing()
 
 
 func _on_regresar_boton_pressed() -> void:
@@ -730,3 +733,21 @@ func _procesar_inicio_partida():
 	"""Se llama cuando Network._iniciar_carga se dispara"""
 	partida_iniciada.emit()
 	hide()
+
+
+func _on_chat_input_text_changed() -> void:
+	if "\n" in chat_input.text:
+		# Si en PC mantienen Shift presionado, permite el salto de línea normal
+		if Input.is_key_pressed(KEY_SHIFT):
+			return
+		
+		# Quita el salto de línea que se acaba de escribir
+		chat_input.text = chat_input.text.replace("\n", "")
+		
+		# Envía el mensaje si no está vacío
+		if chat_input.text.strip_edges() != "":
+			_on_chat_enviar_pressed()
+		else:
+			# Mantiene el cursor al final si estaba vacío
+			chat_input.set_caret_column(chat_input.text.length())
+			
