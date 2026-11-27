@@ -163,6 +163,7 @@ func _mostrar_un_jugador():
 
 func _crear_partida_un_jugador() -> void:
 	GlobalJuego.un_jugador = true
+	GlobalJuego.session_info = {}
 	_deactivate_menu_camera()
 	
 	_mostrar_pantalla_carga("Creando Juego para un solo jugador...")
@@ -211,6 +212,8 @@ func _on_unirse_lan(ip: String, puerto: int, nombre: String) -> void:
 	
 	GlobalJuego.un_jugador = false
 	_deactivate_menu_camera()
+	GlobalJuego.session_info = {}
+	
 	
 	_mostrar_pantalla_carga("Conectando a " + ip + ":" + str(puerto) + "...")
 	
