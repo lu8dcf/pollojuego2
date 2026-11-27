@@ -34,18 +34,12 @@ region = Rect2(3521, 794, 213, 177)
 atlas = ExtResource("4_qjrit")
 region = Rect2(3310, 1389, 178, 178)
 
-[node name="UIMovil" type="Control" unique_id=1052224334]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="UIMovil" type="CanvasLayer" unique_id=256246219]
 script = ExtResource("1_ahvyb")
 metadata/_edit_use_anchors_ = true
 
 [node name="HUD" type="Control" parent="." unique_id=657479289]
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

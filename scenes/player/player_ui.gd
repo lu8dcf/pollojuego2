@@ -129,7 +129,7 @@ func _ready() -> void:
 	GlobalSignal.mi_ping_actualizado.connect(_actualizar_mi_ping)
 	_actualizar_mi_ping(0)
 		
-	_verificar_si_es_mobile()
+	_actualizar_visibilidad_ui_movil()
 	await get_tree().create_timer(0.5).timeout
 	_actualizar_paneles_aliados(GlobalJuego.session_info)
 	
@@ -138,8 +138,7 @@ func _ready() -> void:
 
 func _ocultar_ui_completa() -> void:
 	hide()
-	if ui_movil_actual and is_instance_valid(ui_movil_actual):
-		ui_movil_actual.visible = false
+	_actualizar_visibilidad_ui_movil()
 
 func _mostrar_ui_completa() -> void:
 	show()
@@ -255,6 +254,7 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 			_mostrar_ui_carga()
 		GlobalJuego.FaseJuego.MENU, GlobalJuego.FaseJuego.LOBBY:
 			pass
+	_actualizar_visibilidad_ui_movil()
 	mostrar_oleada_actual()
 
 
@@ -374,11 +374,31 @@ func _get_fade_progress() -> float:
 
 
 # ===== SI ES MOBILE =====
-func _verificar_si_es_mobile() -> void:
-	if OS.has_feature("mobile"):
-		var ui_movil = preload("uid://wsf5ahon4ims")
-		var ui_movil_actual = ui_movil.instantiate()
-		add_child(ui_movil_actual)
+
+func _actualizar_visibilidad_ui_movil()->void:
+	if not ui_movil_actual or not is_instance_valid(ui_movil_actual):
+		return
+
+	# 1. Solo mobile lo ve jamás
+	if not OS.has_feature("mobile"):
+		ui_movil_actual.visible = false
+		return
+
+	# 2. Si estamos en la pantalla de perder: oculto
+	if GlobalJuego.en_pantalla_perder:
+		ui_movil_actual.visible = false
+		return
+
+	# 3. Solo se muestra en fase OLEADA (o DASH/AYUDANDO, que son sub-estados de gameplay)
+	var fase := GlobalJuego.fase_actual
+	var en_gameplay = fase == GlobalJuego.FaseJuego.OLEADA 
+
+	# 4. Si el juego está pausado, tampoco se muestra
+	if GlobalJuego.esta_pausado:
+		ui_movil_actual.visible = false
+		return
+
+	ui_movil_actual.visible = en_gameplay
 
 # ===== MANEJO DE ACTUALIZAR INFO EN PANTALLA =====
 
@@ -661,3 +681,4 @@ func _on_pausa_cambiada(esta_pausado: bool, quien_pauso: int) -> void:
 		
 		if not OS.has_feature("mobile"):
 			Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+	_actualizar_visibilidad_ui_movil()
