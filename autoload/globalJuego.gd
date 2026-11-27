@@ -42,7 +42,7 @@ var menu_abierto: bool = false
 
 # ===== TIPO DE JUEGO =====
 var duracion_oleada:float=90.0
-var duracion_tienda:float=15.0
+var duracion_tienda:float=10.0
 # estados del ciclo
 enum FaseJuego{
 	OLEADA,
@@ -220,6 +220,30 @@ func chequear_fin_multijugador():
 		Network._mostrar_pantalla_perder_rpc.rpc(puntajes)
 		print("chequeando fin multijugador es: todos muertos")
 
+
+# RESETEAR JUEGO
+# En GlobalJuego (global_juego.gd)
+func resetear_estado_partida() -> void:
+	# --- Estado de partida ---
+	oleada = 1
+	fase_actual = FaseJuego.MENU
+	fase_antes_de_pausa = FaseJuego.OLEADA
+	esta_pausado = false
+	en_pantalla_perder = false
+
+	# --- Sesión / multijugador ---
+	session_info.clear()
+	cant_jugadores = 0
+	un_jugador = true
+
+	# --- Datos del jugador local ---
+	experiencia = 0
+	experiencia_maxima = 100
+	nombre_jugador = ""
+
+	# --- Input / pausa del árbol ---
+	get_tree().paused = false
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	
 # ===== REPLICACIÓN DE RED =====
 @rpc("authority", "call_local")

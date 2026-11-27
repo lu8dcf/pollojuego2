@@ -96,10 +96,14 @@ grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="MarginContainer" type="MarginContainer" parent="Menu" unique_id=682346232]
-layout_mode = 0
-offset_left = 949.0
-offset_right = 1152.0
-offset_bottom = 57.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.82400006
+anchor_right = 1.0
+anchor_bottom = 0.08800001
+offset_left = -0.24804688
+offset_bottom = -0.02400589
+metadata/_edit_use_anchors_ = true
 
 [node name="PanelContainer" type="PanelContainer" parent="Menu/MarginContainer" unique_id=81562838]
 layout_mode = 2
@@ -302,7 +306,10 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="Fade" type="ColorRect" parent="." unique_id=539059642]
+[node name="CanvasFondoColor" type="CanvasLayer" parent="." unique_id=1030460098]
+layer = 5
+
+[node name="Fade" type="ColorRect" parent="CanvasFondoColor" unique_id=539059642]
 unique_name_in_owner = true
 material = SubResource("ShaderMaterial_mo8vb")
 anchors_preset = 15

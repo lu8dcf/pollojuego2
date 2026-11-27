@@ -600,6 +600,7 @@ func leave_server():
 	if multiplayer.multiplayer_peer:
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = null
+	GlobalJuego.resetear_estado_partida()
 	get_tree().reload_current_scene()
 
 # MANEJO DE ERRORES:
@@ -1117,7 +1118,11 @@ func host_volver_al_lobby()->void:
 
 @rpc("authority","call_local","reliable")
 func _volver_al_lobby_rpc()->void:
+	GlobalJuego.oleada = 1
+	GlobalJuego.fase_actual = GlobalJuego.FaseJuego.LOBBY
+	GlobalJuego.esta_pausado = false
 	GlobalJuego.en_pantalla_perder = false
+	GlobalJuego.fin_de_partida_disparado = false
 	
 	# resetear session_info
 	for peer_id in GlobalJuego.session_info.keys():

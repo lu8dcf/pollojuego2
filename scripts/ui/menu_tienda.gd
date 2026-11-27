@@ -1,9 +1,10 @@
-extends Control
+extends CanvasLayer
 @onready var v_box_contenedor_puntajes: VBoxContainer = %VBoxContenedorPuntajes
 
 const PANEL_TIENDA_ALIADOS = preload("res://scenes/ui/panel_tienda_aliados.tscn")
 
 func _ready() -> void:
+	print("[pantalla_tienda] _ready, conectando señales")
 	hide() # se muestra solo cuano llega la señal
 	if not GlobalSignal.tienda_abierta.is_connected(_on_oleada_terminada_tienda):
 		GlobalSignal.tienda_abierta.connect(_on_oleada_terminada_tienda)
@@ -12,7 +13,9 @@ func _ready() -> void:
 
 
 func _on_oleada_terminada_tienda(puntajes:Array):
+	print("[pantalla_tienda] señal recibida, visible antes: ", visible)
 	show()
+	print("[pantalla_tienda] visible después: ", visible)
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	for child in v_box_contenedor_puntajes.get_children():
 		v_box_contenedor_puntajes.remove_child(child)

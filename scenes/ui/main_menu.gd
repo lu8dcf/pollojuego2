@@ -47,6 +47,8 @@ var lobby_actual: CanvasLayer = null
 var _creando_tube:bool = false
 
 func _ready() -> void:
+	GlobalJuego.resetear_estado_partida()
+
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	_ocultar_todos_los_paneles()
 	conectar_botones()
@@ -148,11 +150,13 @@ func _on_pantalla_carga_cancelada() -> void:
 	if multiplayer.multiplayer_peer:
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = null
-	
+	GlobalJuego.resetear_estado_partida()
+
 	show()
 	_ocultar_todos_los_paneles()
 	_limpiar_lobby()
 	_activate_menu_camera()
+
 
 
 # ------------------------------------------------------------

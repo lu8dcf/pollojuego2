@@ -247,6 +247,11 @@ func _on_fase_cambiada(nueva_fase: int) -> void:
 			if mundo and mundo.has_method("pausar_gameplay"):
 				mundo.pausar_gameplay()
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+			var puntajes := GlobalJuego._contruir_puntajes_ordenados()
+			GlobalSignal.tienda_abierta.emit(puntajes)
+			print("se deberia de mostrar la tienda")
+			print("[PlayerUI] emitiendo tienda_abierta, hay conexiones: ", GlobalSignal.tienda_abierta.get_connections().size())
+
 
 		GlobalJuego.FaseJuego.CARGANDO:
 			_ocultar_ui_completa()
@@ -616,6 +621,7 @@ func _on_boton_pausa_pressed() -> void:
 	# Si ya está pausado y NO soy el que pausó, no permitir
 	if Network.pausa_activa and not yo_pause:
 		return
+	
 	
 	var nuevo_estado: bool = not Network.pausa_activa
 	

@@ -4,13 +4,12 @@
 [ext_resource type="LabelSettings" uid="uid://bgv5dgaftscvt" path="res://assets/fuentes/label_peque_setting.tres" id="1_kd47h"]
 [ext_resource type="LabelSettings" uid="uid://bv3bgri0yuhlq" path="res://assets/fuentes/label_setting.tres" id="2_fy1g5"]
 
-[node name="MenuTienda" type="Control" unique_id=343696155]
-layout_mode = 3
-anchors_preset = 0
+[node name="MenuTienda" type="CanvasLayer" unique_id=306812951]
+layer = 6
 script = ExtResource("1_fy1g5")
+metadata/_edit_use_anchors_ = true
 
 [node name="Label" type="Label" parent="." unique_id=756712702]
-layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -24,7 +23,6 @@ label_settings = ExtResource("2_fy1g5")
 horizontal_alignment = 1
 
 [node name="PanelInventario" type="Panel" parent="." unique_id=1765299463]
-layout_mode = 0
 offset_top = 354.0
 offset_right = 291.0
 offset_bottom = 648.0
@@ -51,7 +49,6 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="PanelTiendaArmas" type="Panel" parent="." unique_id=1349097042]
-layout_mode = 0
 offset_left = 574.0
 offset_top = 56.0
 offset_right = 1116.0
@@ -79,7 +76,6 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="PanelCombinacion" type="Panel" parent="." unique_id=2066395517]
-layout_mode = 0
 offset_left = 574.0
 offset_top = 357.0
 offset_right = 1116.0
@@ -107,7 +103,6 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="Label2" type="Label" parent="." unique_id=426791389]
-layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -122,7 +117,6 @@ label_settings = ExtResource("2_fy1g5")
 horizontal_alignment = 1
 
 [node name="PanelPersonaje" type="Panel" parent="." unique_id=112597444]
-layout_mode = 0
 offset_top = -1.0
 offset_right = 363.0
 offset_bottom = 103.0
@@ -151,7 +145,6 @@ layout_mode = 2
 columns = 2
 
 [node name="PanelAliados" type="Panel" parent="." unique_id=179909924]
-layout_mode = 0
 offset_top = 104.0
 offset_right = 363.0
 offset_bottom = 351.0
